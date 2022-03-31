@@ -121,17 +121,17 @@ class Gourmet_Food_data_Config(DefaultConfig):
     vocab_size = 50002
     word_dim = 300
 
-    r_max_len = 98
+    r_max_len = 56
 
-    u_max_r = 12
-    i_max_r = 17
+    u_max_r = 10
+    i_max_r = 29
 
-    train_data_size = 121003
-    test_data_size = 15126
-    val_data_size = 15125
+    train_data_size = 914903
+    test_data_size = 114284
+    val_data_size = 114284
 
-    user_num = 14681 + 2
-    item_num = 8713 + 2
+    user_num = 127487 + 2
+    item_num = 41320 + 2
 
     batch_size = 128
     print_step = 100
