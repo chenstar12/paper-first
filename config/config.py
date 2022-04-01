@@ -3,7 +3,7 @@ import numpy as np
 
 class DefaultConfig:
     model = 'DeepCoNN'
-    dataset = 'Digital_Music_data'
+    dataset = ''
 
     # -------------base config-----------------------#
     use_gpu = True
@@ -86,30 +86,6 @@ class DefaultConfig:
                 print("{} => {}".format(k, getattr(self, k)))
 
         print('*************************************************')
-
-
-class Digital_Music_data_Config(DefaultConfig):
-
-    def __init__(self):
-        self.set_path('Digital_Music_data')
-
-    vocab_size = 50002
-    word_dim = 300
-
-    r_max_len = 202
-
-    u_max_r = 13
-    i_max_r = 24
-
-    train_data_size = 51764
-    test_data_size = 6471
-    val_data_size = 6471
-
-    user_num = 5541 + 2
-    item_num = 3568 + 2
-
-    batch_size = 128
-    print_step = 100
 
 
 class Gourmet_Food_data_Config(DefaultConfig):
