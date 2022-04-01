@@ -16,7 +16,7 @@ class DefaultConfig:
     num_workers = 0
 
     optimizer = 'Adam'
-    weight_decay = 1e-3  # optimizer rameteri
+    weight_decay = 1e-3
     lr = 2e-3
     loss_method = 'mse'
     drop_out = 0.5
@@ -132,6 +132,31 @@ class Gourmet_Food_data_Config(DefaultConfig):
 
     user_num = 127487 + 2
     item_num = 41320 + 2
+
+    batch_size = 128
+    print_step = 100
+
+
+class Video_Games_data_Config(DefaultConfig):
+
+    def __init__(self):
+        self.dataset = 'Video_Games_data'
+        self.set_path('Video_Games_data')
+
+    vocab_size = 50002
+    word_dim = 300
+
+    r_max_len = 172
+
+    u_max_r = 10
+    i_max_r = 35
+
+    train_data_size = 397985
+    test_data_size = 49717
+    val_data_size = 49717
+
+    user_num = 55217 + 2
+    item_num = 17408 + 2
 
     batch_size = 128
     print_step = 100
