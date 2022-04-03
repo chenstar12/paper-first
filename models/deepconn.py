@@ -28,10 +28,10 @@ class DeepCoNN(nn.Module):
 
         user_doc = self.user_word_embs(user_doc)
         print('=============================================user_doc.weight.data.shape============================')
-        print(user_doc.weight.data.shape)
+        print(user_doc.shape)
         item_doc = self.item_word_embs(item_doc)
         print('=============================================item_doc.weight.data.shape============================')
-        print(item_doc.weight.data.shape)
+        print(item_doc.shape)
 
         u_fea = F.relu(self.user_cnn(user_doc.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
         print('u_fea.shape: ', u_fea.shape)
