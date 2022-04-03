@@ -113,7 +113,7 @@ class Video_Games_data_Config(DefaultConfig):
     print_step = 100
 
 
-class Pet_data_Config(DefaultConfig):
+class Pet_Supplies_data_Config(DefaultConfig):
 
     def __init__(self):
         self.dataset = 'Pet_Supplies_data'
