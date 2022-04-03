@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import torch
 import torch.nn as nn
 import numpy as np
@@ -10,6 +8,7 @@ class NARRE(nn.Module):
     '''
     NARRE: WWW 2018
     '''
+
     def __init__(self, opt):
         super(NARRE, self).__init__()
         self.opt = opt

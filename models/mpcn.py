@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import torch
 import torch.nn as nn
 import numpy as np
@@ -11,6 +9,7 @@ class MPCN(nn.Module):
     Multi-Pointer Co-Attention Network for Recommendation
     WWW 2018
     '''
+
     def __init__(self, opt, head=3):
         '''
         head: the number of pointers
@@ -66,13 +65,13 @@ class MPCN(nn.Module):
             w_coatt = self.word_coatt[i]
 
             # ------------------review-level co-attention ---------------------------------
-            p_u, p_i = r_coatt(u_reviews, i_reviews)             # B * L1/2 * 1
+            p_u, p_i = r_coatt(u_reviews, i_reviews)  # B * L1/2 * 1
             # ------------------word-level co-attention ---------------------------------
-            u_r_words = user_reviews.permute(0, 2, 1).float().bmm(p_u)   # (B * N * L1) X (B * L1 * 1)
-            i_r_words = item_reviews.permute(0, 2, 1).float().bmm(p_i)   # (B * N * L2) X (B * L2 * 1)
+            u_r_words = user_reviews.permute(0, 2, 1).float().bmm(p_u)  # (B * N * L1) X (B * L1 * 1)
+            i_r_words = item_reviews.permute(0, 2, 1).float().bmm(p_i)  # (B * N * L2) X (B * L2 * 1)
             u_words = self.user_word_embs(u_r_words.squeeze(2).long())  # B * N * d
             i_words = self.item_word_embs(i_r_words.squeeze(2).long())  # B * N * d
-            p_u, p_i = w_coatt(u_words, i_words)                 # B * N * 1
+            p_u, p_i = w_coatt(u_words, i_words)  # B * N * 1
             u_w_fea = u_words.permute(0, 2, 1).bmm(p_u).squeeze(2)
             i_w_fea = u_words.permute(0, 2, 1).bmm(p_i).squeeze(2)
             u_fea.append(u_w_fea)
@@ -114,6 +113,7 @@ class Co_Attention(nn.Module):
     review-level and word-level co-attention module
     Eq (2,3, 10,11)
     '''
+
     def __init__(self, dim, gumbel, pooling):
         super(Co_Attention, self).__init__()
         self.gumbel = gumbel

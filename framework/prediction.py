@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,12 +5,13 @@ import torch.nn.functional as F
 
 class PredictionLayer(nn.Module):
     '''
-        Rating Prediciton Methods
+        Rating Prediciton(i.e., a regression layer),we pre-define the following rating prediction layers:
         - LFM: Latent Factor Model
         - (N)FM: (Neural) Factorization Machine
         - MLP
         - SUM
     '''
+
     def __init__(self, opt):
         super(PredictionLayer, self).__init__()
         self.output = opt.output
@@ -65,6 +64,7 @@ class NFM(nn.Module):
     '''
     Neural FM
     '''
+
     def __init__(self, dim):
         super(NFM, self).__init__()
         self.dim = dim

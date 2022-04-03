@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -11,10 +9,11 @@ class D_ATTN(nn.Module):
     Interpretable Convolutional Neural Networks with Dual Local and Global Attention for Review Rating Prediction
     Rescys 2017
     '''
+
     def __init__(self, opt):
         super(D_ATTN, self).__init__()
         self.opt = opt
-        self.num_fea = 1   # Document
+        self.num_fea = 1  # Document
 
         self.user_net = Net(opt, 'user')
         self.item_net = Net(opt, 'item')
@@ -49,7 +48,7 @@ class Net(nn.Module):
         docs = self.word_embs(docs)  # size * 300
         local_fea = self.local_att(docs)
         global_fea = self.global_att(docs)
-        r_fea = torch.cat([local_fea]+global_fea, 1)
+        r_fea = torch.cat([local_fea] + global_fea, 1)
         r_fea = self.dropout(r_fea)
         r_fea = self.fc(r_fea)
 
@@ -79,7 +78,7 @@ class LocalAttention(nn.Module):
     def __init__(self, seq_len, win_size, emb_size, filters_num):
         super(LocalAttention, self).__init__()
         self.att_conv = nn.Sequential(
-            nn.Conv2d(1, 1, kernel_size=(win_size, emb_size), padding=((win_size-1)//2, 0)),
+            nn.Conv2d(1, 1, kernel_size=(win_size, emb_size), padding=((win_size - 1) // 2, 0)),
             nn.Sigmoid()
         )
         self.cnn = nn.Conv2d(1, filters_num, kernel_size=(1, emb_size))
