@@ -12,13 +12,17 @@ class DeepCoNN(nn.Module):
         self.num_fea = 1  # DOC
 
         self.user_word_embs = nn.Embedding(opt.vocab_size, opt.word_dim)  # vocab_size * 300
+        print('================================embedding========================================')
+        print('user_word_embs', self.user_word_embs.shape)
         self.item_word_embs = nn.Embedding(opt.vocab_size, opt.word_dim)  # vocab_size * 300
+        print('================================embedding========================================')
+        print('item_word_embs', self.item_word_embs.shape)
         # 输出通道数 ---- opt.filters_num ---- 100； 卷积核大小 ---- (3,300)
         self.user_cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
         self.item_cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
 
         self.user_fc_linear = nn.Linear(opt.filters_num, opt.fc_dim)
-        self.item_fc_linear = nn.Linear(opt.filters_num, opt.fc_dim)
+        self.item_fc_linear = nn.Linear(opt.filters_num, opt.fc_dim)  # 100,32
         self.dropout = nn.Dropout(self.opt.drop_out)
 
         self.reset_para()  # 模型参数 ---- 初始化！！！
@@ -27,10 +31,10 @@ class DeepCoNN(nn.Module):
         _, _, uids, iids, _, _, user_doc, item_doc = datas
 
         user_doc = self.user_word_embs(user_doc)
-        print('=============================================user_doc.weight.data.shape============================')
+        print('=============================================user_doc.shape============================')
         print(user_doc.shape)
         item_doc = self.item_word_embs(item_doc)
-        print('=============================================item_doc.weight.data.shape============================')
+        print('=============================================item_doc.shape============================')
         print(item_doc.shape)
 
         u_fea = F.relu(self.user_cnn(user_doc.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
@@ -48,8 +52,8 @@ class DeepCoNN(nn.Module):
 
         i_fea = self.dropout(self.item_fc_linear(i_fea))
         print('fc i_fea.shape: ', i_fea.shape)
-        print('stack u:', torch.stack([u_fea], 1))
-        print('stack i:', torch.stack([i_fea], 1))
+        print('stack u:', torch.stack([u_fea], 1).shape)
+        print('stack i:', torch.stack([i_fea], 1).shape)
         return torch.stack([u_fea], 1), torch.stack([i_fea], 1)
 
     def reset_para(self):
