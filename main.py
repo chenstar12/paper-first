@@ -26,7 +26,7 @@ def collate_fn(batch):
 
 def train(**kwargs):
     if 'dataset' not in kwargs:
-        opt = getattr(config, 'Digital_Music_data_Config')()
+        opt = getattr(config, 'Video_Games_data_Config')()
     else:
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)
@@ -121,14 +121,14 @@ def train(**kwargs):
             best_res = val_mse
         print("*" * 30)
 
-    print("----" * 20)
+    print("----" * 150)
     print(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
-    print("----" * 20)
+    print("----" * 150)
 
 
 def test(**kwargs):
     if 'dataset' not in kwargs:
-        opt = getattr(config, 'Digital_Music_data_Config')()
+        opt = getattr(config, 'Video_Games_data_Config')()
     else:
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)

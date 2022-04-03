@@ -7,7 +7,7 @@ class DefaultConfig:
 
     # -------------base config-----------------------#
     use_gpu = True
-    gpu_id = 1
+    gpu_id = 0
     multi_gpu = False
     gpu_ids = []
 
@@ -40,7 +40,7 @@ class DefaultConfig:
     ui_merge = 'cat'  # cat/add/dot
     output = 'lfm'  # 'fm', 'lfm', 'other: sum the ui_feature'
 
-    fine_step = False  # save mode in step level, defualt in epoch
+    fine_step = False  # save mode in step level, default in epoch
     pth_path = ""  # the saved pth path for test
     print_opt = 'default'
 

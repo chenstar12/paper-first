@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import torch
 import torch.nn as nn
 import numpy as np
@@ -10,6 +8,7 @@ class DAML(nn.Module):
     '''
     KDD 2019 DAML
     '''
+
     def __init__(self, opt):
         super(DAML, self).__init__()
 
@@ -68,7 +67,7 @@ class DAML(nn.Module):
         iid_emb = self.iid_embedding(iids)
 
         use_fea = torch.stack([user_doc_fea, uid_emb], 1)
-        item_fea = torch.stack([item_doc_fea,  iid_emb], 1)
+        item_fea = torch.stack([item_doc_fea, iid_emb], 1)
 
         return use_fea, item_fea
 
