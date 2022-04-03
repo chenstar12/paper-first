@@ -23,19 +23,18 @@ class DeepCoNN(nn.Module):
 
         self.reset_para()  # 模型参数 ---- 初始化！！！
 
-    def forward(self, datas):
+    def forward(self, datas): # 依次调用各nn.Module子类的forward函数
         _, _, uids, iids, _, _, user_doc, item_doc = datas  # user_doc形状：torch.Size([128, 500])
 
         # 调用Embedding类的forward函数（F.embedding查找表）： torch.Size([50002, 300]) -> torch.Size([128, 500, 300])
         user_doc = self.user_word_embs(user_doc)  # torch.Size([128, 500, 300])
         item_doc = self.item_word_embs(item_doc)  # torch.Size([128, 500, 300])
-
+        # unsqueeze(1): [128,500,300] -> [128,1,500,300]; cnn+squeeze: [] -> [128,100,498]
         u_fea = F.relu(self.user_cnn(user_doc.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
-        print(user_doc.unsqueeze(1))
-        print('shape:::::::::::::::',u_fea.shape)
         i_fea = F.relu(self.item_cnn(item_doc.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
 
         u_fea = F.max_pool1d(u_fea, u_fea.size(2)).squeeze(2)
+        print('----------',u_fea.shape)
         i_fea = F.max_pool1d(i_fea, i_fea.size(2)).squeeze(2)
 
         u_fea = self.dropout(self.user_fc_linear(u_fea))
