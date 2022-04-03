@@ -36,6 +36,7 @@ class DeepCoNN(nn.Module):
         u_fea = F.max_pool1d(u_fea, u_fea.size(2)).squeeze(2)
         print('----------', u_fea.shape)
         print('----------', u_fea.shape)
+        print('----------', u_fea.shape)
         i_fea = F.max_pool1d(i_fea, i_fea.size(2)).squeeze(2)
 
         u_fea = self.dropout(self.user_fc_linear(u_fea))
