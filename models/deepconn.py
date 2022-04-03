@@ -13,10 +13,10 @@ class DeepCoNN(nn.Module):
 
         self.user_word_embs = nn.Embedding(opt.vocab_size, opt.word_dim)  # vocab_size * 300
         print('================================embedding========================================')
-        print('user_word_embs', self.user_word_embs.shape)
+        print('user_word_embs', self.user_word_embs.weight.data.shape)
         self.item_word_embs = nn.Embedding(opt.vocab_size, opt.word_dim)  # vocab_size * 300
         print('================================embedding========================================')
-        print('item_word_embs', self.item_word_embs.shape)
+        print('item_word_embs', self.item_word_embs.weight.data.shape)
         # 输出通道数 ---- opt.filters_num ---- 100； 卷积核大小 ---- (3,300)
         self.user_cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
         self.item_cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
