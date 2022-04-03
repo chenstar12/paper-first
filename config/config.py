@@ -88,31 +88,6 @@ class DefaultConfig:
         print('*************************************************')
 
 
-class Gourmet_Food_data_Config(DefaultConfig):
-
-    def __init__(self):
-        self.dataset = 'Gourmet_Food_data'
-        self.set_path('Gourmet_Food_data')
-
-    vocab_size = 50002
-    word_dim = 300
-
-    r_max_len = 56
-
-    u_max_r = 10
-    i_max_r = 29
-
-    train_data_size = 914903
-    test_data_size = 114284
-    val_data_size = 114284
-
-    user_num = 127487 + 2
-    item_num = 41320 + 2
-
-    batch_size = 128
-    print_step = 100
-
-
 class Video_Games_data_Config(DefaultConfig):
 
     def __init__(self):
@@ -122,17 +97,42 @@ class Video_Games_data_Config(DefaultConfig):
     vocab_size = 50002
     word_dim = 300
 
-    r_max_len = 172
+    r_max_len = 214
 
     u_max_r = 10
-    i_max_r = 35
+    i_max_r = 27
 
-    train_data_size = 397985
-    test_data_size = 49717
-    val_data_size = 49717
+    train_data_size = 185439
+    test_data_size = 23171
+    val_data_size = 23170
 
-    user_num = 55217 + 2
-    item_num = 17408 + 2
+    user_num = 24303 + 2
+    item_num = 10672 + 2
+
+    batch_size = 128
+    print_step = 100
+
+
+class Pet_data_Config(DefaultConfig):
+
+    def __init__(self):
+        self.dataset = 'Pet_Supplies_data'
+        self.set_path('Pet_Supplies_data')
+
+    vocab_size = 50002
+    word_dim = 300
+
+    r_max_len = 95
+
+    u_max_r = 9
+    i_max_r = 22
+
+    train_data_size = 126283
+    test_data_size = 15777
+    val_data_size = 15776
+
+    user_num = 19856 + 2
+    item_num = 8510 + 2
 
     batch_size = 128
     print_step = 100
