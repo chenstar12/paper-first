@@ -24,7 +24,9 @@ class DeepCoNN(nn.Module):
         self.reset_para()  # 模型参数 ---- 初始化！！！
 
     def forward(self, datas):
-        _, _, uids, iids, _, _, user_doc, item_doc = datas
+        _, _, uids, iids, _, _, user_doc, item_doc = datas  # user_doc:
+        print('=' * 50)
+        print(user_doc.shape)
 
         user_doc = self.user_word_embs(user_doc)  # 调用了Embedding类的forward函数 -> torch.Size([128, 500, 300])
 
@@ -52,11 +54,7 @@ class DeepCoNN(nn.Module):
             nn.init.constant_(fc.bias, 0.1)
 
         if self.opt.use_word_embedding:
-            w2v = torch.from_numpy(np.load(self.opt.w2v_path))
-            print('==============================w2v===================================')
-            print(w2v)
-            print('==============================opt.w2v_path===================================')
-            print(np.load(self.opt.w2v_path).shape)
+            w2v = torch.from_numpy(np.load(self.opt.w2v_path))  # w2v: torch.Size([50002, 300])
             if self.opt.use_gpu:
                 self.user_word_embs.weight.data.copy_(w2v.cuda())
                 self.item_word_embs.weight.data.copy_(w2v.cuda())
