@@ -38,13 +38,12 @@ class FusionLayer(nn.Module):
         # 后：user和item的融合
         if self.opt.ui_merge == 'cat':
             out = torch.cat([u_out, i_out], 1)
-            print(out.shpape)
+            print(out.shape)
         elif self.opt.ui_merge == 'add':
             out = u_out + i_out
         else:
             out = u_out * i_out
-        # out = self.drop_out(out)
-        # return F.relu(self.linear(out))
+
         return out
 
 
