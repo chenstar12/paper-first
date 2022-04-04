@@ -77,8 +77,7 @@ def train(**kwargs):
                 scores = torch.FloatTensor(scores).cuda()
             else:
                 scores = torch.FloatTensor(scores)
-            print('batch train_datas:')
-            print(train_datas)
+
             train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
 
             optimizer.zero_grad()
@@ -99,6 +98,7 @@ def train(**kwargs):
                 loss = smooth_mae_loss
             loss.backward()
             optimizer.step()
+            if idx % 50 == 0: print("\t{}, {} step;".format(now(), idx))
             if opt.fine_step:  # 默认False。。。。。
                 if idx % opt.print_step == 0 and idx > 0:
                     print("\t{}, {} step finised;".format(now(), idx))
