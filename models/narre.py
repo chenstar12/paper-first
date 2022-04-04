@@ -40,12 +40,12 @@ class Net(nn.Module):
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # vocab_size * 300
         self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)
 
+        self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
+
         self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
-
-        self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
@@ -56,15 +56,19 @@ class Net(nn.Module):
         bs, r_num, r_len, wd = reviews.size()
         reviews = reviews.view(-1, r_len, wd)  # [1280, 214, 300]
 
-        id_emb = self.id_embedding(ids)
-        print(id_emb.shape)
-        u_i_id_emb = self.u_i_id_embedding(ids_list)
-        print(u_i_id_emb.shape)
+        id_emb = self.id_embedding(ids)  # torch.Size([128, 32])
+        u_i_id_emb = self.u_i_id_embedding(ids_list)  # torch.Size([128, 32])
 
         # --------cnn for review--------------------
         fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
+        print('cnn\n')
+        print(fea.shape)
+
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)
+        print('pool\n')
+        print(fea.shape)
         fea = fea.view(-1, r_num, fea.size(1))
+        print(fea, shape)
 
         # ------------------linear attention-------------------------------
         rs_mix = F.relu(self.review_linear(fea) + self.id_linear(F.relu(u_i_id_emb)))
@@ -77,6 +81,9 @@ class Net(nn.Module):
         return torch.stack([id_emb, self.fc_layer(r_fea)], 1)
 
     def reset_para(self):
+        nn.init.uniform_(self.id_embedding.weight, a=-0.1, b=0.1)
+        nn.init.uniform_(self.u_i_id_embedding.weight, a=-0.1, b=0.1)
+
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.constant_(self.cnn.bias, 0.1)
 
@@ -98,5 +105,3 @@ class Net(nn.Module):
                 self.word_embs.weight.data.copy_(w2v)
         else:
             nn.init.xavier_normal_(self.word_embs.weight)
-        nn.init.uniform_(self.id_embedding.weight, a=-0.1, b=0.1)
-        nn.init.uniform_(self.u_i_id_embedding.weight, a=-0.1, b=0.1)
