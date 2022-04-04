@@ -19,8 +19,9 @@ class NARRE(nn.Module):
 
     def forward(self, datas):
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc = datas
-        u_fea = self.user_net(user_reviews, uids, user_item2id)
-        i_fea = self.item_net(item_reviews, iids, item_user2id)
+        u_fea = self.user_net(user_reviews, uids, user_item2id)  # 有下面Net的forward函数得：[128,2,32]
+        print(u_fea.shape)
+        i_fea = self.item_net(item_reviews, iids, item_user2id)  # [128,2,32]
         return u_fea, i_fea
 
 
@@ -75,15 +76,12 @@ class Net(nn.Module):
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 还是[128,10/27,1]
 
-        r_fea = fea * att_weight
-        print('fea')
-        print(fea.shape)
-        print('r_fea')
-        print(r_fea)
-        r_fea = r_fea.sum(1)  # 相当于池化？ -> [128,10/27]
-        print(r_fea.shape)
+        r_fea = fea * att_weight  # fea:[128, 10, 100]; 得到的r_fea也是[128, 10, 100]；原理：broadcast（最后一维的attention自动扩展到100个）
+        # print(r_fea)
+        r_fea = r_fea.sum(1)  # 每个user的10条特征相加，相当于池化？ -> [128,100]
+        # print(r_fea.shape)
         r_fea = self.dropout(r_fea)
-
+        # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([id_emb, self.fc_layer(r_fea)], 1)
 
     def reset_para(self):
