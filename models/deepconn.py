@@ -32,15 +32,13 @@ class DeepCoNN(nn.Module):
         # unsqueeze(1): [128,500,300] -> [128,1,500,300]; cnn+squeeze: [] -> [128,100,498]
         u_fea = F.relu(self.user_cnn(user_doc.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
         i_fea = F.relu(self.item_cnn(item_doc.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
-
+        # 最大池化：[] -> [128,100，1] ，squeeze(2): -> [128,100],作为fc层的输入
         u_fea = F.max_pool1d(u_fea, u_fea.size(2)).squeeze(2)
-        print('----------', u_fea.shape)
-        print('----------', u_fea.shape)
-        print('----------', u_fea.shape)
         i_fea = F.max_pool1d(i_fea, i_fea.size(2)).squeeze(2)
-
+        # fc层：[128,100] -> [128,32]
         u_fea = self.dropout(self.user_fc_linear(u_fea))
-
+        print(u_fea.shape)
+        print('==========',torch.stack([u_fea], 1).shape)
         i_fea = self.dropout(self.item_fc_linear(i_fea))
         return torch.stack([u_fea], 1), torch.stack([i_fea], 1)
 
