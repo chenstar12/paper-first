@@ -36,14 +36,14 @@ class Net(nn.Module):
             id_num = self.opt.item_num
             ui_id_num = self.opt.user_num
 
-        self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user/item num * 32
+        self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user/item num * 32,即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # vocab_size * 300
-        self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # [10或27，32]
+        self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # embedding的搜索空间：[几万，32]
 
-        self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))
+        self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
 
         self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)  # [100,32]
-        self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)
+        self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
@@ -63,17 +63,17 @@ class Net(nn.Module):
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10, 100])
 
         id_emb = self.id_embedding(ids)  # torch.Size([128, 32])
+        print(ids.shape)
+        print(id_emb.shape)
         u_i_id_emb = self.u_i_id_embedding(ids_list)  # torch.Size([128, 32])
+        print(ids_list.shape)
+        print(u_i_id_emb.shape)
 
         #  linear attention
         rs_mix = F.relu(
             self.review_linear(fea) +  # review:[128,10,100]->[128,10,32]
-            self.id_linear(F.relu(u_i_id_emb)))  # id:[128,32]->[ui_id_num,32]
-        x = F.relu(u_i_id_emb)
-        print('relu:', x.shape)
-        y = self.id_linear(x)
-        print('linear:', y.shape)
-        print('rs_mix', rs_mix.shape)
+            self.id_linear(F.relu(u_i_id_emb)))  # id:还是[128,10或27，32]
+
         att_score = self.attention_linear(rs_mix)
         att_weight = F.softmax(att_score, 1)
         r_fea = fea * att_weight
