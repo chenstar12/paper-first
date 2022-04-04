@@ -68,7 +68,7 @@ class Net(nn.Module):
         print('pool\n')
         print(fea.shape)
         fea = fea.view(-1, r_num, fea.size(1))
-        print(fea, shape)
+        print(fea.shape)
 
         # ------------------linear attention-------------------------------
         rs_mix = F.relu(self.review_linear(fea) + self.id_linear(F.relu(u_i_id_emb)))
