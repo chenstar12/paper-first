@@ -29,8 +29,7 @@ class FusionLayer(nn.Module):
             u_out = u_out + s_u_out
             i_out = i_out + s_i_out
         if self.opt.r_id_merge == 'cat':  # 默认用cat
-            u_out = u_out.reshape(u_out.size(0), -1)  # 打平
-            print('---------', u_out.shape)
+            u_out = u_out.reshape(u_out.size(0), -1)  # 打平，如：deepConn的[128,1,32]变为torch.Size([128, 32])
             i_out = i_out.reshape(i_out.size(0), -1)
         else:
             u_out = u_out.sum(1)
@@ -39,6 +38,7 @@ class FusionLayer(nn.Module):
         # 后：user和item的融合
         if self.opt.ui_merge == 'cat':
             out = torch.cat([u_out, i_out], 1)
+            print(out.shpape)
         elif self.opt.ui_merge == 'add':
             out = u_out + i_out
         else:
