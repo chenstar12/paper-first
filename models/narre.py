@@ -51,27 +51,23 @@ class Net(nn.Module):
         self.reset_para()
 
     def forward(self, reviews, ids, ids_list):
-        #  word embedding ->  [128, 10, 214, 300],其中：u_max_r = 10, r_max_len=214
-        reviews = self.word_embs(reviews)
+        #  word embedding
+        reviews = self.word_embs(
+            reviews)  # reviews:[128, 10, 214] ->  [128, 10, 214, 300],其中：u_max_r = 10, r_max_len=214
         bs, r_num, r_len, wd = reviews.size()
         reviews = reviews.view(-1, r_len, wd)  # [1280, 214, 300]
+
+        # cnn for review
+        fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)  # torch.Size([1280, 100, 212])
+        fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # torch.Size([1280, 100])
+        fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10, 100])
 
         id_emb = self.id_embedding(ids)  # torch.Size([128, 32])
         u_i_id_emb = self.u_i_id_embedding(ids_list)  # torch.Size([128, 32])
 
-        # --------cnn for review--------------------
-        fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)  # .permute(0, 2, 1)
-        print('cnn\n')
-        print(fea.shape)
-
-        fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)
-        print('pool\n')
-        print(fea.shape)
-        fea = fea.view(-1, r_num, fea.size(1))
-        print(fea.shape)
-
-        # ------------------linear attention-------------------------------
+        #  linear attention
         rs_mix = F.relu(self.review_linear(fea) + self.id_linear(F.relu(u_i_id_emb)))
+        print(rs_mix.shape)
         att_score = self.attention_linear(rs_mix)
         att_weight = F.softmax(att_score, 1)
         r_fea = fea * att_weight
@@ -81,6 +77,15 @@ class Net(nn.Module):
         return torch.stack([id_emb, self.fc_layer(r_fea)], 1)
 
     def reset_para(self):
+        if self.opt.use_word_embedding:
+            w2v = torch.from_numpy(np.load(self.opt.w2v_path))
+            if self.opt.use_gpu:
+                self.word_embs.weight.data.copy_(w2v.cuda())
+            else:
+                self.word_embs.weight.data.copy_(w2v)
+        else:
+            nn.init.xavier_normal_(self.word_embs.weight)
+
         nn.init.uniform_(self.id_embedding.weight, a=-0.1, b=0.1)
         nn.init.uniform_(self.u_i_id_embedding.weight, a=-0.1, b=0.1)
 
@@ -97,11 +102,3 @@ class Net(nn.Module):
 
         nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
-        if self.opt.use_word_embedding:
-            w2v = torch.from_numpy(np.load(self.opt.w2v_path))
-            if self.opt.use_gpu:
-                self.word_embs.weight.data.copy_(w2v.cuda())
-            else:
-                self.word_embs.weight.data.copy_(w2v)
-        else:
-            nn.init.xavier_normal_(self.word_embs.weight)
