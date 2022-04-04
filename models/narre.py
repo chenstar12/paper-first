@@ -51,27 +51,33 @@ class Net(nn.Module):
         self.reset_para()
 
     def forward(self, reviews, ids, ids_list):
-        #  word embedding
-        reviews = self.word_embs(
-            reviews)  # reviews:[128, 10, 214] ->  [128, 10, 214, 300],其中：u_max_r = 10, r_max_len=214
+        #  1. word embedding
+        # reviews:[128, 10, 214] ->  [128, 10, 214, 300],其中：u_max_r = 10（物品：i_max_r=27）, r_max_len=214
+        reviews = self.word_embs(reviews)
         bs, r_num, r_len, wd = reviews.size()
         reviews = reviews.view(-1, r_len, wd)  # [1280, 214, 300]
 
-        # cnn for review
-        fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)  # torch.Size([1280, 100, 212])
-        fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # torch.Size([1280, 100])
-        fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10或27, 100])
+        # 2. cnn for review
+        # 先unsqueeze(1) -> [1280,1,214,300]，再cnn -> [1280, 100, 212,1],最后squeeze(3) -> [1280, 100, 212]
+        fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)
+        fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
+        fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
-        u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10] -> [128, 10, 32]
+        u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
-        #  linear attention ——> rs_mix维度：user为[128,10,32]，item为[128,27，32]
-        rs_mix = F.relu(
-            self.review_linear(fea) +  # review:[128,10,100]->[128,10,32]
-            self.id_linear(F.relu(u_i_id_emb)))  # id:还是[128,user为10/item为27，32]
+        #  3. attention（linear attention） ——> rs_mix维度：user为[128,10,32]，item为[128,27，32]
+        rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
+            self.review_linear(fea) +  # review降维:[128,10/27,100]->[128,10/27,32]
+            self.id_linear(F.relu(u_i_id_emb))  # id降维后还是[128,10/27，32]
+        )
 
-        att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10或27,1]，10/27即为某个user/item的每条review注意力权重
+        att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
+        print('attention score:')
+        print(att_score)
         att_weight = F.softmax(att_score, 1)
+        print('after softmax:')
+        print(att_weight)
         r_fea = fea * att_weight
         r_fea = r_fea.sum(1)  # 相当于池化？ -> [128,10/27]
         r_fea = self.dropout(r_fea)
@@ -82,7 +88,7 @@ class Net(nn.Module):
         if self.opt.use_word_embedding:
             w2v = torch.from_numpy(np.load(self.opt.w2v_path))
             if self.opt.use_gpu:
-                self.word_embs.weight.data.copy_(w2v.cuda())
+                self.word_embs.weight.data.copy_(w2v.cuda())  # word_embs：直接复制w2v矩阵
             else:
                 self.word_embs.weight.data.copy_(w2v)
         else:

@@ -20,8 +20,7 @@ class PredictionLayer(nn.Module):
         elif opt.output == "lfm":
             self.model = LFM(opt.feature_dim, opt.user_num, opt.item_num)
         elif opt.output == 'mlp':  # 单层感知机：F.relu(self.fc(feature))
-            self.model = MLP(opt.feature_dim)
-            print('opt.feature_dim: ', opt.feature_dim)
+            self.model = MLP(opt.feature_dim)  # feature_dim在models的init中
         elif opt.output == 'nfm':
             self.model = NFM(opt.feature_dim)
         else:
@@ -150,7 +149,7 @@ class MLP(nn.Module):
         print('dim.....................')
         print(self.dim)
         # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(dim, 1)
+        self.fc = nn.Linear(dim, 1)  # [64,1]
         self.init_weight()
 
     def init_weight(self):
@@ -158,4 +157,4 @@ class MLP(nn.Module):
         nn.init.uniform_(self.fc.bias, a=0, b=0.2)
 
     def forward(self, feature, *args, **kwargs):
-        return F.relu(self.fc(feature))
+        return F.relu(self.fc(feature))  # [128,64] -> [128,1], 然后在models中squeeze(1)得到output

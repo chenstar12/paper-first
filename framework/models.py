@@ -36,11 +36,8 @@ class Model(nn.Module):
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
 
         ui_feature = self.fusion_net(user_feature, item_feature)  # fusion feature,如cat得到[128,64]
-        print('ui_feature：', ui_feature.shape)
-        ui_feature = self.dropout(ui_feature)
-        print('dropout 后 ，ui_feature：', ui_feature.shape)
-        output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred
-        print('output:',output.shape)
+        ui_feature = self.dropout(ui_feature)  # 还是[128,64]
+        output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
         return output
 
     def load(self, path):
