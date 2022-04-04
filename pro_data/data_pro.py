@@ -213,6 +213,7 @@ if __name__ == '__main__':
     df_sentiment = {'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity)}
     np.save(f"{save_folder}/train/sentiment.npy", df_sentiment)  # 保存
     print(df_sentiment)
+    print(df_sentiment.shape)
     print('df')
     del polarity, subjectivity
 
