@@ -146,6 +146,7 @@ class MLP(nn.Module):
     def __init__(self, dim):
         super(MLP, self).__init__()
         self.dim = dim
+        print(self.dim)
         # ---------------------------fc_linear------------------------------
         self.fc = nn.Linear(dim, 1)
         self.init_weight()

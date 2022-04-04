@@ -38,7 +38,9 @@ class DeepCoNN(nn.Module):
         # fc层：[128,100] -> [128,32]
         u_fea = self.dropout(self.user_fc_linear(u_fea))
         i_fea = self.dropout(self.item_fc_linear(i_fea))
-
+        # stack: 沿着一个新维度对输入张量list连接;序列中所有张量应为相同形状；
+        # 结果：添加了一个新维度；
+        # 可理解为：多个二维平面堆叠成三维立体；
         return torch.stack([u_fea], 1), torch.stack([i_fea], 1)  # torch.Size([128, 1, 32])
 
     def reset_para(self):
@@ -53,6 +55,7 @@ class DeepCoNN(nn.Module):
         else:
             nn.init.uniform_(self.user_word_embs.weight, -0.1, 0.1)
             nn.init.uniform_(self.item_word_embs.weight, -0.1, 0.1)
+
         for cnn in [self.user_cnn, self.item_cnn]:
             nn.init.xavier_normal_(cnn.weight)
             nn.init.constant_(cnn.bias, 0.1)
