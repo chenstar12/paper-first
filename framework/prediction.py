@@ -30,7 +30,7 @@ class PredictionLayer(nn.Module):
         if self.output == "lfm" or "fm" or "nfm":
             return self.model(feature, uid, iid)
         else:
-            return self.model(feature, 1, keepdim=True)
+            return self.model(feature, 1, keepdim=True)  # NARRE调用MLP的forward函数
 
 
 class LFM(nn.Module):

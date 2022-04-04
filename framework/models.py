@@ -35,8 +35,8 @@ class Model(nn.Module):
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc = datas
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
 
-        ui_feature = self.fusion_net(user_feature, item_feature)  # fusion feature,如DeepCoNN的cat得到[128,64]
-        print(ui_feature.shape)
+        # fusion feature,如DeepCoNN的cat得到[128,64]
+        ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
         return output
