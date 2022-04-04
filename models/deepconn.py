@@ -37,10 +37,9 @@ class DeepCoNN(nn.Module):
         i_fea = F.max_pool1d(i_fea, i_fea.size(2)).squeeze(2)
         # fc层：[128,100] -> [128,32]
         u_fea = self.dropout(self.user_fc_linear(u_fea))
-        print(u_fea.shape)
-        print('==========',torch.stack([u_fea], 1).shape)
         i_fea = self.dropout(self.item_fc_linear(i_fea))
-        return torch.stack([u_fea], 1), torch.stack([i_fea], 1)
+        
+        return torch.stack([u_fea], 1), torch.stack([i_fea], 1)  # torch.Size([128, 1, 32])
 
     def reset_para(self):
 

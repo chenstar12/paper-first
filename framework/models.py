@@ -26,18 +26,18 @@ class Model(nn.Module):
                 feature_dim = self.opt.id_emb_size
 
         self.opt.feature_dim = feature_dim
-        self.fusion_net = FusionLayer(opt)
-        self.predict_net = PredictionLayer(opt)
+        self.fusion_net = FusionLayer(opt)  # fusion层！！！
+        self.predict_net = PredictionLayer(opt)  # predict层！！！
         self.dropout = nn.Dropout(self.opt.drop_out)
 
     def forward(self, datas):
 
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc = datas
-        user_feature, item_feature = self.net(datas)
+        user_feature, item_feature = self.net(datas) # 如：DeepConn输出的u_fea,i_fea
 
-        ui_feature = self.fusion_net(user_feature, item_feature)
+        ui_feature = self.fusion_net(user_feature, item_feature) # fusion feature
         ui_feature = self.dropout(ui_feature)
-        output = self.predict_net(ui_feature, uids, iids).squeeze(1)
+        output = self.predict_net(ui_feature, uids, iids).squeeze(1) # pred
         return output
 
     def load(self, path):

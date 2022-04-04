@@ -16,24 +16,27 @@ class FusionLayer(nn.Module):
         if opt.self_att:
             self.attn = SelfAtt(opt.id_emb_size, opt.num_heads)
         self.opt = opt
-        self.linear = nn.Linear(opt.feature_dim, opt.feature_dim)
+        self.linear = nn.Linear(opt.feature_dim, opt.feature_dim)  # [] -> [feature_dim,feature_dim]
         self.drop_out = nn.Dropout(0.5)
-        nn.init.uniform_(self.linear.weight, -0.1, 0.1)
+        nn.init.uniform_(self.linear.weight, -0.1, 0.1)  # 初始化权重
         nn.init.constant_(self.linear.bias, 0.1)
 
     def forward(self, u_out, i_out):
+        # 先：review和id融合
         if self.opt.self_att:
             out = self.attn(u_out, i_out)
             s_u_out, s_i_out = torch.split(out, out.size(1) // 2, 1)
             u_out = u_out + s_u_out
             i_out = i_out + s_i_out
-        if self.opt.r_id_merge == 'cat':
-            u_out = u_out.reshape(u_out.size(0), -1)
+        if self.opt.r_id_merge == 'cat':  # 默认用cat
+            u_out = u_out.reshape(u_out.size(0), -1)  # 打平
+            print('---------', u_out.shape)
             i_out = i_out.reshape(i_out.size(0), -1)
         else:
             u_out = u_out.sum(1)
             i_out = i_out.sum(1)
 
+        # 后：user和item的融合
         if self.opt.ui_merge == 'cat':
             out = torch.cat([u_out, i_out], 1)
         elif self.opt.ui_merge == 'add':
