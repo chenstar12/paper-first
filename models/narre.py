@@ -73,13 +73,15 @@ class Net(nn.Module):
         )
 
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
-        print('attention score:')
-        print(att_score)
-        att_weight = F.softmax(att_score, 1)
-        print('after softmax:')
-        print(att_weight)
+        att_weight = F.softmax(att_score, 1)  # 还是[128,10/27,1]
+
         r_fea = fea * att_weight
+        print('fea')
+        print(fea.shape)
+        print('r_fea')
+        print(r_fea)
         r_fea = r_fea.sum(1)  # 相当于池化？ -> [128,10/27]
+        print(r_fea.shape)
         r_fea = self.dropout(r_fea)
 
         return torch.stack([id_emb, self.fc_layer(r_fea)], 1)
