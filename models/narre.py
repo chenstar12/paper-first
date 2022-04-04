@@ -60,25 +60,24 @@ class Net(nn.Module):
         # cnn for review
         fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)  # torch.Size([1280, 100, 212])
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # torch.Size([1280, 100])
-        fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10, 100])
+        fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10或27, 100])
 
-        id_emb = self.id_embedding(ids)  # torch.Size([128, 32])
-        print(ids.shape)
-        print(id_emb.shape)
-        u_i_id_emb = self.u_i_id_embedding(ids_list)  # torch.Size([128, 32])
-        print(ids_list.shape)
-        print(u_i_id_emb.shape)
+        id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
+        u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10] -> [128, 10, 32]
 
-        #  linear attention
+        #  linear attention ——> rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(
             self.review_linear(fea) +  # review:[128,10,100]->[128,10,32]
-            self.id_linear(F.relu(u_i_id_emb)))  # id:还是[128,10或27，32]
+            self.id_linear(F.relu(u_i_id_emb)))  # id:还是[128,user为10/item为27，32]
 
-        att_score = self.attention_linear(rs_mix)
+        att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10或27]，10/27即为某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)
         r_fea = fea * att_weight
-        r_fea = r_fea.sum(1)
+        r_fea = r_fea.sum(1)  # 相当于池化？
+        print(r_fea.shape)
+        print(r_fea)
         r_fea = self.dropout(r_fea)
+        print(r_fea)
 
         return torch.stack([id_emb, self.fc_layer(r_fea)], 1)
 
