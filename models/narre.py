@@ -71,6 +71,7 @@ class Net(nn.Module):
             self.id_linear(F.relu(u_i_id_emb)))  # id:还是[128,user为10/item为27，32]
 
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10或27]，10/27即为某个user/item的每条review注意力权重
+        print(att_score.shape)
         att_weight = F.softmax(att_score, 1)
         r_fea = fea * att_weight
         r_fea = r_fea.sum(1)  # 相当于池化？
