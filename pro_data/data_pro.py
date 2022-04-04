@@ -10,6 +10,7 @@ from operator import itemgetter
 import gensim
 from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer
+from textblob import TextBlob
 
 P_REVIEW = 0.85
 MAX_DF = 0.7
@@ -147,17 +148,17 @@ def countNum(xDict):
 if __name__ == '__main__':
 
     start_time = time.time()
-    assert(len(sys.argv) >= 2)
+    assert (len(sys.argv) >= 2)
     filename = sys.argv[1]
 
     yelp_data = False
     if len(sys.argv) > 2 and sys.argv[2] == 'yelp':
         # yelp dataset
         yelp_data = True
-        save_folder = '../dataset/' + filename[:-3]+"_data"
+        save_folder = '../dataset/' + filename[:-3] + "_data"
     else:
         # amazon dataset
-        save_folder = '../dataset/' + filename[:-7]+"_data"
+        save_folder = '../dataset/' + filename[:-7] + "_data"
     print(f"数据集名称：{save_folder}")
 
     if not os.path.exists(save_folder + '/train'):
@@ -202,9 +203,22 @@ if __name__ == '__main__':
             except:
                 continue
 
+    polarity = []
+    subjectivity = []
+    # vader待完成
+    for sentence in reviews:
+        blob = TextBlob(sentence)
+        polarity.append(blob.sentiment.polarity)
+        subjectivity.append(blob.sentiment.subjectivity)
+    df_sentiment = {'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity)}
+    np.save(f"{save_folder}/train/sentiment.npy", df_sentiment)  # 保存
+    print(df_sentiment)
+    del polarity, subjectivity
+
     data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
                   'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews)}
-    data = pd.DataFrame(data_frame)     # [['user_id', 'item_id', 'ratings', 'reviews']]
+
+    data = pd.DataFrame(data_frame)  # [['user_id', 'item_id', 'ratings', 'reviews']]
     del users_id, items_id, ratings, reviews
 
     uidList, iidList = get_count(data, 'user_id'), get_count(data, 'item_id')
@@ -214,14 +228,14 @@ if __name__ == '__main__':
     print(f"dataNum: {data.shape[0]}")
     print(f"userNum: {userNum_all}")
     print(f"itemNum: {itemNum_all}")
-    print(f"data densiy: {data.shape[0]/float(userNum_all * itemNum_all):.4f}")
+    print(f"data densiy: {data.shape[0] / float(userNum_all * itemNum_all):.4f}")
     print("===============End: rawData size========================")
 
-    user2id = dict((uid, i) for(i, uid) in enumerate(uidList))
-    item2id = dict((iid, i) for(i, iid) in enumerate(iidList))
+    user2id = dict((uid, i) for (i, uid) in enumerate(uidList))
+    item2id = dict((iid, i) for (i, iid) in enumerate(iidList))
     data = numerize(data)
 
-    print(f"-"*60)
+    print(f"-" * 60)
     print(f"{now()} Step2: split datsets into train/val/test, save into npy data")
     data_train, data_test = train_test_split(data, test_size=0.2, random_state=1234)
     uids_train, iids_train = get_count(data_train, 'user_id'), get_count(data_train, 'item_id')
@@ -268,6 +282,7 @@ if __name__ == '__main__':
     print("itemNum: {}".format(itemNum))
     print("===============End-process finished: trainData size========================")
 
+
     def extract(data_dict):
         x = []
         y = []
@@ -277,6 +292,7 @@ if __name__ == '__main__':
             x.append([uid, iid])
             y.append(float(i[2]))
         return x, y
+
 
     x_train, y_train = extract(data_train)
     x_val, y_val = extract(data_val)
@@ -294,7 +310,7 @@ if __name__ == '__main__':
     print(f"Val data size: {len(x_val)}")
     print(f"Test data size: {len(x_test)}")
 
-    print(f"-"*60)
+    print(f"-" * 60)
     print(f"{now()} Step3: Construct the vocab and user/item reviews from training set.")
     # 2: build vocabulary only with train dataset
     user_reviews_dict = {}
@@ -324,24 +340,27 @@ if __name__ == '__main__':
             item_reviews_dict[i[1]] = [str_review]
             item_uid_dict[i[1]] = [i[0]]
 
-    vocab, user_review2doc, item_review2doc, user_reviews_dict, item_reviews_dict = build_doc(user_reviews_dict, item_reviews_dict)
+    vocab, user_review2doc, item_review2doc, user_reviews_dict, item_reviews_dict = build_doc(user_reviews_dict,
+                                                                                              item_reviews_dict)
     word_index = {}
     word_index['<unk>'] = 0
     for i, w in enumerate(vocab.keys(), 1):
         word_index[w] = i
     print(f"The vocab size: {len(word_index)}")
-    print(f"Average user document length: {sum([len(i) for i in user_review2doc])/len(user_review2doc)}")
-    print(f"Average item document length: {sum([len(i) for i in item_review2doc])/len(item_review2doc)}")
+    print(f"Average user document length: {sum([len(i) for i in user_review2doc]) / len(user_review2doc)}")
+    print(f"Average item document length: {sum([len(i) for i in item_review2doc]) / len(item_review2doc)}")
 
     print(now())
     u_minNum, u_maxNum, u_averageNum, u_maxSent, u_minSent, u_pReviewLen, u_pSentLen = countNum(user_reviews_dict)
     print("用户最少有{}个评论,最多有{}个评论，平均有{}个评论, " \
-         "句子最大长度{},句子的最短长度{}，" \
-         "设定用户评论个数为{}： 设定句子最大长度为{}".format(u_minNum, u_maxNum, u_averageNum, u_maxSent, u_minSent, u_pReviewLen, u_pSentLen))
+          "句子最大长度{},句子的最短长度{}，" \
+          "设定用户评论个数为{}： 设定句子最大长度为{}".format(u_minNum, u_maxNum, u_averageNum, u_maxSent, u_minSent, u_pReviewLen,
+                                            u_pSentLen))
     i_minNum, i_maxNum, i_averageNum, i_maxSent, i_minSent, i_pReviewLen, i_pSentLen = countNum(item_reviews_dict)
     print("商品最少有{}个评论,最多有{}个评论，平均有{}个评论," \
-         "句子最大长度{},句子的最短长度{}," \
-         ",设定商品评论数目{}, 设定句子最大长度为{}".format(i_minNum, i_maxNum, i_averageNum, u_maxSent, i_minSent, i_pReviewLen, i_pSentLen))
+          "句子最大长度{},句子的最短长度{}," \
+          ",设定商品评论数目{}, 设定句子最大长度为{}".format(i_minNum, i_maxNum, i_averageNum, u_maxSent, i_minSent, i_pReviewLen,
+                                            i_pSentLen))
     print("最终设定句子最大长度为(取最大值)：{}".format(max(u_pSentLen, i_pSentLen)))
     # ########################################################################################################
     maxSentLen = max(u_pSentLen, i_pSentLen)
@@ -351,8 +370,9 @@ if __name__ == '__main__':
     userDoc2Index = []
     user_iid_list = []
 
-    print(f"-"*60)
+    print(f"-" * 60)
     print(f"{now()} Step4: padding all the text and id lists and save into npy.")
+
 
     def padding_text(textList, num):
         new_textList = []
@@ -363,12 +383,14 @@ if __name__ == '__main__':
             new_textList = textList + padding
         return new_textList
 
+
     def padding_ids(iids, num, pad_id):
         if len(iids) >= num:
             new_iids = iids[:num]
         else:
             new_iids = iids + [pad_id] * (num - len(iids))
         return new_iids
+
 
     def padding_doc(doc):
         pDocLen = DOC_LEN
@@ -382,6 +404,7 @@ if __name__ == '__main__':
 
         return new_doc, pDocLen
 
+
     for i in range(userNum):
         count_user = 0
         dataList = []
@@ -391,7 +414,7 @@ if __name__ == '__main__':
         u_iids = user_iid_dict[i]
         u_reviewList = []
 
-        user_iid_list.append(padding_ids(u_iids, u_pReviewLen, itemNum+1))
+        user_iid_list.append(padding_ids(u_iids, u_pReviewLen, itemNum + 1))
         doc2index = [word_index[w] for w in user_review2doc[i]]
 
         for text in textList:
@@ -423,7 +446,7 @@ if __name__ == '__main__':
         i_uids = item_uid_dict[i]
         i_reviewList = []  # 待添加
         i_reviewLen = []  # 待添加
-        item_uid_list.append(padding_ids(i_uids, i_pReviewLen, userNum+1))
+        item_uid_list.append(padding_ids(i_uids, i_pReviewLen, userNum + 1))
         doc2index = [word_index[w] for w in item_review2doc[i]]
 
         for text in textList:
@@ -445,7 +468,7 @@ if __name__ == '__main__':
     itemDoc2Index, itemDocLen = padding_doc(itemDoc2Index)
     print(f"item document length: {itemDocLen}")
 
-    print("-"*60)
+    print("-" * 60)
     print(f"{now()} start writing npy...")
     np.save(f"{save_folder}/train/userReview2Index.npy", userReview2Index)
     np.save(f"{save_folder}/train/user_item2id.npy", user_iid_list)
@@ -458,7 +481,7 @@ if __name__ == '__main__':
     print(f"{now()} write finised")
 
     # #####################################################3,产生w2v############################################
-    print("-"*60)
+    print("-" * 60)
     print(f"{now()} Step5: start word embedding mapping...")
     vocab_item = sorted(word_index.items(), key=itemgetter(1))
     w2v = []
@@ -483,4 +506,4 @@ if __name__ == '__main__':
     print(w2vArray.shape)
     np.save(f"{save_folder}/train/w2v.npy", w2v)
     end_time = time.time()
-    print(f"{now()} all steps finised, cost time: {end_time-start_time:.4f}s")
+    print(f"{now()} all steps finised, cost time: {end_time - start_time:.4f}s")
