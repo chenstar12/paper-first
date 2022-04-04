@@ -51,8 +51,10 @@ class Net(nn.Module):
         self.reset_para()
 
     def forward(self, reviews, ids, ids_list):
-        # --------------- word embedding ----------------------------------
+        #  word embedding
         reviews = self.word_embs(reviews)  # size * 300
+        print('user/item reviews embedding:')
+        print(reviews.shape)
         bs, r_num, r_len, wd = reviews.size()
         reviews = reviews.view(-1, r_len, wd)
 
