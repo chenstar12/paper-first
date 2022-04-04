@@ -19,7 +19,7 @@ class PredictionLayer(nn.Module):
             self.model = FM(opt.feature_dim, opt.user_num, opt.item_num)
         elif opt.output == "lfm":
             self.model = LFM(opt.feature_dim, opt.user_num, opt.item_num)
-        elif opt.output == 'mlp':
+        elif opt.output == 'mlp':  # 单层感知机：F.relu(self.fc(feature))
             self.model = MLP(opt.feature_dim)
         elif opt.output == 'nfm':
             self.model = NFM(opt.feature_dim)

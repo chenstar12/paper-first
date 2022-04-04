@@ -40,7 +40,7 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-    model = Model(opt, getattr(models, opt.model))
+    model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
     if opt.use_gpu:
         model.cuda()
         if len(opt.gpu_ids) > 0:
@@ -77,7 +77,9 @@ def train(**kwargs):
                 scores = torch.FloatTensor(scores).cuda()
             else:
                 scores = torch.FloatTensor(scores)
-            train_datas = unpack_input(opt, train_datas)
+            print('batch train_datas:')
+            print(train_datas)
+            train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
 
             optimizer.zero_grad()
             output = model(train_datas)
@@ -97,7 +99,7 @@ def train(**kwargs):
                 loss = smooth_mae_loss
             loss.backward()
             optimizer.step()
-            if opt.fine_step:
+            if opt.fine_step:  # 默认False。。。。。
                 if idx % opt.print_step == 0 and idx > 0:
                     print("\t{}, {} step finised;".format(now(), idx))
                     val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
@@ -110,7 +112,7 @@ def train(**kwargs):
 
         scheduler.step()
         mse = total_loss * 1.0 / len(train_data)
-        print(f"\ttrain data: loss:{total_loss:.4f}, mse: {mse:.4f};")
+        print(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
         if val_loss < min_loss:
@@ -186,21 +188,20 @@ def predict(model, data_loader, opt):
 
 
 def unpack_input(opt, x):
-    uids, iids = list(zip(*x))
-    uids = list(uids)
+    uids, iids = list(zip(*x))  # 解包两列数据 -> 两列元组（数据类型：tensor）
+    uids = list(uids)  # uids列表（数据类型：tensor）
     iids = list(iids)
 
-    user_reviews = opt.users_review_list[uids]
+    user_reviews = opt.users_review_list[uids]  # 检索出该user的reviews
     user_item2id = opt.user2itemid_list[uids]  # 检索出该user对应的item id
-
     user_doc = opt.user_doc[uids]
 
     item_reviews = opt.items_review_list[iids]
-    item_user2id = opt.item2userid_list[iids]  # 检索出该item对应的user id
+    item_user2id = opt.item2userid_list[iids]
     item_doc = opt.item_doc[iids]
 
     data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc]
-    data = list(map(lambda x: torch.LongTensor(x).cuda(), data))
+    data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
     return data
 
 
