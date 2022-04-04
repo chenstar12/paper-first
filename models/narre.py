@@ -20,7 +20,6 @@ class NARRE(nn.Module):
     def forward(self, datas):
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc = datas
         u_fea = self.user_net(user_reviews, uids, user_item2id)  # 有下面Net的forward函数得：[128,2,32]
-        print(u_fea.shape)
         i_fea = self.item_net(item_reviews, iids, item_user2id)  # [128,2,32]
         return u_fea, i_fea
 
