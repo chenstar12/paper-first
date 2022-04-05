@@ -60,6 +60,8 @@ class DefaultConfig:
         self.user_doc_path = f'{prefix}/userDoc2Index.npy'
         self.item_doc_path = f'{prefix}/itemDoc2Index.npy'
 
+        self.sentiment_path = f'{prefix}/Sentiments.npy'
+
         self.w2v_path = f'{prefix}/w2v.npy'
 
     def parse(self, kwargs):
@@ -73,6 +75,7 @@ class DefaultConfig:
         self.item2userid_list = np.load(self.item2userid_path, encoding='bytes')
         self.user_doc = np.load(self.user_doc_path, encoding='bytes')
         self.item_doc = np.load(self.item_doc_path, encoding='bytes')
+        self.sentiments = np.load(self.sentiment_path, encoding='bytes')
 
         for k, v in kwargs.items():
             if not hasattr(self, k):

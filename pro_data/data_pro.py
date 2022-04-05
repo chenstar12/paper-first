@@ -178,6 +178,10 @@ if __name__ == '__main__':
     items_id = []
     ratings = []
     reviews = []
+    # sentiment特征：
+    polarity = []
+    subjectivity = []
+    # vader待完成:
 
     if yelp_data:
         for line in file:
@@ -200,28 +204,26 @@ if __name__ == '__main__':
                 users_id.append(str(js['reviewerID']))
                 items_id.append(str(js['asin']))
                 ratings.append(str(js['overall']))
+
+                blob = TextBlob(js['reviewText'])
+
+                pola = blob.sentiment.polarity
+                pola = int(pola * 10000) / 10000  # 保留四位小数
+                polarity.append(pola)
+
+                subj = blob.sentiment.subjectivity
+                subj = int(subj * 10000) / 10000
+                subjectivity.append(subj)
             except:
                 continue
 
-    polarity = []
-    subjectivity = []
-    # vader待完成
-    for sentence in reviews:
-        blob = TextBlob(sentence)
-        polarity.append(blob.sentiment.polarity)
-        subjectivity.append(blob.sentiment.subjectivity)
-    df_sentiment = {'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity)}
-    np.save(f"{save_folder}/train/sentiment.npy", df_sentiment)  # 保存
-    print(df_sentiment)
-    print(df_sentiment.shape)
-    print('df')
-    del polarity, subjectivity
-
 data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
-              'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews)}
+              'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews),
+              'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity)
+              }
 
 data = pd.DataFrame(data_frame)  # [['user_id', 'item_id', 'ratings', 'reviews']]
-del users_id, items_id, ratings, reviews
+del users_id, items_id, ratings, reviews, polarity, subjectivity
 
 uidList, iidList = get_count(data, 'user_id'), get_count(data, 'item_id')
 userNum_all = len(uidList)
@@ -249,6 +251,7 @@ print("userNum: {}".format(userNum))
 print("itemNum: {}".format(itemNum))
 print("===============End: no-preprocess: trainData size========================")
 
+# 添加train data（从test data移除train中没有的）
 uidMiss = []
 iidMiss = []
 if userNum != userNum_all or itemNum != itemNum_all:
@@ -273,7 +276,7 @@ data_train = pd.concat([data_train, data_test.loc[iid_index]])
 all_index = list(set().union(uid_index, iid_index))
 data_test = data_test.drop(all_index)
 
-# split validate set aand test set
+# split validate set and test set
 data_test, data_val = train_test_split(data_test, test_size=0.5, random_state=1234)
 uidList_train, iidList_train = get_count(data_train, 'user_id'), get_count(data_train, 'item_id')
 userNum = len(uidList_train)
@@ -312,6 +315,16 @@ print(f"Train data size: {len(x_train)}")
 print(f"Val data size: {len(x_val)}")
 print(f"Test data size: {len(x_test)}")
 
+# def extract_sentiment(data_dict):
+#     senti = []
+#     for i in data_dict.values:
+#         senti.append([i[4], i[5]])
+#     return senti
+
+
+# sentiments = extract_sentiment(data_train)
+# np.save(f"{save_folder}/train/Sentiments.npy", sentiments)
+
 print(f"-" * 60)
 print(f"{now()} Step3: Construct the vocab and user/item reviews from training set.")
 # 2: build vocabulary only with train dataset
@@ -321,6 +334,9 @@ user_iid_dict = {}
 item_uid_dict = {}
 user_len = defaultdict(int)
 item_len = defaultdict(int)
+# 抽取特征 ---- sentiment:
+user_sentiments_dict = {}
+item_sentiments_dict = {}
 
 for i in data_train.values:
     str_review = clean_str(i[3].encode('ascii', 'ignore').decode('ascii'))
@@ -341,6 +357,19 @@ for i in data_train.values:
     else:
         item_reviews_dict[i[1]] = [str_review]
         item_uid_dict[i[1]] = [i[0]]
+    # sentiment:
+    if i[0] not in user_sentiments_dict:
+        user_sentiments_dict[i[0]] = [[i[4], i[5]]]
+    else:
+        user_sentiments_dict[i[0]].append([i[4], i[5]])
+
+    if i[1] not in item_sentiments_dict:
+        item_sentiments_dict[i[1]] = [[i[4], i[5]]]
+    else:
+        item_sentiments_dict[i[1]].append([i[4], i[5]])
+
+# np.save(f"{save_folder}/train/userReview2Sentiment.npy", user_sentiments_dict)
+# np.save(f"{save_folder}/train/itemReview2Sentiment.npy", item_sentiments_dict)
 
 vocab, user_review2doc, item_review2doc, user_reviews_dict, item_reviews_dict = build_doc(user_reviews_dict,
                                                                                           item_reviews_dict)
@@ -367,10 +396,6 @@ print("最终设定句子最大长度为(取最大值)：{}".format(max(u_pSentL
 # ########################################################################################################
 maxSentLen = max(u_pSentLen, i_pSentLen)
 minSentlen = 1
-
-userReview2Index = []
-userDoc2Index = []
-user_iid_list = []
 
 print(f"-" * 60)
 print(f"{now()} Step4: padding all the text and id lists and save into npy.")
@@ -407,12 +432,18 @@ def padding_doc(doc):
     return new_doc, pDocLen
 
 
+userReview2Index = []
+userDoc2Index = []
+user_iid_list = []
+userReview2Sentiment = []
 for i in range(userNum):
+
     count_user = 0
     dataList = []
     a_count = 0
 
     textList = user_reviews_dict[i]
+    sentimentList = user_sentiments_dict[i]
     u_iids = user_iid_dict[i]
     u_reviewList = []
 
@@ -433,6 +464,7 @@ for i in range(userNum):
 
     userReview2Index.append(padding_text(u_reviewList, u_pReviewLen))
     userDoc2Index.append(doc2index)
+    userReview2Sentiment.append(user_sentiments_dict[i])  # sentiment
 
 # userReview2Index = []
 userDoc2Index, userDocLen = padding_doc(userDoc2Index)
