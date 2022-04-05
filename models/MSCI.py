@@ -74,11 +74,9 @@ class Net(nn.Module):
         （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
         （3）上一步的特征相加除以2或3
         '''
-        print(sentiments)
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
-        polarity_w = polarity_w.unsqueeze(2)
-        print('polarity_w')
-        print(polarity_w.shape)
+        polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
+        polarity_w = F.softmax(polarity_w, 1)
         print(polarity_w)
 
         #  3. attention（linear attention）
