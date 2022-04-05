@@ -208,11 +208,11 @@ if __name__ == '__main__':
                 blob = TextBlob(js['reviewText'])
 
                 pola = blob.sentiment.polarity
-                pola = int(pola * 10000) / 10000  # 保留四位小数
+                pola = int(pola * 10000)  # 防止被floattensor截断
                 polarity.append(pola)
 
                 subj = blob.sentiment.subjectivity
-                subj = int(subj * 10000) / 10000
+                subj = int(subj * 10000)
                 subjectivity.append(subj)
             except:
                 continue
@@ -476,7 +476,7 @@ for i in range(userNum):
 
     userReview2Index.append(padding_text(u_reviewList, u_pReviewLen))
     userDoc2Index.append(doc2index)
-    userReview2Sentiment.append(padding_sentiment(user_sentiments_dict[i],u_pReviewLen))  # sentiment
+    userReview2Sentiment.append(padding_sentiment(user_sentiments_dict[i], u_pReviewLen))  # sentiment
 
 # userReview2Index = []
 userDoc2Index, userDocLen = padding_doc(userDoc2Index)
@@ -513,7 +513,7 @@ for i in range(itemNum):
         i_reviewList.append(text2index)
     itemReview2Index.append(padding_text(i_reviewList, i_pReviewLen))
     itemDoc2Index.append(doc2index)
-    itemReview2Sentiment.append(padding_sentiment(item_sentiments_dict[i],i_pReviewLen))  # sentiment
+    itemReview2Sentiment.append(padding_sentiment(item_sentiments_dict[i], i_pReviewLen))  # sentiment
 
 itemDoc2Index, itemDocLen = padding_doc(itemDoc2Index)
 print(f"item document length: {itemDocLen}")
