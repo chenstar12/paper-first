@@ -127,14 +127,14 @@ class Pet_Supplies_data_Config(DefaultConfig):
     vocab_size = 50002
     word_dim = 300
 
-    r_max_len = 95
+    r_max_len = 98
 
-    u_max_r = 9
-    i_max_r = 22
+    u_max_r = 12
+    i_max_r = 17
 
-    train_data_size = 126283
-    test_data_size = 15777
-    val_data_size = 15776
+    train_data_size = 121003
+    test_data_size = 15126
+    val_data_size = 15125
 
     user_num = 19856 + 2
     item_num = 8510 + 2
