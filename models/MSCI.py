@@ -80,10 +80,7 @@ class Net(nn.Module):
         polarity_w = F.softmax(polarity_w, 1)
         # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
         fea = fea * polarity_w  # fea还是[128, 10/27, 100]
-        print(fea)
         fea = fea * r_num
-        print('***************rnum')
-        print(fea)
 
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
