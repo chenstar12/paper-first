@@ -226,8 +226,8 @@ def unpack_input_sentiment(opt, x):
     data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
             user_sentiments, item_sentiments]  # 添加了sentiment
     data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
-    for i in len(data):
-        print(i)
+    for i in range(len(data)):
+        print(data[i])
         print('='*100)
     return data
 
