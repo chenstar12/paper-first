@@ -31,8 +31,13 @@ class Model(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
 
     def forward(self, datas):
+        if self.opt.model in ['MSCI', 'MSCFI']:  # 获取所有模型输入数据 ---- 添加sentiment
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc, user_sentiments, item_sentiments = datas
+        else:
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc = datas
 
-        user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc = datas
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
 
         # fusion feature,如DeepCoNN的cat得到[128,64]

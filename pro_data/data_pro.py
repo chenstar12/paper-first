@@ -401,6 +401,7 @@ print(f"-" * 60)
 print(f"{now()} Step4: padding all the text and id lists and save into npy.")
 
 
+# 把单个user/item的的review数统一为10/27
 def padding_text(textList, num):
     new_textList = []
     if len(textList) >= num:
@@ -409,6 +410,17 @@ def padding_text(textList, num):
         padding = [[0] * len(textList[0]) for _ in range(num - len(textList))]
         new_textList = textList + padding
     return new_textList
+
+
+# 把单个user/item的的sentiment数统一为10/27
+def padding_sentiment(sentiList, num):
+    new_list = []
+    if len(sentiList) >= num:
+        new_list = sentiList[:num]
+    else:
+        padding = [[0.0, 0.0] for _ in range(num - len(sentiList))]
+        new_list = sentiList + padding
+    return new_list
 
 
 def padding_ids(iids, num, pad_id):
@@ -464,7 +476,7 @@ for i in range(userNum):
 
     userReview2Index.append(padding_text(u_reviewList, u_pReviewLen))
     userDoc2Index.append(doc2index)
-    userReview2Sentiment.append(user_sentiments_dict[i])  # sentiment
+    userReview2Sentiment.append(padding_sentiment(user_sentiments_dict[i],u_pReviewLen))  # sentiment
 
 # userReview2Index = []
 userDoc2Index, userDocLen = padding_doc(userDoc2Index)
@@ -473,10 +485,13 @@ print(f"user document length: {userDocLen}")
 itemReview2Index = []
 itemDoc2Index = []
 item_uid_list = []
+itemReview2Sentiment = []
 for i in range(itemNum):
     count_item = 0
     dataList = []
     textList = item_reviews_dict[i]
+    sentimentList = item_sentiments_dict[i]
+
     i_uids = item_uid_dict[i]
     i_reviewList = []  # 待添加
     i_reviewLen = []  # 待添加
@@ -498,6 +513,7 @@ for i in range(itemNum):
         i_reviewList.append(text2index)
     itemReview2Index.append(padding_text(i_reviewList, i_pReviewLen))
     itemDoc2Index.append(doc2index)
+    itemReview2Sentiment.append(padding_sentiment(item_sentiments_dict[i],i_pReviewLen))  # sentiment
 
 itemDoc2Index, itemDocLen = padding_doc(itemDoc2Index)
 print(f"item document length: {itemDocLen}")
@@ -507,10 +523,12 @@ print(f"{now()} start writing npy...")
 np.save(f"{save_folder}/train/userReview2Index.npy", userReview2Index)
 np.save(f"{save_folder}/train/user_item2id.npy", user_iid_list)
 np.save(f"{save_folder}/train/userDoc2Index.npy", userDoc2Index)
+np.save(f"{save_folder}/train/userReview2Sentiment.npy", userReview2Sentiment)
 
 np.save(f"{save_folder}/train/itemReview2Index.npy", itemReview2Index)
 np.save(f"{save_folder}/train/item_user2id.npy", item_uid_list)
 np.save(f"{save_folder}/train/itemDoc2Index.npy", itemDoc2Index)
+np.save(f"{save_folder}/train/itemReview2Sentiment.npy", itemReview2Sentiment)
 
 print(f"{now()} write finised")
 
