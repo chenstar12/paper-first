@@ -76,7 +76,7 @@ class Net(nn.Module):
         '''
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
-        polarity_w = polarity_w / 100
+        polarity_w = polarity_w / 1000
         print(polarity_w)
         polarity_w = F.softmax(polarity_w, 1)
         print(polarity_w)
