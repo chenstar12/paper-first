@@ -188,6 +188,9 @@ def predict(model, data_loader, opt):
                 test_data = unpack_input(opt, test_data)
 
             output = model(test_data)
+            print('-' * 100)
+            print(output.shape)
+            print(output)
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
 
