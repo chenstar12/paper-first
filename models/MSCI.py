@@ -74,6 +74,7 @@ class Net(nn.Module):
         （2）乘以sentiment，subjectivity，vader的conpound； 或者选其中一两个
         （3）上一步的特征相加除以2或3
         '''
+        print(sentiments)
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
         print('polarity_w')
         print(polarity_w.shape)
