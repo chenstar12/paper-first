@@ -71,11 +71,12 @@ class Net(nn.Module):
 
         '''
         （1）先把情感权重归一化 ---- softmax
-        （2）乘以sentiment，subjectivity，vader的conpound； 或者选其中一两个
+        （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
         （3）上一步的特征相加除以2或3
         '''
         print(sentiments)
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
+        polarity_w = polarity_w.squeeze(2)
         print('polarity_w')
         print(polarity_w.shape)
         print(polarity_w)
