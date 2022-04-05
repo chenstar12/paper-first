@@ -88,6 +88,8 @@ def train(**kwargs):
             print('-' * 100)
             print(output.shape)
             print(output)
+            print('scores')
+            print(scores)
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)
 
