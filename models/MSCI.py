@@ -77,9 +77,8 @@ class Net(nn.Module):
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
-        print(polarity_w)
         polarity_w = F.softmax(polarity_w, 1)
-        print(polarity_w)
+        fea = fea * polarity_w
 
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
@@ -89,7 +88,6 @@ class Net(nn.Module):
         )
 
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
-        print(att_score)
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
 
         r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
