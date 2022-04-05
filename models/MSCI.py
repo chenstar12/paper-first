@@ -76,8 +76,10 @@ class Net(nn.Module):
         '''
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
-        #polarity_w = F.softmax(polarity_w, 1)
-        #print(polarity_w)
+        polarity_w = polarity_w / 100
+        print(polarity_w)
+        polarity_w = F.softmax(polarity_w, 1)
+        print(polarity_w)
 
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
