@@ -34,8 +34,6 @@ class Model(nn.Module):
         if self.opt.model in ['MSCI', 'MSCFI']:  # 获取所有模型输入数据 ---- 添加sentiment
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc, user_sentiments, item_sentiments = datas
-            print('datas:::')
-            print(user_sentiments)
         else:
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc = datas
