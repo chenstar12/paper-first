@@ -76,7 +76,7 @@ class Net(nn.Module):
         '''
         print(sentiments)
         polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
-        polarity_w = polarity_w.squeeze(2)
+        polarity_w = polarity_w.unsqueeze(2)
         print('polarity_w')
         print(polarity_w.shape)
         print(polarity_w)
