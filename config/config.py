@@ -77,8 +77,6 @@ class DefaultConfig:
         self.user_doc = np.load(self.user_doc_path, encoding='bytes')
         self.item_doc = np.load(self.item_doc_path, encoding='bytes')
         self.userReview2Sentiment = np.load(self.user_sentiment_path, encoding='bytes')
-        print('np load')
-        print(self.userReview2Sentiment[:2])
         self.itemReview2Sentiment = np.load(self.item_sentiment_path, encoding='bytes')
 
         for k, v in kwargs.items():
