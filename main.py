@@ -173,7 +173,11 @@ def predict(model, data_loader, opt):
                 scores = torch.FloatTensor(scores).cuda()
             else:
                 scores = torch.FloatTensor(scores)
-            test_data = unpack_input(opt, test_data)
+
+            if opt.model in ['MSCI', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
+                test_data = unpack_input_sentiment(opt, test_data)
+            else:
+                test_data = unpack_input(opt, test_data)
 
             output = model(test_data)
             mse_loss = torch.sum((output - scores) ** 2)
