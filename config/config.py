@@ -41,6 +41,7 @@ class DefaultConfig:
     output = 'lfm'  # 'fm', 'lfm', 'other: sum the ui_feature'
 
     fine_step = False  # save mode in step level, default in epoch
+    early_stop = 3  # 在验证集连续三轮mse下降时early stop
     pth_path = ""  # the saved pth path for test
     print_opt = 'default'
 
@@ -127,14 +128,14 @@ class Pet_Supplies_data_Config(DefaultConfig):
     vocab_size = 50002
     word_dim = 300
 
-    r_max_len = 98
+    r_max_len = 95
 
-    u_max_r = 12
-    i_max_r = 17
+    u_max_r = 9
+    i_max_r = 22
 
-    train_data_size = 121003
-    test_data_size = 15126
-    val_data_size = 15125
+    train_data_size = 126283
+    test_data_size = 15777
+    val_data_size = 15776
 
     user_num = 19856 + 2
     item_num = 8510 + 2

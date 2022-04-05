@@ -122,8 +122,15 @@ def train(**kwargs):
             model.save(name=opt.dataset, opt=opt.print_opt)
             min_loss = val_loss
             print("model save")
+
         if val_mse < best_res:
             best_res = val_mse
+            num_decline = 0  # early_stop 指标
+        else:
+            num_decline += 1
+            if num_decline >= opt.early_stop:
+                print('--------------------------Early Stop----------------------------')
+                break
         print("*" * 30)
 
     print("----" * 150)
@@ -159,10 +166,11 @@ def test(**kwargs):
     print(f"load model: {opt.pth_path}")
     test_data = ReviewData(opt.data_root, mode="Test")
     test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-    print(f"{now()}: test in the test datset")
+    print(f"{now()}: test in the test dataset")
     predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
 
 
+# 待添加：HR@1，nDCG@5，Diversity@5，
 def predict(model, data_loader, opt):
     total_loss = 0.0
     total_maeloss = 0.0
