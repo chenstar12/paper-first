@@ -80,8 +80,6 @@ def train(**kwargs):
 
             if opt.model in ['MSCI', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
                 train_datas = unpack_input_sentiment(opt, train_datas)
-                print('batch data')
-                print(train_datas)
             else:
                 train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
 
@@ -227,6 +225,8 @@ def unpack_input_sentiment(opt, x):
 
     data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
             user_sentiments, item_sentiments]  # 添加了sentiment
+    print('user_sentiments:')
+    print(user_sentiments)
     data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
     return data
 
