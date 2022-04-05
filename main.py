@@ -85,6 +85,9 @@ def train(**kwargs):
 
             optimizer.zero_grad()
             output = model(train_datas)
+            print('-' * 100)
+            print(output.shape)
+            print(output)
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)
 
@@ -99,8 +102,10 @@ def train(**kwargs):
                 loss = mae_loss
             if opt.loss_method == 'smooth_mae':
                 loss = smooth_mae_loss
+
             loss.backward()
             optimizer.step()
+
             # if idx % 50 == 0: print("\t{}, {} step;".format(now(), idx))
             if opt.fine_step:  # 默认False。。。。。
                 if idx % opt.print_step == 0 and idx > 0:
@@ -188,9 +193,7 @@ def predict(model, data_loader, opt):
                 test_data = unpack_input(opt, test_data)
 
             output = model(test_data)
-            print('-' * 100)
-            print(output.shape)
-            print(output)
+
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
 
