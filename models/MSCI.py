@@ -18,9 +18,12 @@ class MSCI(nn.Module):
         self.item_net = Net(opt, 'item')
 
     def forward(self, datas):
-        user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc = datas
-        u_fea = self.user_net(user_reviews, uids, user_item2id)  # 有下面Net的forward函数得：[128,2,32]
-        i_fea = self.item_net(item_reviews, iids, item_user2id)  # [128,2,32]
+        user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+        user_doc, item_doc, user_sentiments, item_sentiments = datas
+
+        u_fea = self.user_net(user_reviews, uids, user_item2id, user_sentiments)  # 下面Net的forward函数得：[128,2,32]
+        i_fea = self.item_net(item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
+
         return u_fea, i_fea
 
 
@@ -50,7 +53,7 @@ class Net(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
 
-    def forward(self, reviews, ids, ids_list):
+    def forward(self, reviews, ids, ids_list, sentiments):  # 添加了sentiments
         #  1. word embedding
         # reviews:用户[128, 10, 214] ->  [128, 10, 214, 300]，物品[128, 27, 214] ->  [128, 27, 214, 300]
         reviews = self.word_embs(reviews)
@@ -66,6 +69,16 @@ class Net(nn.Module):
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
+        '''
+        （1）先把情感权重归一化 ---- softmax
+        （2）乘以sentiment，subjectivity，vader的conpound； 或者选其中一两个
+        （3）上一步的特征相加除以2或3
+        '''
+        polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
+        print('polarity_w')
+        print(polarity_w.shape)
+        print(polarity_w)
+
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
@@ -76,11 +89,6 @@ class Net(nn.Module):
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
 
-        '''
-        （1）先把情感权重归一化 ---- softmax
-        （2）乘以sentiment，subjectivity，vader的conpound； 或者选其中一两个
-        （3）上一步的特征相加除以2或3
-        '''
         r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
         r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)

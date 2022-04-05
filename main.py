@@ -78,7 +78,10 @@ def train(**kwargs):
             else:
                 scores = torch.FloatTensor(scores)
 
-            train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
+            if opt.model in ['MSCI', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
+                train_datas = unpack_input_sentiment(opt, train_datas)
+            else:
+                train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
 
             optimizer.zero_grad()
             output = model(train_datas)
@@ -187,7 +190,7 @@ def predict(model, data_loader, opt):
     return total_loss, mse, mae
 
 
-def unpack_input(opt, x):
+def unpack_input(opt, x):  # 打包一个batch所有数据
     uids, iids = list(zip(*x))  # 解包两列数据 -> 两列元组（数据类型：tensor）
     uids = list(uids)  # uids列表（数据类型：tensor）
     iids = list(iids)
@@ -201,6 +204,27 @@ def unpack_input(opt, x):
     item_doc = opt.item_doc[iids]
 
     data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc]
+    data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
+    return data
+
+
+def unpack_input_sentiment(opt, x):
+    uids, iids = list(zip(*x))  # 解包两列数据 -> 两列元组（数据类型：tensor）
+    uids = list(uids)  # uids列表（数据类型：tensor）
+    iids = list(iids)
+
+    user_reviews = opt.users_review_list[uids]  # 检索出该user的reviews
+    user_item2id = opt.user2itemid_list[uids]  # 检索出该user对应的item id
+    user_doc = opt.user_doc[uids]
+    user_sentiments = opt.userReview2Sentiment[uids]  # sentiment
+
+    item_reviews = opt.items_review_list[iids]
+    item_user2id = opt.item2userid_list[iids]
+    item_doc = opt.item_doc[iids]
+    item_sentiments = opt.itemReview2Sentiment[iids]  # sentiment
+
+    data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
+            user_sentiments, item_sentiments] # 添加了sentiment
     data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
     return data
 
