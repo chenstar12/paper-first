@@ -9,3 +9,7 @@ from .d_attn import D_ATTN
 from .mpcn import MPCN
 # mine
 from .MSCI import MSCI
+from MSCI0 import MSCI0
+from .MSCI2 import MSCI2  # 最合理（理论上）
+from .MSCI3 import MSCI3
+from .MSCI4 import MSCI4
