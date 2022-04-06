@@ -243,6 +243,12 @@ def predict(model, data_loader, opt):
 
             output_list.append([int(i) for i in (output > 2.5000)])
             scores_list.append([int(i) for i in (scores > 2.5000)])
+            # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
+            print('acc: ', accuracy_score(output_list, scores_list))
+            print('auc: ', auc(output_list, scores_list))
+            print('roc_auc_score: ', roc_auc_score(output_list, scores_list))
+            print('recall_score: ', recall_score(output_list, scores_list))
+            print('precision_score: ', precision_score(output_list, scores_list))
 
         # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
         print('acc: ', accuracy_score(output_list, scores_list))
