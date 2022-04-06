@@ -88,9 +88,9 @@ def train(**kwargs):
     mae_func = nn.L1Loss()
     smooth_mae_func = nn.SmoothL1Loss()
 
+    iter_loss = []  # 每个iteration的loss，用来画图
+    epoch_loss = []
     for epoch in range(opt.num_epochs):
-        epoch_loss = []
-        iter_loss = []
         total_loss = 0.0
         total_maeloss = 0.0
         model.train()
@@ -150,9 +150,10 @@ def train(**kwargs):
 
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
         logger.info('train loss list: ' + str(epoch_loss))
-        logger.info('train iteration loss list: ' + str(iter_loss))
 
+        # 模型评估 ---- 需添加排序指标：NDCG，Diversity。。。。
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+
         if val_loss < min_loss:
             model.save(name=opt.dataset, opt=opt.print_opt)
             min_loss = val_loss
@@ -171,6 +172,7 @@ def train(**kwargs):
     logger.info("----" * 150)
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
     logger.info("----" * 150)
+    logger.info('train iteration loss list: ' + str(iter_loss))
 
 
 def test(**kwargs):
@@ -205,7 +207,6 @@ def test(**kwargs):
     predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
 
 
-# 待添加：HR@1，nDCG@5，Diversity@5，
 def predict(model, data_loader, opt):
     total_loss = 0.0
     total_maeloss = 0.0
@@ -224,15 +225,22 @@ def predict(model, data_loader, opt):
 
             output = model(test_data)
 
+            print(output)
+            print(output > 2.5000)
+            print(int(output > 2.5000))
+
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
 
             mae_loss = torch.sum(abs(output - scores))
             total_maeloss += mae_loss.item()
 
+            # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,。。。。
+
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
     mae = total_maeloss * 1.0 / data_len
+
     logger.info(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     model.train()
     return total_loss, mse, mae
