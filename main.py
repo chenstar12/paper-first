@@ -34,6 +34,15 @@ def train(**kwargs):
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)
 
+    log_file_name = os.path.join(os.getcwd(), 'log',
+                                 opt.model + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')
+    logger.setLevel(level=logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - : %(message)s')
+    file_handler = logging.FileHandler(log_file_name)
+    file_handler.setLevel(level=logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
     random.seed(opt.seed)
     np.random.seed(opt.seed)
     torch.manual_seed(opt.seed)
@@ -252,12 +261,5 @@ def unpack_input_sentiment(opt, x):
 
 if __name__ == "__main__":
     logger = logging.getLogger('')
-    file_name = os.path.join(os.getcwd(), 'log', time.strftime("%m%d-%H%M%S", time.localtime()) + '.txt')
-    logger.setLevel(level=logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - : %(message)s')
-    file_handler = logging.FileHandler(file_name)
-    file_handler.setLevel(level=logging.INFO)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
 
     fire.Fire()
