@@ -34,8 +34,8 @@ def train(**kwargs):
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)
     logger.info(
-        'model: ' + opt.model + '\n' + 'dataset: ' + opt.dataset + '\n' + 'batch_size:' + opt.batch_size + '\n' +
-        'num_epochs: ' + opt.num_epochs + '\n' + 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n'
+        'model: ' + opt.model + '\n' + 'dataset: ' + opt.dataset + '\n' + 'batch_size:' + str(opt.batch_size) + '\n' +
+        'num_epochs: ' + str(opt.num_epochs) + '\n' + 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n'
         + 'output' + opt.output + '\n')
 
     log_file_name = os.path.join(os.getcwd(), 'log',
