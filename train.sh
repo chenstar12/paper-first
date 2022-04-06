@@ -11,3 +11,5 @@ python main.py train --model=MSCI --num_fea=2 --ui_merge=dot --output=nfm --data
 python main.py train --model=MSCI --num_fea=2 --ui_merge=dot --output=mlp --dataset=Video_Games_data --batch_size=256
 
 python main.py train --model=MSCI --num_fea=2 --ui_merge=dot --output=mlp --dataset=Video_Games_data --batch_size=512
+
+# ...
