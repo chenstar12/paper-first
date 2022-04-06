@@ -12,6 +12,8 @@ from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer
 from textblob import TextBlob
 
+import logging
+
 P_REVIEW = 0.85
 MAX_DF = 0.7
 MAX_VOCAB = 50000
@@ -146,6 +148,7 @@ def countNum(xDict):
 
 
 if __name__ == '__main__':
+    logger = logging.getLogger('')
 
     start_time = time.time()
     assert (len(sys.argv) >= 2)
@@ -156,10 +159,22 @@ if __name__ == '__main__':
         # yelp dataset
         yelp_data = True
         save_folder = '../dataset/' + filename[:-3] + "_data"
+        data_name = filename[:-3]
     else:
         # amazon dataset
         save_folder = '../dataset/' + filename[:-7] + "_data"
-    print(f"数据集名称：{save_folder}")
+        data_name = filename[:-7]
+
+    log_file_name = os.path.join(os.getcwd(), 'log', 'data',
+                                 data_name + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')
+    logger.setLevel(level=logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - : %(message)s')
+    file_handler = logging.FileHandler(log_file_name)
+    file_handler.setLevel(level=logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    logger.info(f"数据集名称：{save_folder}")
 
     if not os.path.exists(save_folder + '/train'):
         os.makedirs(save_folder + '/train')
@@ -172,7 +187,7 @@ if __name__ == '__main__':
         print("Warning: the word embedding file is not provided, will be initialized randomly")
     file = open(filename, errors='ignore')
 
-    print(f"{now()}: Step1: loading raw review datasets...")
+    logger.info(f"{now()}: Step1: loading raw review datasets...")
 
     users_id = []
     items_id = []
@@ -228,28 +243,28 @@ del users_id, items_id, ratings, reviews, polarity, subjectivity
 uidList, iidList = get_count(data, 'user_id'), get_count(data, 'item_id')
 userNum_all = len(uidList)
 itemNum_all = len(iidList)
-print("===============Start:all  rawData size======================")
-print(f"dataNum: {data.shape[0]}")
-print(f"userNum: {userNum_all}")
-print(f"itemNum: {itemNum_all}")
-print(f"data densiy: {data.shape[0] / float(userNum_all * itemNum_all):.4f}")
-print("===============End: rawData size========================")
+logger.info("===============Start:all  rawData size======================")
+logger.info(f"dataNum: {data.shape[0]}")
+logger.info(f"userNum: {userNum_all}")
+logger.info(f"itemNum: {itemNum_all}")
+logger.info(f"data densiy: {data.shape[0] / float(userNum_all * itemNum_all):.4f}")
+logger.info("===============End: rawData size========================")
 
 user2id = dict((uid, i) for (i, uid) in enumerate(uidList))
 item2id = dict((iid, i) for (i, iid) in enumerate(iidList))
 data = numerize(data)
 
-print(f"-" * 60)
-print(f"{now()} Step2: split datsets into train/val/test, save into npy data")
+logger.info(f"-" * 60)
+logger.info(f"{now()} Step2: split datsets into train/val/test, save into npy data")
 data_train, data_test = train_test_split(data, test_size=0.2, random_state=1234)
 uids_train, iids_train = get_count(data_train, 'user_id'), get_count(data_train, 'item_id')
 userNum = len(uids_train)
 itemNum = len(iids_train)
-print("===============Start: no-preprocess: trainData size======================")
-print("dataNum: {}".format(data_train.shape[0]))
-print("userNum: {}".format(userNum))
-print("itemNum: {}".format(itemNum))
-print("===============End: no-preprocess: trainData size========================")
+logger.info("===============Start: no-preprocess: trainData size======================")
+logger.info("dataNum: {}".format(data_train.shape[0]))
+logger.info("userNum: {}".format(userNum))
+logger.info("itemNum: {}".format(itemNum))
+logger.info("===============End: no-preprocess: trainData size========================")
 
 # 添加train data（从test data移除train中没有的）
 uidMiss = []
@@ -281,11 +296,11 @@ data_test, data_val = train_test_split(data_test, test_size=0.5, random_state=12
 uidList_train, iidList_train = get_count(data_train, 'user_id'), get_count(data_train, 'item_id')
 userNum = len(uidList_train)
 itemNum = len(iidList_train)
-print("===============Start--process finished: trainData size======================")
-print("dataNum: {}".format(data_train.shape[0]))
-print("userNum: {}".format(userNum))
-print("itemNum: {}".format(itemNum))
-print("===============End-process finished: trainData size========================")
+logger.info("===============Start--process finished: trainData size======================")
+logger.info("dataNum: {}".format(data_train.shape[0]))
+logger.info("userNum: {}".format(userNum))
+logger.info("itemNum: {}".format(itemNum))
+logger.info("===============End-process finished: trainData size========================")
 
 
 def extract(data_dict):
@@ -310,10 +325,10 @@ np.save(f"{save_folder}/val/Val_Score.npy", y_val)
 np.save(f"{save_folder}/test/Test.npy", x_test)
 np.save(f"{save_folder}/test/Test_Score.npy", y_test)
 
-print(now())
-print(f"Train data size: {len(x_train)}")
-print(f"Val data size: {len(x_val)}")
-print(f"Test data size: {len(x_test)}")
+logger.info(now())
+logger.info(f"Train data size: {len(x_train)}")
+logger.info(f"Val data size: {len(x_val)}")
+logger.info(f"Test data size: {len(x_test)}")
 
 # def extract_sentiment(data_dict):
 #     senti = []
@@ -325,8 +340,8 @@ print(f"Test data size: {len(x_test)}")
 # sentiments = extract_sentiment(data_train)
 # np.save(f"{save_folder}/train/Sentiments.npy", sentiments)
 
-print(f"-" * 60)
-print(f"{now()} Step3: Construct the vocab and user/item reviews from training set.")
+logger.info(f"-" * 60)
+logger.info(f"{now()} Step3: Construct the vocab and user/item reviews from training set.")
 # 2: build vocabulary only with train dataset
 user_reviews_dict = {}
 item_reviews_dict = {}
@@ -377,28 +392,28 @@ word_index = {}
 word_index['<unk>'] = 0
 for i, w in enumerate(vocab.keys(), 1):
     word_index[w] = i
-print(f"The vocab size: {len(word_index)}")
-print(f"Average user document length: {sum([len(i) for i in user_review2doc]) / len(user_review2doc)}")
-print(f"Average item document length: {sum([len(i) for i in item_review2doc]) / len(item_review2doc)}")
+logger.info(f"The vocab size: {len(word_index)}")
+logger.info(f"Average user document length: {sum([len(i) for i in user_review2doc]) / len(user_review2doc)}")
+logger.info(f"Average item document length: {sum([len(i) for i in item_review2doc]) / len(item_review2doc)}")
 
-print(now())
+logger.info(now())
 u_minNum, u_maxNum, u_averageNum, u_maxSent, u_minSent, u_pReviewLen, u_pSentLen = countNum(user_reviews_dict)
-print("用户最少有{}个评论,最多有{}个评论，平均有{}个评论, " \
-      "句子最大长度{},句子的最短长度{}，" \
-      "设定用户评论个数为{}： 设定句子最大长度为{}".format(u_minNum, u_maxNum, u_averageNum, u_maxSent, u_minSent, u_pReviewLen,
-                                        u_pSentLen))
+logger.info("用户最少有{}个评论,最多有{}个评论，平均有{}个评论, " \
+            "句子最大长度{},句子的最短长度{}，" \
+            "设定用户评论个数为{}： 设定句子最大长度为{}".format(u_minNum, u_maxNum, u_averageNum, u_maxSent, u_minSent, u_pReviewLen,
+                                              u_pSentLen))
 i_minNum, i_maxNum, i_averageNum, i_maxSent, i_minSent, i_pReviewLen, i_pSentLen = countNum(item_reviews_dict)
-print("商品最少有{}个评论,最多有{}个评论，平均有{}个评论," \
-      "句子最大长度{},句子的最短长度{}," \
-      ",设定商品评论数目{}, 设定句子最大长度为{}".format(i_minNum, i_maxNum, i_averageNum, u_maxSent, i_minSent, i_pReviewLen,
-                                        i_pSentLen))
-print("最终设定句子最大长度为(取最大值)：{}".format(max(u_pSentLen, i_pSentLen)))
+logger.info("商品最少有{}个评论,最多有{}个评论，平均有{}个评论," \
+            "句子最大长度{},句子的最短长度{}," \
+            ",设定商品评论数目{}, 设定句子最大长度为{}".format(i_minNum, i_maxNum, i_averageNum, u_maxSent, i_minSent, i_pReviewLen,
+                                              i_pSentLen))
+logger.info("最终设定句子最大长度为(取最大值)：{}".format(max(u_pSentLen, i_pSentLen)))
 # ########################################################################################################
 maxSentLen = max(u_pSentLen, i_pSentLen)
 minSentlen = 1
 
-print(f"-" * 60)
-print(f"{now()} Step4: padding all the text and id lists and save into npy.")
+logger.info(f"-" * 60)
+logger.info(f"{now()} Step4: padding all the text and id lists and save into npy.")
 
 
 # 把单个user/item的的review数统一为10/27
@@ -480,7 +495,7 @@ for i in range(userNum):
 
 # userReview2Index = []
 userDoc2Index, userDocLen = padding_doc(userDoc2Index)
-print(f"user document length: {userDocLen}")
+logger.info(f"user document length: {userDocLen}")
 
 itemReview2Index = []
 itemDoc2Index = []
@@ -516,10 +531,10 @@ for i in range(itemNum):
     itemReview2Sentiment.append(padding_sentiment(item_sentiments_dict[i], i_pReviewLen))  # sentiment
 
 itemDoc2Index, itemDocLen = padding_doc(itemDoc2Index)
-print(f"item document length: {itemDocLen}")
+logger.info(f"item document length: {itemDocLen}")
 
-print("-" * 60)
-print(f"{now()} start writing npy...")
+logger.info("-" * 60)
+logger.info(f"{now()} start writing npy...")
 np.save(f"{save_folder}/train/userReview2Index.npy", userReview2Index)
 np.save(f"{save_folder}/train/user_item2id.npy", user_iid_list)
 np.save(f"{save_folder}/train/userDoc2Index.npy", userDoc2Index)
@@ -530,11 +545,11 @@ np.save(f"{save_folder}/train/item_user2id.npy", item_uid_list)
 np.save(f"{save_folder}/train/itemDoc2Index.npy", itemDoc2Index)
 np.save(f"{save_folder}/train/itemReview2Sentiment.npy", itemReview2Sentiment)
 
-print(f"{now()} write finised")
+logger.info(f"{now()} write finised")
 
 # #####################################################3,产生w2v############################################
-print("-" * 60)
-print(f"{now()} Step5: start word embedding mapping...")
+logger.info("-" * 60)
+logger.info(f"{now()} Step5: start word embedding mapping...")
 vocab_item = sorted(word_index.items(), key=itemgetter(1))
 w2v = []
 out = 0
@@ -542,20 +557,20 @@ if PRE_W2V_BIN_PATH:
     pre_word2v = gensim.models.KeyedVectors.load_word2vec_format(PRE_W2V_BIN_PATH, binary=True)
 else:
     pre_word2v = {}
-print(f"{now()} 开始提取embedding")
+logger.info(f"{now()} 开始提取embedding")
 for word, key in vocab_item:
     if word in pre_word2v:
         w2v.append(pre_word2v[word])
     else:
         out += 1
         w2v.append(np.random.uniform(-1.0, 1.0, (300,)))
-print("############################")
-print(f"out of vocab: {out}")
-# print w2v[1000]
-print(f"w2v size: {len(w2v)}")
-print("############################")
+logger.info("############################")
+logger.info(f"out of vocab: {out}")
+# print(w2v[1000])
+logger.info(f"w2v size: {len(w2v)}")
+logger.info("#" * 100)
 w2vArray = np.array(w2v)
-print(w2vArray.shape)
+logger.info(w2vArray.shape)
 np.save(f"{save_folder}/train/w2v.npy", w2v)
 end_time = time.time()
-print(f"{now()} all steps finised, cost time: {end_time - start_time:.4f}s")
+logger.info(f"{now()} all steps finised, cost time: {end_time - start_time:.4f}s")
