@@ -165,7 +165,7 @@ if __name__ == '__main__':
         save_folder = '../dataset/' + filename[:-7] + "_data"
         data_name = filename[:-7]
 
-    log_file_name = os.path.join(os.getcwd(), 'log', 'data',
+    log_file_name = os.path.join(os.getcwd(), 'log',
                                  data_name + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')
     logger.setLevel(level=logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - : %(message)s')
