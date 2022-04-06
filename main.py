@@ -14,6 +14,9 @@ from framework import Model
 import models
 import config
 
+import logging
+import os
+
 
 def now():
     return str(time.strftime('%Y-%m-%d %H:%M:%S'))
@@ -25,6 +28,15 @@ def collate_fn(batch):
 
 
 def train(**kwargs):
+    logger = logging.getLogger('')
+    file_name = os.path.join(os.getcwd(), 'log', time.strftime("%m%d-%H%M%S", time.localtime()) + '.txt')
+    logger.setLevel(level=logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - [line:%(lineno)d] - : %(message)s')
+    file_handler = logging.FileHandler(file_name)
+    file_handler.setLevel(level=logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:
@@ -47,6 +59,7 @@ def train(**kwargs):
             model = nn.DataParallel(model, device_ids=opt.gpu_ids)
 
     if model.net.num_fea != opt.num_fea:
+        logger.error(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
 
     # 3 data
