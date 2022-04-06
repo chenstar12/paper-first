@@ -111,12 +111,6 @@ def train(**kwargs):
             optimizer.zero_grad()
             output = model(train_datas)
 
-            print(output)
-            print(output > 2.5000)
-            print([int(i) for i in (output > 2.5000)])
-            print('scores...................')
-            print(scores)
-
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
             iter_loss.append(mse_loss.item() * len(scores))
@@ -233,9 +227,8 @@ def predict(model, data_loader, opt):
 
             output = model(test_data)
 
-            print(output)
-            print(output > 2.5000)
-            print(int(output > 2.5000))
+            output_list = [int(i) for i in (output > 2.5000)]
+            scores_list = [int(i) for i in (scores > 2.5000)]
 
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
