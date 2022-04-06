@@ -35,7 +35,7 @@ def train(**kwargs):
     opt.parse(kwargs)
 
     log_file_name = os.path.join(os.getcwd(), 'log',
-                                 opt.model + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')
+                                 opt.dataset[:-5] + '-' + opt.model + '.txt')
     logger.setLevel(level=logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - : %(message)s')
     file_handler = logging.FileHandler(log_file_name)
@@ -82,10 +82,13 @@ def train(**kwargs):
     smooth_mae_func = nn.SmoothL1Loss()
 
     for epoch in range(opt.num_epochs):
+        epoch_loss = []
         total_loss = 0.0
+        epoch_maeloss = []
         total_maeloss = 0.0
         model.train()
         logger.info(f"{now()}  Epoch {epoch}...")
+        print(f"{now()}  Epoch {epoch}...")
         for idx, (train_datas, scores) in enumerate(train_data_loader):
             if opt.use_gpu:
                 scores = torch.FloatTensor(scores).cuda()
@@ -105,7 +108,9 @@ def train(**kwargs):
 
             mae_loss = mae_func(output, scores)
             total_maeloss += mae_loss.item()
+
             smooth_mae_loss = smooth_mae_func(output, scores)
+
             if opt.loss_method == 'mse':
                 loss = mse_loss
             if opt.loss_method == 'rmse':
@@ -131,8 +136,12 @@ def train(**kwargs):
                         best_res = min_loss
 
         scheduler.step()
+
         mse = total_loss * 1.0 / len(train_data)
+        epoch_loss.append(mse)
+
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
+        logger.info('train loss list: ' + str(epoch_loss))
 
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
         if val_loss < min_loss:
