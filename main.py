@@ -209,6 +209,10 @@ def test(**kwargs):
 
 
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import auc
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import roc_auc_score
 
 
 def predict(model, data_loader, opt):
@@ -216,6 +220,8 @@ def predict(model, data_loader, opt):
     total_maeloss = 0.0
     model.eval()
     with torch.no_grad():
+        output_list = []
+        scores_list = []
         for idx, (test_data, scores) in enumerate(data_loader):
             if opt.use_gpu:
                 scores = torch.FloatTensor(scores).cuda()
@@ -229,19 +235,21 @@ def predict(model, data_loader, opt):
 
             output = model(test_data)
 
-            print('-----------------acc-------------------------')
-            output_list = [int(i) for i in (output > 2.5000)]
-            scores_list = [int(i) for i in (scores > 2.5000)]
-            print(accuracy_score(output_list, scores_list))
-            print(accuracy_score(output, scores))
-
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
 
             mae_loss = torch.sum(abs(output - scores))
             total_maeloss += mae_loss.item()
 
-            # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,。。。。
+            output_list.append([int(i) for i in (output > 2.5000)])
+            scores_list.append([int(i) for i in (scores > 2.5000)])
+
+        # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
+        print('acc: ', accuracy_score(output_list, scores_list))
+        print('auc: ', auc(output_list, scores_list))
+        print('roc_auc_score: ', roc_auc_score(output_list, scores_list))
+        print('recall_score: ', recall_score(output_list, scores_list))
+        print('precision_score: ', precision_score(output_list, scores_list))
 
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
