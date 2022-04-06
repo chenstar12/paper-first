@@ -14,10 +14,8 @@ from framework import Model
 import models
 import config
 
-from sklearn import preprocessing
 import logging
 import os
-import copy
 
 
 def now():
@@ -75,15 +73,6 @@ def train(**kwargs):
 
     val_data = ReviewData(opt.data_root, mode="Val")
     val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-
-    # 归一化 --- 0-1之间;用来计算排序指标
-    scaler = preprocessing.MinMaxScaler().fit(val_data.scores)
-    val_data_rank = copy.deepcopy(val_data)
-    val_data_rank.scores = scaler.transform(val_data.scores)
-    print(val_data.scores)
-    print('..............................................')
-    print(val_data_rank.scores)
-    val_data_loader_rank = DataLoader(val_data_rank, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
     # print(f'train data: {len(train_data)}; test data: {len(val_data)}')
