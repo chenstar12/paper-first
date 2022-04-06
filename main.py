@@ -38,7 +38,7 @@ def train(**kwargs):
         'model: ' + opt.model + '\n' + 'dataset: ' + opt.dataset + '\n' +
         'batch_size:' + str(opt.batch_size) + '\n' + 'num_epochs: ' + str(opt.num_epochs) + '\n' +
         'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n' +
-        'output: ' + opt.output + '\n')
+        'output: ' + opt.output)
 
     log_file_name = os.path.join(os.getcwd(), 'log',
                                  opt.dataset[:4] + '-' + opt.model + '.txt')
