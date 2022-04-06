@@ -223,7 +223,7 @@ if __name__ == '__main__':
                 blob = TextBlob(js['reviewText'])
 
                 pola = blob.sentiment.polarity
-                pola = int(pola * 10000)  # 防止被floattensor截断
+                pola = int(pola * 10000)  # 防止被floatTensor截断
                 polarity.append(pola)
 
                 subj = blob.sentiment.subjectivity
