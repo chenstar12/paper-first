@@ -28,15 +28,6 @@ def collate_fn(batch):
 
 
 def train(**kwargs):
-    logger = logging.getLogger('')
-    file_name = os.path.join(os.getcwd(), 'log', time.strftime("%m%d-%H%M%S", time.localtime()) + '.txt')
-    logger.setLevel(level=logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - [line:%(lineno)d] - : %(message)s')
-    file_handler = logging.FileHandler(file_name)
-    file_handler.setLevel(level=logging.INFO)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:
@@ -74,7 +65,7 @@ def train(**kwargs):
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.8)
 
     # training
-    print("start training....")
+    logger.info("start training.........................................................")
     min_loss = 1e+10
     best_res = 1e+10
     mse_func = nn.MSELoss()
@@ -85,7 +76,7 @@ def train(**kwargs):
         total_loss = 0.0
         total_maeloss = 0.0
         model.train()
-        print(f"{now()}  Epoch {epoch}...")
+        logger.info(f"{now()}  Epoch {epoch}...")
         for idx, (train_datas, scores) in enumerate(train_data_loader):
             if opt.use_gpu:
                 scores = torch.FloatTensor(scores).cuda()
@@ -99,10 +90,6 @@ def train(**kwargs):
 
             optimizer.zero_grad()
             output = model(train_datas)
-            print('output')
-            print(output)
-            print('scores')
-            print(scores)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)
@@ -125,24 +112,24 @@ def train(**kwargs):
             # if idx % 50 == 0: print("\t{}, {} step;".format(now(), idx))
             if opt.fine_step:  # 默认False。。。。。
                 if idx % opt.print_step == 0 and idx > 0:
-                    print("\t{}, {} step finised;".format(now(), idx))
+                    logger.info("\t{}, {} step finised;".format(now(), idx))
                     val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
                     if val_loss < min_loss:
                         model.save(name=opt.dataset, opt=opt.print_opt)
                         min_loss = val_loss
-                        print("\tmodel save")
+                        logger.info("\tmodel save")
                     if val_loss > min_loss:
                         best_res = min_loss
 
         scheduler.step()
         mse = total_loss * 1.0 / len(train_data)
-        print(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
+        logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
         if val_loss < min_loss:
             model.save(name=opt.dataset, opt=opt.print_opt)
             min_loss = val_loss
-            print("model save")
+            logger.info("model save")
 
         if val_mse < best_res:
             best_res = val_mse
@@ -150,13 +137,13 @@ def train(**kwargs):
         else:
             num_decline += 1
             if num_decline >= opt.early_stop:
-                print('--------------------------Early Stop----------------------------')
+                logger.info('--------------------------Early Stop----------------------------')
                 break
-        print("*" * 30)
+        logger.info("*" * 30)
 
-    print("----" * 150)
-    print(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
-    print("----" * 150)
+    logger.info("----" * 150)
+    logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
+    logger.info("----" * 150)
 
 
 def test(**kwargs):
@@ -184,10 +171,10 @@ def test(**kwargs):
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
 
     model.load(opt.pth_path)
-    print(f"load model: {opt.pth_path}")
+    logger.info(f"load model: {opt.pth_path}")
     test_data = ReviewData(opt.data_root, mode="Test")
     test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-    print(f"{now()}: test in the test dataset")
+    logger.info(f"{now()}: test in the test dataset")
     predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
 
 
@@ -219,7 +206,7 @@ def predict(model, data_loader, opt):
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
     mae = total_maeloss * 1.0 / data_len
-    print(f"\tevaluation reslut: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    logger.info(f"\tevaluation reslut: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     model.train()
     return total_loss, mse, mae
 
@@ -264,4 +251,13 @@ def unpack_input_sentiment(opt, x):
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger('')
+    file_name = os.path.join(os.getcwd(), 'log', time.strftime("%m%d-%H%M%S", time.localtime()) + '.txt')
+    logger.setLevel(level=logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - : %(message)s')
+    file_handler = logging.FileHandler(file_name)
+    file_handler.setLevel(level=logging.INFO)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
     fire.Fire()
