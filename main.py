@@ -110,15 +110,6 @@ def train(**kwargs):
             optimizer.zero_grad()
             output = model(train_datas)
 
-            output_list = ([int(i) for i in (output > 2.5000)])
-            scores_list = ([int(i) for i in (scores > 2.5000)])
-            # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
-            print('acc: ', accuracy_score(output_list, scores_list))
-            print('auc: ', auc(output_list, scores_list))
-            print('roc_auc_score: ', roc_auc_score(output_list, scores_list))
-            print('recall_score: ', recall_score(output_list, scores_list))
-            print('precision_score: ', precision_score(output_list, scores_list))
-
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
             iter_loss.append(mse_loss.item() * len(scores))
@@ -158,7 +149,7 @@ def train(**kwargs):
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
-        # 模型评估 ---- 需添加排序指标：NDCG，Diversity。。。。
+        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
         epoch_val_mse.append(val_mse)
 
@@ -217,13 +208,6 @@ def test(**kwargs):
     predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
 
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import auc
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import roc_auc_score
-
-
 def predict(model, data_loader, opt):
     total_loss = 0.0
     total_maeloss = 0.0
@@ -253,12 +237,7 @@ def predict(model, data_loader, opt):
             output_list.append([int(i) for i in (output > 2.5000)])
             scores_list.append([int(i) for i in (scores > 2.5000)])
 
-        # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
-        print('acc: ', accuracy_score(output_list, scores_list))
-        print('auc: ', auc(output_list, scores_list))
-        print('roc_auc_score: ', roc_auc_score(output_list, scores_list))
-        print('recall_score: ', recall_score(output_list, scores_list))
-        print('precision_score: ', precision_score(output_list, scores_list))
+        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
 
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
