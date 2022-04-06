@@ -33,9 +33,13 @@ def train(**kwargs):
     else:
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)
+    logger.info(
+        'model: ' + opt.model + '\n' + 'dataset: ' + opt.dataset + '\n' + 'batch_size:' + opt.batch_size + '\n' +
+        'num_epochs: ' + opt.num_epochs + '\n' + 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n'
+        + 'output' + opt.output + '\n')
 
     log_file_name = os.path.join(os.getcwd(), 'log',
-                                 opt.dataset[:-5] + '-' + opt.model + '.txt')
+                                 opt.dataset[:4] + '-' + opt.model + '.txt')
     logger.setLevel(level=logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - : %(message)s')
     file_handler = logging.FileHandler(log_file_name)
@@ -83,8 +87,8 @@ def train(**kwargs):
 
     for epoch in range(opt.num_epochs):
         epoch_loss = []
+        iter_loss = []
         total_loss = 0.0
-        epoch_maeloss = []
         total_maeloss = 0.0
         model.train()
         logger.info(f"{now()}  Epoch {epoch}...")
@@ -104,7 +108,8 @@ def train(**kwargs):
             output = model(train_datas)
 
             mse_loss = mse_func(output, scores)
-            total_loss += mse_loss.item() * len(scores)
+            total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
+            iter_loss.append(mse_loss.item() * len(scores))
 
             mae_loss = mae_func(output, scores)
             total_maeloss += mae_loss.item()
@@ -142,6 +147,7 @@ def train(**kwargs):
 
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
         logger.info('train loss list: ' + str(epoch_loss))
+        logger.info('train iteration loss list: ' + str(iter_loss))
 
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
         if val_loss < min_loss:
@@ -224,7 +230,7 @@ def predict(model, data_loader, opt):
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
     mae = total_maeloss * 1.0 / data_len
-    logger.info(f"\tevaluation reslut: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    logger.info(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     model.train()
     return total_loss, mse, mae
 

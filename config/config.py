@@ -45,6 +45,12 @@ class DefaultConfig:
     pth_path = ""  # the saved pth path for test
     print_opt = 'default'
 
+    batch_size = 128
+    print_step = 100
+
+    vocab_size = 50002
+    word_dim = 300
+
     def set_path(self, name):
         '''
         specific
@@ -100,9 +106,6 @@ class Video_Games_data_Config(DefaultConfig):
         self.dataset = 'Video_Games_data'
         self.set_path('Video_Games_data')
 
-    vocab_size = 50002
-    word_dim = 300
-
     r_max_len = 214
 
     u_max_r = 10
@@ -115,18 +118,12 @@ class Video_Games_data_Config(DefaultConfig):
     user_num = 24303 + 2
     item_num = 10672 + 2
 
-    batch_size = 128
-    print_step = 100
-
 
 class Pet_Supplies_data_Config(DefaultConfig):
 
     def __init__(self):
         self.dataset = 'Pet_Supplies_data'
         self.set_path('Pet_Supplies_data')
-
-    vocab_size = 50002
-    word_dim = 300
 
     r_max_len = 95
 
@@ -139,6 +136,3 @@ class Pet_Supplies_data_Config(DefaultConfig):
 
     user_num = 19856 + 2
     item_num = 8510 + 2
-
-    batch_size = 128
-    print_step = 100
