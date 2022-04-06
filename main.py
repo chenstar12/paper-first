@@ -113,7 +113,7 @@ def train(**kwargs):
 
             print(output)
             print(output > 2.5000)
-            print(int(output.cpu().detach().numpy() > 2.5000))
+            print([int(i) for i in (output > 2.5000)])
             print('scores...................')
             print(scores)
 
