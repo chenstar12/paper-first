@@ -110,6 +110,15 @@ def train(**kwargs):
             optimizer.zero_grad()
             output = model(train_datas)
 
+            output_list = ([int(i) for i in (output > 2.5000)])
+            scores_list = ([int(i) for i in (scores > 2.5000)])
+            # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
+            print('acc: ', accuracy_score(output_list, scores_list))
+            print('auc: ', auc(output_list, scores_list))
+            print('roc_auc_score: ', roc_auc_score(output_list, scores_list))
+            print('recall_score: ', recall_score(output_list, scores_list))
+            print('precision_score: ', precision_score(output_list, scores_list))
+
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
             iter_loss.append(mse_loss.item() * len(scores))
@@ -243,12 +252,6 @@ def predict(model, data_loader, opt):
 
             output_list.append([int(i) for i in (output > 2.5000)])
             scores_list.append([int(i) for i in (scores > 2.5000)])
-            # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
-            print('acc: ', accuracy_score(output_list, scores_list))
-            print('auc: ', auc(output_list, scores_list))
-            print('roc_auc_score: ', roc_auc_score(output_list, scores_list))
-            print('recall_score: ', recall_score(output_list, scores_list))
-            print('precision_score: ', precision_score(output_list, scores_list))
 
         # 添加评价指标：NDCG，Diversity,MRR,HR,AUC,
         print('acc: ', accuracy_score(output_list, scores_list))
