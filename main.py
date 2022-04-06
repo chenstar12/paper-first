@@ -14,8 +14,10 @@ from framework import Model
 import models
 import config
 
+from sklearn import preprocessing
 import logging
 import os
+import copy
 
 
 def now():
@@ -70,8 +72,19 @@ def train(**kwargs):
     # 3 data
     train_data = ReviewData(opt.data_root, mode="Train")
     train_data_loader = DataLoader(train_data, batch_size=opt.batch_size, shuffle=True, collate_fn=collate_fn)
+
     val_data = ReviewData(opt.data_root, mode="Val")
     val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
+
+    # 归一化 --- 0-1之间;用来计算排序指标
+    scaler = preprocessing.MinMaxScaler().fit(val_data.scores)
+    val_data_rank = copy.deepcopy(val_data)
+    val_data_rank.scores = scaler.transform(val_data.scores)
+    print(val_data.scores)
+    print('..............................................')
+    print(val_data_rank.scores)
+    val_data_loader_rank = DataLoader(val_data_rank, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
+
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
     # print(f'train data: {len(train_data)}; test data: {len(val_data)}')
 
@@ -107,9 +120,6 @@ def train(**kwargs):
 
             optimizer.zero_grad()
             output = model(train_datas)
-            print(output)
-            print('scccccccccccccccccccccccccccccccc------------')
-            print(scores)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
