@@ -208,6 +208,9 @@ def test(**kwargs):
     predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
 
 
+from sklearn.metrics import accuracy_score
+
+
 def predict(model, data_loader, opt):
     total_loss = 0.0
     total_maeloss = 0.0
@@ -226,8 +229,11 @@ def predict(model, data_loader, opt):
 
             output = model(test_data)
 
+            print('-----------------acc-------------------------')
             output_list = [int(i) for i in (output > 2.5000)]
             scores_list = [int(i) for i in (scores > 2.5000)]
+            print(accuracy_score(output_list, scores_list))
+            print(accuracy_score(output, scores))
 
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
