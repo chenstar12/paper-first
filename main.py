@@ -109,7 +109,7 @@ def train(**kwargs):
             loss.backward()
             optimizer.step()
 
-            # if idx % 50 == 0: print("\t{}, {} step;".format(now(), idx))
+            if idx % 50 == 0: logger.info("\t{}, {} step;".format(now(), idx))
             if opt.fine_step:  # 默认False。。。。。
                 if idx % opt.print_step == 0 and idx > 0:
                     logger.info("\t{}, {} step finised;".format(now(), idx))
