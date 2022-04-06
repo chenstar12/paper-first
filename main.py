@@ -89,7 +89,8 @@ def train(**kwargs):
     smooth_mae_func = nn.SmoothL1Loss()
 
     iter_loss = []  # 每个iteration的loss，用来画图
-    epoch_loss = []
+    epoch_train_mse = []
+    epoch_val_mse = []
     for epoch in range(opt.num_epochs):
         total_loss = 0.0
         total_maeloss = 0.0
@@ -109,6 +110,12 @@ def train(**kwargs):
 
             optimizer.zero_grad()
             output = model(train_datas)
+
+            print(output)
+            print(output > 2.5000)
+            print(int(output > 2.5000))
+            print('scores...................')
+            print(scores)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
@@ -131,7 +138,7 @@ def train(**kwargs):
             loss.backward()
             optimizer.step()
 
-            if idx % 50 == 0: logger.info("\t{}, {} step;".format(now(), idx))
+            # if idx % 50 == 0: logger.info("\t{}, {} step;".format(now(), idx))
             if opt.fine_step:  # 默认False。。。。。
                 if idx % opt.print_step == 0 and idx > 0:
                     logger.info("\t{}, {} step finised;".format(now(), idx))
@@ -146,13 +153,12 @@ def train(**kwargs):
         scheduler.step()
 
         mse = total_loss * 1.0 / len(train_data)
-        epoch_loss.append(mse)
-
+        epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
-        logger.info('train loss list: ' + str(epoch_loss))
 
         # 模型评估 ---- 需添加排序指标：NDCG，Diversity。。。。
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+        epoch_val_mse.append(val_mse)
 
         if val_loss < min_loss:
             model.save(name=opt.dataset, opt=opt.print_opt)
@@ -173,6 +179,8 @@ def train(**kwargs):
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
     logger.info("----" * 150)
     logger.info('train iteration loss list: ' + str(iter_loss))
+    logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
+    logger.info('train loss list: ' + str(epoch_train_mse))
 
 
 def test(**kwargs):
