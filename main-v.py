@@ -167,7 +167,7 @@ def train(**kwargs):
             num_decline += 1
             if num_decline >= opt.early_stop:
                 logger.info(
-                    '=======================Early Stop: ' + 'num_decline = ' + num_decline + '==================')
+                    '=======================Early Stop: ' + 'num_decline = ' + str(num_decline) + '==================')
                 break
         logger.info("*" * 30)
 
