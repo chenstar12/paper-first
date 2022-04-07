@@ -103,7 +103,7 @@ def train(**kwargs):
             else:
                 scores = torch.FloatTensor(scores)
 
-            if opt.model in ['MSCI', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
+            if opt.model in ['MSCI', 'MSCI0', 'MSCI2', 'MSCI3', 'MSCI4', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
                 train_datas = unpack_input_sentiment(opt, train_datas)
             else:
                 train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
@@ -223,7 +223,7 @@ def predict(model, data_loader, opt):
             else:
                 scores = torch.FloatTensor(scores)
 
-            if opt.model in ['MSCI', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
+            if opt.model in ['MSCI', 'MSCI0', 'MSCI2', 'MSCI3', 'MSCI4', 'MSCFI']:  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
             else:
                 test_data = unpack_input(opt, test_data)
