@@ -136,3 +136,22 @@ class Pet_Supplies_data_Config(DefaultConfig):
 
     user_num = 19856 + 2
     item_num = 8510 + 2
+
+
+class Kindle_Store_data_Config(DefaultConfig):
+
+    def __init__(self):
+        self.dataset = 'Kindle_Store_data'
+        self.set_path('Kindle_Store_data')
+
+    r_max_len = 123
+
+    u_max_r = 16
+    i_max_r = 19
+
+    train_data_size = 786159
+    test_data_size = 98230
+    val_data_size = 98230
+
+    user_num = 68223 + 2
+    item_num = 61934 + 2
