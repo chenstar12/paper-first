@@ -35,7 +35,7 @@ def train(**kwargs):
     opt.parse(kwargs)
 
     log_file_name = os.path.join('/content/drive/MyDrive/log', opt.dataset[:4] + '-' +
-                                 opt.model + '-' + str(time.strftime('%m%d%H%M')) + '.txt')
+                                 opt.model + '-' + str(time.strftime('%d%H%M')) + '.txt')
     logger.setLevel(level=logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - : %(message)s')
     file_handler = logging.FileHandler(log_file_name)
@@ -90,6 +90,7 @@ def train(**kwargs):
     iter_loss = []  # 每个iteration的loss，用来画图
     epoch_train_mse = []
     epoch_val_mse = []
+    num_decline = 0  # early_stop 指标
     for epoch in range(opt.num_epochs):
         total_loss = 0.0
         total_maeloss = 0.0
@@ -164,7 +165,7 @@ def train(**kwargs):
         else:
             num_decline += 1
             if num_decline >= opt.early_stop:
-                logger.info('--------------------------Early Stop----------------------------')
+                logger.info('=================================Early Stop==================================')
                 break
         logger.info("*" * 30)
 
