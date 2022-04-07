@@ -46,7 +46,7 @@ def train(**kwargs):
     logger.info('\n' + 'model: ' + opt.model + '\n' + 'dataset: ' + opt.dataset + '\n' +
                 'batch_size:' + str(opt.batch_size) + '\n' + 'num_epochs: ' + str(opt.num_epochs) + '\n' +
                 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n' +
-                'output: ' + opt.output)
+                'output: ' + opt.output + 'lr: ' + opt.lr)
 
     random.seed(opt.seed)
     np.random.seed(opt.seed)
@@ -165,7 +165,8 @@ def train(**kwargs):
         else:
             num_decline += 1
             if num_decline >= opt.early_stop:
-                logger.info('=================================Early Stop==================================')
+                logger.info(
+                    '=======================Early Stop: ' + 'num_decline = ' + num_decline + '==================')
                 break
         logger.info("*" * 30)
 
