@@ -82,7 +82,9 @@ class Net(nn.Module):
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
         polarity_w = F.softmax(polarity_w, 1)
+
         fea = fea * polarity_w
+        fea = fea * r_num
 
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
