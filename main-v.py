@@ -35,7 +35,7 @@ def train(**kwargs):
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)
 
-    log_file_name = os.path.join('/content/drive/MyDrive/log', opt.dataset[:4] + '-' +
+    log_file_name = os.path.join('/content/log', opt.dataset[:4] + '-' +
                                  opt.model + '-' + str(time.strftime('%d%H%M')) + '.txt')
     logger.setLevel(level=logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s - : %(message)s')
