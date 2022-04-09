@@ -4,7 +4,7 @@ import numpy as np
 import torch.nn.functional as F
 
 
-class DeepCoNN(nn.Module):
+class DeepCoNN1(nn.Module):
 
     def __init__(self, opt, uori='user'):
         super(DeepCoNN, self).__init__()

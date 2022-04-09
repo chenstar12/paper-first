@@ -3,6 +3,7 @@ User/Item Representation Learning Layer (models/*.py): the main part of most bas
 such as : the CNN encoder in DeepCoNN;
 '''
 from .deepconn import DeepCoNN
+from .deepconn1 import DeepCoNN1
 from .daml import DAML
 from .narre import NARRE
 from .d_attn import D_ATTN

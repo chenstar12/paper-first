@@ -131,21 +131,20 @@ def train(**kwargs):
             loss.backward()
             optimizer.step()
 
-            # if idx % 50 == 0: logger.info("\t{}, {} step;".format(now(), idx))
-            if opt.fine_step:  # 默认False。。。。。
-                if idx % opt.print_step == 0 and idx > 0:
-                    logger.info("\t{}, {} step finised;".format(now(), idx))
-                    val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
-                    if val_loss < min_loss:
-                        model.save(name=opt.dataset, opt=opt.print_opt)
-                        min_loss = val_loss
-                        logger.info("\tmodel save")
-                    if val_loss > min_loss:
-                        best_res = min_loss
+            # if opt.fine_step:  # 默认False。。。。。
+            #     if idx % opt.print_step == 0 and idx > 0:
+            #         logger.info("\t{}, {} step finised;".format(now(), idx))
+            #         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+            #         if val_loss < min_loss:
+            #             model.save(name=opt.dataset, opt=opt.print_opt)
+            #             min_loss = val_loss
+            #             logger.info("\tmodel save")
+            #         if val_loss > min_loss:
+            #             best_res = min_loss
 
         scheduler.step()
 
-        mse = total_loss * 1.0 / len(train_data)
+        mse = total_loss * 1.0 / len(train_data)  # total_loss每轮都会置0； len(train_data)：几万
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
@@ -153,25 +152,26 @@ def train(**kwargs):
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
         epoch_val_mse.append(val_mse)
 
-        if val_loss < min_loss:
+        if val_mse < best_res:
+            num_decline = 0  # early_stop 指标
+            best_res = val_mse
+            logger.info('current best_res: ' + str(best_res) + 'num_decline: ', str(num_decline))
+
             model.save(name=opt.dataset, opt=opt.print_opt)
             min_loss = val_loss
             logger.info("model save")
-
-        if val_mse < best_res:
-            best_res = val_mse
-            num_decline = 0  # early_stop 指标
         else:
             num_decline += 1
+            logger.info('num_decline: ', str(num_decline))
             if num_decline >= opt.early_stop:
                 logger.info(
                     '=======================Early Stop: ' + 'num_decline = ' + str(num_decline) + '==================')
                 break
         logger.info("*" * 30)
 
-    logger.info("----" * 150)
+    logger.info("-" * 150)
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
-    logger.info("----" * 150)
+    logger.info("-" * 150)
     logger.info('train iteration loss list: ' + str(iter_loss))
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
     logger.info('train loss list: ' + str(epoch_train_mse))
@@ -214,8 +214,6 @@ def predict(model, data_loader, opt):
     total_maeloss = 0.0
     model.eval()
     with torch.no_grad():
-        output_list = []
-        scores_list = []
         for idx, (test_data, scores) in enumerate(data_loader):
             if opt.use_gpu:
                 scores = torch.FloatTensor(scores).cuda()
@@ -234,9 +232,6 @@ def predict(model, data_loader, opt):
 
             mae_loss = torch.sum(abs(output - scores))
             total_maeloss += mae_loss.item()
-
-            output_list.append([int(i) for i in (output > 2.5000)])
-            scores_list.append([int(i) for i in (scores > 2.5000)])
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
 

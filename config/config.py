@@ -41,7 +41,7 @@ class DefaultConfig:
     output = 'lfm'  # 'fm', 'lfm', 'other: sum the ui_feature'
 
     fine_step = False  # save mode in step level, default in epoch
-    early_stop = 20  # 在验证集连续10轮mse下降时early stop
+    early_stop = 10  # 在验证集连续10轮mse下降时early stop
     pth_path = ""  # the saved pth path for test
     print_opt = 'default'
 
