@@ -155,7 +155,7 @@ def train(**kwargs):
         if val_mse < best_res:
             num_decline = 0  # early_stop 指标
             best_res = val_mse
-            logger.info('current best_res: ' + str(best_res) + 'num_decline: ' + str(num_decline))
+            logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
 
             model.save(name=opt.dataset, opt=opt.print_opt)
             min_loss = val_loss
