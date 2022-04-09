@@ -15,4 +15,6 @@ from .MSCI1 import MSCI1
 from .MSCI2 import MSCI2
 from .MSCI3 import MSCI3
 from .MSCI4 import MSCI4
+from .MSCI5 import MSCI5
+from .MSCI6 import MSCI6
 from .MSCI11 import MSCI11

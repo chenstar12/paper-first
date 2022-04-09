@@ -3,13 +3,17 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
+'''
+review和id_embedding融合时：采用拼接的方式
+'''
 
-class MSCI0(nn.Module):
+
+class MSCI5(nn.Module):
 
     def __init__(self, opt):
-        super(MSCI0, self).__init__()
+        super(MSCI5, self).__init__()
         self.opt = opt
-        self.num_fea = 2  # 0,1,2 == id,doc,review
+        self.num_fea = 3  # 0,1,2 == id,doc,review
 
         self.user_net = Net(opt, 'user')
         self.item_net = Net(opt, 'item')
@@ -18,8 +22,8 @@ class MSCI0(nn.Module):
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
         user_doc, item_doc, user_sentiments, item_sentiments = datas
 
-        u_fea = self.user_net(user_reviews, uids, user_item2id, user_sentiments)  # Net的forward -> [128,2,32]
-        i_fea = self.item_net(item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
+        u_fea = self.user_net(user_doc, user_reviews, uids, user_item2id, user_sentiments)  # Net的forward函数得：[128,2,32]
+        i_fea = self.item_net(item_doc, item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
 
         return u_fea, i_fea
 
@@ -42,8 +46,9 @@ class Net(nn.Module):
 
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
 
-        self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)  # [100,32].用来给review特征降维
-        self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
+        self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
+                                self.opt.id_emb_size)  # [100,32].用来给review特征降维
+        # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
@@ -51,12 +56,12 @@ class Net(nn.Module):
         self.reset_para()
 
     def forward(self, doc, reviews, ids, ids_list, sentiments):  # 添加了sentiments
+
         #  1. word embedding
         # reviews:用户[128, 10, 214] ->  [128, 10, 214, 300]，物品[128, 27, 214] ->  [128, 27, 214, 300]
         reviews = self.word_embs(reviews)
         bs, r_num, r_len, wd = reviews.size()
         reviews = reviews.view(-1, r_len, wd)  # [1280, 214, 300]
-
         # 2. cnn
         # 先unsqueeze(1) -> [1280,1,214,300]，再cnn -> [1280, 100, 212,1],最后squeeze(3) -> [1280, 100, 212]
         fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)
@@ -69,9 +74,9 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            self.review_linear(fea) +  # review降维:[128,10/27,100]->[128,10/27,32]
-            self.id_linear(F.relu(u_i_id_emb))  # id降维后还是[128,10/27，32]
+            torch.cat([fea, u_i_id_emb], dim=1)
         )
+        rs_mix = self.linear(rs_mix)  # [128,10,132] -> [128,10,32]
 
         '''
         （1）先把情感权重归一化 ---- softmax
@@ -82,18 +87,31 @@ class Net(nn.Module):
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
         polarity_w = F.softmax(polarity_w, 1)
-
-        fea = fea * polarity_w
-        fea = fea * r_num
+        # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
+        rs_mix = rs_mix * polarity_w  # fea还是[128, 10/27, 32]
+        rs_mix = rs_mix * r_num
 
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
+        r_fea = rs_mix * att_weight  # fea:[128, 10/27, 32]; 得到r_fea也是[128, 10, 32]；原理：最后一维attention自动扩展100次
 
-        r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
-        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
+        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,32]
+
         r_fea = self.dropout(r_fea)
+
+        '''
+        添加了doc特征
+        '''
+        # 调用Embedding类的forward函数（F.embedding查找表）： torch.Size([50002, 300]) -> torch.Size([128, 500, 300])
+        doc = self.word_embs(doc)  # [128, 500] -> [128, 500, 300]
+        # unsqueeze(1): [128,500,300] -> [128,1,500,300]; cnn -> [128,100,498,1]; squeeze -> [128,100,498]
+        doc_fea = F.relu(self.cnn(doc.unsqueeze(1))).squeeze(3)
+        # 最大池化：[] -> [128,100，1] ，squeeze(2): -> [128,100],作为fc层的输入
+        doc_fea = F.max_pool1d(doc_fea, doc_fea.size(2)).squeeze(2)
+        doc_fea = self.linear(doc_fea)  # 降维 -> [128,32]
+
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
-        return torch.stack([id_emb, self.fc_layer(r_fea)], 1)
+        return torch.stack([id_emb, doc_fea, self.fc_layer(r_fea)], 1)  # 加入doc后 -> [128,3,32]
 
     def reset_para(self):
         if self.opt.use_word_embedding:
@@ -113,8 +131,8 @@ class Net(nn.Module):
 
         nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
 
-        nn.init.uniform_(self.review_linear.weight, -0.1, 0.1)
-        nn.init.constant_(self.review_linear.bias, 0.1)
+        nn.init.uniform_(self.linear.weight, -0.1, 0.1)
+        nn.init.constant_(self.linear.bias, 0.1)
 
         nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.attention_linear.bias, 0.1)

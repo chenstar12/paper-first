@@ -32,7 +32,7 @@ class FusionLayer(nn.Module):
             u_out = u_out.reshape(u_out.size(0), -1)  # 打平，如：deepConn的[128,1,32]变为torch.Size([128, 32])
             i_out = i_out.reshape(i_out.size(0), -1)  # NARRE的两个[128,2,32]都变成[128,64]，MSCI1获得两个[128,96]
         else:
-            u_out = u_out.sum(1)
+            u_out = u_out.sum(1)  # 按列求和
             i_out = i_out.sum(1)
 
         # 后：user和item的融合
