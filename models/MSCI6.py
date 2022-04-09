@@ -98,7 +98,7 @@ class Net(nn.Module):
 
         r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,132]
 
-        fea = self.mix_layer(rs_mix)  # 降维 -> [128,100]
+        r_fea = self.mix_layer(r_fea)  # 降维 -> [128,100]
         '''
         是否需要relu
         '''
