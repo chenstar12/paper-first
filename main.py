@@ -162,7 +162,7 @@ def train(**kwargs):
             logger.info("model save")
         else:
             num_decline += 1
-            logger.info('num_decline: ', str(num_decline))
+            logger.info('num_decline: ' + str(num_decline))
             if num_decline >= opt.early_stop:
                 logger.info(
                     '=======================Early Stop: ' + 'num_decline = ' + str(num_decline) + '==================')

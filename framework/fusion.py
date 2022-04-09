@@ -16,7 +16,7 @@ class FusionLayer(nn.Module):
         if opt.self_att:
             self.attn = SelfAtt(opt.id_emb_size, opt.num_heads)
         self.opt = opt
-        self.linear = nn.Linear(opt.feature_dim, opt.feature_dim)  # [] -> [feature_dim,feature_dim]
+        self.linear = nn.Linear(opt.feature_dim, opt.feature_dim)  # models中设置的特征维度 -> [feature_dim,feature_dim]
         self.drop_out = nn.Dropout(0.5)
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)  # 初始化权重
         nn.init.constant_(self.linear.bias, 0.1)
@@ -30,7 +30,7 @@ class FusionLayer(nn.Module):
             i_out = i_out + s_i_out
         if self.opt.r_id_merge == 'cat':  # 默认用cat
             u_out = u_out.reshape(u_out.size(0), -1)  # 打平，如：deepConn的[128,1,32]变为torch.Size([128, 32])
-            i_out = i_out.reshape(i_out.size(0), -1)  # NARRE的两个[128,2,32]都变成[128,64]
+            i_out = i_out.reshape(i_out.size(0), -1)  # NARRE的两个[128,2,32]都变成[128,64]，MSCI1获得两个[128,96]
         else:
             u_out = u_out.sum(1)
             i_out = i_out.sum(1)
