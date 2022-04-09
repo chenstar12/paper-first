@@ -50,6 +50,7 @@ class Net(nn.Module):
                                 self.opt.id_emb_size)  # [100,32].用来给review特征降维
         # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
+        self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
@@ -74,9 +75,8 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            torch.cat([fea, u_i_id_emb], dim=2)
+            torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
         )
-        print(rs_mix.shape)
         rs_mix = self.linear(rs_mix)  # [128,10,132] -> [128,10,32]
 
         '''
@@ -134,6 +134,9 @@ class Net(nn.Module):
 
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)
         nn.init.constant_(self.linear.bias, 0.1)
+
+        nn.init.uniform_(self.doc_linear.weight, -0.1, 0.1)
+        nn.init.constant_(self.doc_linear.bias, 0.1)
 
         nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.attention_linear.bias, 0.1)
