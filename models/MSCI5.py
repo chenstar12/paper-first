@@ -129,7 +129,7 @@ class Net(nn.Module):
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.constant_(self.cnn.bias, 0.1)
 
-        nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
+        # nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
 
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)
         nn.init.constant_(self.linear.bias, 0.1)
