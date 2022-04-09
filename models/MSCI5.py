@@ -94,9 +94,10 @@ class Net(nn.Module):
 
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
-        r_fea = rs_mix * att_weight  # fea:[128, 10/27, 32]; 得到r_fea也是[128, 10, 32]；原理：最后一维attention自动扩展100次
 
-        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,32]
+        r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
+
+        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
 
         r_fea = self.dropout(r_fea)
 
