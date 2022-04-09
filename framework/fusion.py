@@ -38,7 +38,7 @@ class FusionLayer(nn.Module):
         # 后：user和item的融合
         if self.opt.ui_merge == 'cat':
             out = torch.cat([u_out, i_out], 1)  # torch.Size([128, 64])
-        elif self.opt.ui_merge == 'add':  # NARRE的两个[128,64]进行dot还是[128,64]
+        elif self.opt.ui_merge == 'add':  # NARRE的两个[128,64]还是[128,64]
             out = u_out + i_out
         else:
             out = u_out * i_out
