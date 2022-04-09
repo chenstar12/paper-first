@@ -74,8 +74,9 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            torch.cat([fea, u_i_id_emb], dim=1)
+            torch.cat([fea, u_i_id_emb], dim=2)
         )
+        print(rs_mix.shape)
         rs_mix = self.linear(rs_mix)  # [128,10,132] -> [128,10,32]
 
         '''
