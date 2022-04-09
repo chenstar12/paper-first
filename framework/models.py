@@ -17,7 +17,6 @@ class Model(nn.Module):
         if self.opt.ui_merge == 'cat':
             if self.opt.r_id_merge == 'cat':
                 feature_dim = self.opt.id_emb_size * self.opt.num_fea * 2
-                print('feature_dim feature_dim feature_dim: ', feature_dim)
             else:
                 feature_dim = self.opt.id_emb_size * 2
         else:
