@@ -4,14 +4,14 @@ import torch.nn.functional as F
 import numpy as np
 
 '''
-review和id_embedding融合时：采用拼接的方式
+MSCI5：增加review list id embedding的利用率（获取fea）
 '''
 
 
-class MSCI5(nn.Module):
+class MSCI7(nn.Module):
 
     def __init__(self, opt):
-        super(MSCI5, self).__init__()
+        super(MSCI7, self).__init__()
         self.opt = opt
         self.num_fea = 3  # 0,1,2 == id,doc,review
 
@@ -52,6 +52,7 @@ class Net(nn.Module):
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.mix_layer = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
@@ -77,9 +78,12 @@ class Net(nn.Module):
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
             torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
         )
-        rs_mix = self.linear(rs_mix)  # [128,10,132] -> [128,10,32]
+        fea = self.mix_layer(rs_mix)  # 降维 -> [128,100]
+
+        rs_mix = self.linear(rs_mix)  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
+
         r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
 
         '''
@@ -133,6 +137,9 @@ class Net(nn.Module):
 
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)
         nn.init.constant_(self.linear.bias, 0.1)
+
+        nn.init.uniform_(self.mix_layer.weight, -0.1, 0.1)
+        nn.init.constant_(self.mix_layer.bias, 0.1)
 
         nn.init.uniform_(self.doc_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.doc_linear.bias, 0.1)

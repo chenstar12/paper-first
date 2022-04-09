@@ -4,14 +4,14 @@ import torch.nn.functional as F
 import numpy as np
 
 '''
-MSCI5删除attention
+MSCI7删除attention
 '''
 
 
-class MSCI6(nn.Module):
+class MSCI7(nn.Module):
 
     def __init__(self, opt):
-        super(MSCI6, self).__init__()
+        super(MSCI7, self).__init__()
         self.opt = opt
         self.num_fea = 3  # 0,1,2 == id,doc,review
 
@@ -48,11 +48,11 @@ class Net(nn.Module):
 
         self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
                                 self.opt.id_emb_size)  # [100,32].用来给review特征降维
-        self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
-
         # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
-        # self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
+        self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
+        self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.mix_layer = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
@@ -76,9 +76,14 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            torch.cat([fea, u_i_id_emb], dim=1)
+            torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
         )
-        rs_mix = self.linear(rs_mix)  # [128,10,132] -> [128,10,32]
+        r_fea = rs_mix
+        # rs_mix = self.linear(rs_mix)  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
+        # att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
+        # att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
+
+        # r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
 
         '''
         （1）先把情感权重归一化 ---- softmax
@@ -89,17 +94,15 @@ class Net(nn.Module):
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
         polarity_w = F.softmax(polarity_w, 1)
-        # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
-        rs_mix = rs_mix * polarity_w  # fea还是[128, 10/27, 32]
-        rs_mix = rs_mix
+        r_fea = r_fea * polarity_w  # fea还是[128, 10/27, 132]
 
-        # att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
-        # att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
-        # r_fea = rs_mix * att_weight  # fea:[128, 10/27, 32]; 得到r_fea也是[128, 10, 32]；原理：最后一维attention自动扩展100次
+        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,132]
 
-        rs_mix = rs_mix.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,32]
-
-        r_fea = self.dropout(rs_mix)
+        fea = self.mix_layer(rs_mix)  # 降维 -> [128,100]
+        '''
+        是否需要relu
+        '''
+        r_fea = self.dropout(r_fea)
 
         '''
         添加了doc特征
@@ -136,11 +139,14 @@ class Net(nn.Module):
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)
         nn.init.constant_(self.linear.bias, 0.1)
 
+        nn.init.uniform_(self.mix_layer.weight, -0.1, 0.1)
+        nn.init.constant_(self.mix_layer.bias, 0.1)
+
         nn.init.uniform_(self.doc_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.doc_linear.bias, 0.1)
 
-        # nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
-        # nn.init.constant_(self.attention_linear.bias, 0.1)
+        nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
+        nn.init.constant_(self.attention_linear.bias, 0.1)
 
         nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
