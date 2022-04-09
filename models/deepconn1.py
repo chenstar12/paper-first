@@ -7,7 +7,7 @@ import torch.nn.functional as F
 class DeepCoNN1(nn.Module):
 
     def __init__(self, opt, uori='user'):
-        super(DeepCoNN, self).__init__()
+        super(DeepCoNN1, self).__init__()
         self.opt = opt
         self.num_fea = 1  # DOC
 
