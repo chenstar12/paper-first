@@ -85,6 +85,8 @@ class Net(nn.Module):
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
 
         r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
+        # 矩阵的每个数都缩放了r_num倍；由于下面还要乘以weight，所以这里要乘r_num
+        r_fea = r_fea * r_num
 
         '''
         （1）先把情感权重归一化 ---- softmax
