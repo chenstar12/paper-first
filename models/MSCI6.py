@@ -4,14 +4,14 @@ import torch.nn.functional as F
 import numpy as np
 
 '''
-MSCI7删除attention
+对MSCI7删除attention
 '''
 
 
-class MSCI7(nn.Module):
+class MSCI6(nn.Module):
 
     def __init__(self, opt):
-        super(MSCI7, self).__init__()
+        super(MSCI6, self).__init__()
         self.opt = opt
         self.num_fea = 3  # 0,1,2 == id,doc,review
 
