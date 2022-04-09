@@ -17,7 +17,7 @@ class DefaultConfig:
 
     optimizer = 'Adam'
     weight_decay = 1e-3
-    lr = 2e-3
+    lr = 1e-3
     loss_method = 'mse'
     drop_out = 0.5
 
@@ -41,7 +41,7 @@ class DefaultConfig:
     output = 'lfm'  # 'fm', 'lfm', 'other: sum the ui_feature'
 
     fine_step = False  # save mode in step level, default in epoch
-    early_stop = 10  # 在验证集连续10轮mse下降时early stop
+    early_stop = 20  # 在验证集连续10轮mse下降时early stop
     pth_path = ""  # the saved pth path for test
     print_opt = 'default'
 

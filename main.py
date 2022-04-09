@@ -64,7 +64,6 @@ def train(**kwargs):
             model = nn.DataParallel(model, device_ids=opt.gpu_ids)
 
     if model.net.num_fea != opt.num_fea:
-        logger.error(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
 
     # 3 data
