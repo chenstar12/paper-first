@@ -78,6 +78,7 @@ class Net(nn.Module):
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
+        print(u_i_id_emb.shape)
         u_i_id_emb = u_i_id_emb.view(-1, u_i_id_emb.size(1))  # [128,10,32]->[1280,32]
         u_i_id_emb = u_i_id_emb.unsqueeze(1)  # ->[1280,1,32]
         print(u_i_id_emb.shape)
