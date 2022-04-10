@@ -84,7 +84,7 @@ class Net(nn.Module):
         if self.uori == 'user':
             u_i_id_emb = self.cnn_u_id(u_i_id_emb)  # ->[1280,100,30]
         else:
-            u_i_id_emb = F.leaky_relu_(self.cnn_i_id(u_i_id_emb.unsqueeze(1))).squeeze(2)
+            u_i_id_emb = self.cnn_i_id(u_i_id_emb)
 
         u_i_id_emb = F.leaky_relu_(u_i_id_emb)
         u_i_id_emb = F.avg_pool1d(u_i_id_emb, u_i_id_emb.size(2)).squeeze(2)  # -> [1280,100,1] ->[1280,100]
