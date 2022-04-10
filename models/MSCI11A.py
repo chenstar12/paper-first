@@ -117,7 +117,7 @@ class Net(nn.Module):
 
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([F.leaky_relu_(self.fc_layer(doc_fea)), F.leaky_relu_(self.fc_layer(r_fea))],
-                           1)  # 加入doc后 -> [128,3,32]
+                           1)  # 加入doc后 -> [128,2,32]
 
     def reset_para(self):
         if self.opt.use_word_embedding:
