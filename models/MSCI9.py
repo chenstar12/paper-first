@@ -8,10 +8,10 @@ import numpy as np
 '''
 
 
-class MSCI8(nn.Module):
+class MSCI9(nn.Module):
 
     def __init__(self, opt):
-        super(MSCI8, self).__init__()
+        super(MSCI9, self).__init__()
         self.opt = opt
         self.num_fea = 3  # 0,1,2 == id,doc,review
 
