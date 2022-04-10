@@ -81,6 +81,7 @@ class Net(nn.Module):
         u_i_id_emb = u_i_id_emb.view(-1, u_i_id_emb.size(1))  # [128,10,32]->[1280,32]
         if self.uori == 'user':
             u_i_id_emb = u_i_id_emb.unsqueeze(1)
+            print(u_i_id_emb.shape)
             u_i_id_emb = self.cnn_u_id(u_i_id_emb)
             u_i_id_emb = F.leaky_relu_(u_i_id_emb)
             u_i_id_emb = u_i_id_emb.squeeze(2)  # [1280,32]->[1280,1,32]->[1280,100,1] -> [1280,100]
