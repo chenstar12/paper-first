@@ -89,7 +89,7 @@ class Net(nn.Module):
 
         print(u_i_id_emb.shape)
         u_i_id_emb = F.leaky_relu_(u_i_id_emb)
-        u_i_id_emb = F.avg_pool1d(u_i_id_emb, u_i_id_emb.size(2)).squeeze(2)  # -> [1280,100]
+        u_i_id_emb = F.avg_pool1d(u_i_id_emb, u_i_id_emb.size(2)).squeeze(2)  # -> [1280,100,1] ->[1280,100]
         print(u_i_id_emb.shape)
         u_i_id_emb = u_i_id_emb.squeeze(2)
         u_i_id_emb = u_i_id_emb.view(-1, r_num, u_i_id_emb.size(2))  # [1280,100] -> [128,10,100]
