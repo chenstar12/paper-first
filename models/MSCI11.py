@@ -47,8 +47,8 @@ class Net(nn.Module):
 
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积ker：[1,100,3,300]
 
-        self.cnn_u_id = nn.Conv1d(1, opt.filters_num, opt.id_emb_size)
-        self.cnn_i_id = nn.Conv1d(1, opt.filters_num, opt.id_emb_size)
+        self.cnn_u_id = nn.Conv1d(1, opt.filters_num, opt.kernel_size)
+        self.cnn_i_id = nn.Conv1d(1, opt.filters_num, opt.kernel_size)
 
         self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
                                 self.opt.id_emb_size)  # [100,32].用来给review特征降维
@@ -84,7 +84,8 @@ class Net(nn.Module):
             print(u_i_id_emb.shape)
             u_i_id_emb = self.cnn_u_id(u_i_id_emb)
             u_i_id_emb = F.leaky_relu_(u_i_id_emb)
-            u_i_id_emb = u_i_id_emb.squeeze(2)  # [1280,32]->[1280,1,32]->[1280,100,1] -> [1280,100]
+            u_i_id_emb = F.avg_pool1d(u_i_id_emb, u_i_id_emb.size(2)).squeeze(2)
+            u_i_id_emb = u_i_id_emb.squeeze(2)  # [1280,32]->[1280,1,32]->[1280,100,30] -> [1280,100]
         else:
             u_i_id_emb = F.leaky_relu_(self.cnn_i_id(u_i_id_emb.unsqueeze(1))).squeeze(2)
         u_i_id_emb = u_i_id_emb.view(-1, r_num, u_i_id_emb.size(2))  # [1280,100] -> [128,10,100]
