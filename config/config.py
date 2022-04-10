@@ -51,6 +51,8 @@ class DefaultConfig:
     vocab_size = 50002
     word_dim = 300
 
+    alpha = 0.5  # review融合其他特征的权重
+
     def set_path(self, name):
         '''
         specific
@@ -155,3 +157,9 @@ class Kindle_Store_data_Config(DefaultConfig):
 
     user_num = 68223 + 2
     item_num = 61934 + 2
+
+
+class Yelp_data_Config(DefaultConfig):
+    def __init__(self):
+        self.dataset = ''
+        self.set_path('')

@@ -78,7 +78,7 @@ class Net(nn.Module):
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
             torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
         )
-        fea = self.mix_layer(rs_mix)  # 降维 -> [128,100]
+        fea = self.mix_layer(rs_mix)  # 降维 -> [128,10,100]
 
         rs_mix = self.linear(rs_mix)  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
