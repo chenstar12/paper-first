@@ -24,4 +24,7 @@ from .MSCI9A import MSCI9A
 from .MSCI9B import MSCI9B
 from .MSCI9C import MSCI9C
 from .MSCI10 import MSCI10
+from .MSCI10Z import MSCI10Z
+from .MSCI10Z0 import MSCI10Z0
+from .MSCI11A import MSCI11A
 from .MSCI11 import MSCI11
