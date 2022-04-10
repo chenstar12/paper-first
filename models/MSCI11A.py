@@ -51,7 +51,7 @@ class Net(nn.Module):
         # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
-        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.filters_num)
         self.mix_layer = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
@@ -113,7 +113,7 @@ class Net(nn.Module):
         doc_fea = F.relu(self.cnn(doc.unsqueeze(1))).squeeze(3)
         # 最大池化：[] -> [128,100，1] ，squeeze(2): -> [128,100],作为fc层的输入
         doc_fea = F.max_pool1d(doc_fea, doc_fea.size(2)).squeeze(2)
-        doc_fea = self.doc_linear(doc_fea)  # 降维 -> [128,32]
+        # doc_fea = self.doc_linear(doc_fea)  # 降维 -> [128,32]
 
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([doc_fea, self.fc_layer(r_fea)], 1)  # 加入doc后 -> [128,3,32]
