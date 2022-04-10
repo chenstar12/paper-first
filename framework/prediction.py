@@ -155,4 +155,4 @@ class MLP(nn.Module):
         nn.init.uniform_(self.fc.bias, a=0, b=0.2)
 
     def forward(self, feature, *args, **kwargs):
-        return F.relu(self.fc(feature))  # [128,64] -> [128,1], 然后在models中squeeze(1)得到output
+        return F.leaky_relu_(self.fc(feature))  # [128,64] -> [128,1], 然后在models中squeeze(1)得到output

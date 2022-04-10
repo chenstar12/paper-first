@@ -40,7 +40,7 @@ class FusionLayer(nn.Module):
             out = torch.cat([u_out, i_out], 1)  # torch.Size([128, 64])
         elif self.opt.ui_merge == 'add':  # NARRE的两个[128,64]还是[128,64]
             out = u_out + i_out
-        else:
+        else:  # 点积 ！！！！！！！！！！！！！！！！！！！！！！！！！
             out = u_out * i_out
 
         return out

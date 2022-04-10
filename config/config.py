@@ -51,7 +51,7 @@ class DefaultConfig:
     vocab_size = 50002
     word_dim = 300
 
-    alpha = 0.5  # review融合其他特征的权重
+    alpha = 1  # review融合其他特征的权重
 
     def set_path(self, name):
         '''
