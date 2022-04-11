@@ -67,7 +67,7 @@ def bulid_vocbulary(xDict):
 def build_doc(u_reviews_dict, i_reviews_dict):
     '''
     1. extract the vocab
-    2. fiter the reviews and documents of users and items
+    2. filter the reviews and documents of users and items
     '''
     u_reviews = []
     for ind in range(len(u_reviews_dict)):
