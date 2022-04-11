@@ -159,6 +159,25 @@ class Kindle_Store_data_Config(DefaultConfig):
     item_num = 61934 + 2
 
 
+class Gourmet_Food_data_Config(DefaultConfig):
+
+    def __init__(self):
+        self.dataset = 'Gourmet_Food_data'
+        self.set_path('Gourmet_Food_data')
+
+    r_max_len = 98
+
+    u_max_r = 12
+    i_max_r = 17
+
+    train_data_size = 121003
+    test_data_size = 15126
+    val_data_size = 15125
+
+    user_num = 14681 + 2
+    item_num = 8713 + 2
+
+
 class Yelp_data_Config(DefaultConfig):
     def __init__(self):
         self.dataset = ''
