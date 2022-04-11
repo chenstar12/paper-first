@@ -29,4 +29,5 @@ from .MSCI10Z0 import MSCI10Z0
 from .MSCI11A import MSCI11A
 from .MSCI11B import MSCI11B
 from .MSCI11C import MSCI11C
+from .MSCI11D import MSCI11D
 from .MSCI11 import MSCI11
