@@ -92,13 +92,11 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
-        print(rs_mix.shape)
-        print(polarity_w.shape)
-        print((rs_mix * polarity_w).shape)
-
-        rs_mix = F.relu(self.polarity_linear(rs_mix * polarity_w))
+        rs_mix = rs_mix * polarity_w
+        rs_mix = F.relu(self.polarity_linear(rs_mix))
         rs_mix = rs_mix * r_num
-        rs_mix = F.relu(self.subj_linear(rs_mix * subj_w))
+        rs_mix = rs_mix * subj_w
+        rs_mix = F.relu(self.subj_linear(rs_mix))
         rs_mix = rs_mix * r_num
         # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
 
