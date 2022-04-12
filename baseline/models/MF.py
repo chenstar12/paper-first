@@ -24,6 +24,5 @@ class MF(nn.Module):
         return output
 
     def reset_para(self):
-        for fc in [self.user_id_embs, self.item_id_embs]:
-            nn.init.uniform_(fc.weight, -0.1, 0.1)
-            nn.init.constant_(fc.bias, 0.1)
+        for layer in [self.user_id_embs, self.item_id_embs]:
+            nn.init.uniform_(layer.weight, -0.1, 0.1)
