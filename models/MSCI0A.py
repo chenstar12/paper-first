@@ -95,10 +95,10 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
-        fea = F.relu(self.polarity_linear(fea * polarity_w))
-        fea = fea * r_num
-        fea = F.relu(self.subj_linear(fea * subj_w))
-        fea = fea * r_num
+        rs_mix = F.relu(self.polarity_linear(rs_mix * polarity_w))
+        rs_mix = rs_mix * r_num
+        rs_mix = F.relu(self.subj_linear(rs_mix * subj_w))
+        rs_mix = rs_mix * r_num
 
         att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
