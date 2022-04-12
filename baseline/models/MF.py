@@ -26,4 +26,4 @@ class MF(BaseModel):
 
     def reset_para(self):
         for layer in [self.user_id_embs, self.item_id_embs]:
-            nn.init.uniform_(layer.weight, -0.1, 0.1)
+            nn.init.normal_(layer.weight)
