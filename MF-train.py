@@ -93,15 +93,15 @@ def train(**kwargs):
             scores = torch.FloatTensor(scores).cuda()
 
             train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
-            print(train_datas[0].shape)
-            print(train_datas[1].shape)
-            print(train_datas[2].shape)
-            print(train_datas[3].shape)
-            print(train_datas[4].shape)
-            print(train_datas[5].shape)
-            print(train_datas[6].shape)
-            print(train_datas[7].shape)
-            return
+            # print(train_datas[0].shape)
+            # print(train_datas[1].shape)
+            # print(train_datas[2].shape)
+            # print(train_datas[3].shape)
+            # print(train_datas[4].shape)
+            # print(train_datas[5].shape)
+            # print(train_datas[6].shape)
+            # print(train_datas[7].shape)
+            # return
 
             optimizer.zero_grad()
             output = model(train_datas)
