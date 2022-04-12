@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
+import BaseModel
 
 
-class MF(nn.Module):
+class MF(BaseModel):
 
     def __init__(self, opt):
         super(MF, self).__init__()
