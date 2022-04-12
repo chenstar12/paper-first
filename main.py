@@ -28,6 +28,9 @@ def collate_fn(batch):
 
 
 def train(**kwargs):
+    torch.backends.cudnn.benchmark = True
+    torch.backends.cudnn.deterministic = True
+
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:

@@ -75,13 +75,13 @@ class Net(nn.Module):
 
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
-        rs_mix = F.leaky_relu_(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
+        rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
             torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
         )
-        fea = F.leaky_relu_(self.mix_layer(rs_mix))  # 降维 -> [128,10,100]
+        fea = F.relu(self.mix_layer(rs_mix))  # 降维 -> [128,10,100]
 
-        rs_mix = F.leaky_relu_(self.linear(rs_mix))  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
-        att_score = F.leaky_relu_(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
+        rs_mix = F.relu(self.linear(rs_mix))  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
+        att_score = F.relu(self.attention_linear(rs_mix))  # -> [128,10/27,1]，得到每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
 
         r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
@@ -117,7 +117,7 @@ class Net(nn.Module):
         doc_fea = self.doc_linear(doc_fea)  # 降维 -> [128,32]
 
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
-        return torch.stack([id_emb, doc_fea, self.fc_layer(r_fea)], 1)  # 加入doc后 -> [128,3,32]
+        return torch.stack([F.relu(id_emb), doc_fea, F.relu(self.fc_layer(r_fea))], 1)  # 加入doc后 -> [128,3,32]
 
     def reset_para(self):
         if self.opt.use_word_embedding:
