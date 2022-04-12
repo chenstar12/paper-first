@@ -4,6 +4,8 @@ import time
 
 
 class BaseModel(nn.Module):
+    def __init__(self):
+        pass
 
     def load(self, path):
         '''
