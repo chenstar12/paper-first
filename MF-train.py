@@ -105,6 +105,8 @@ def train(**kwargs):
 
             optimizer.zero_grad()
             output = model(train_datas)
+            print(output)
+            print(scores)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
