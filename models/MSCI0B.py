@@ -57,7 +57,7 @@ class Net(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
 
-    def forward(self, doc, reviews, ids, ids_list, sentiments):  # 添加了sentiments
+    def forward(self, reviews, ids, ids_list, sentiments):  # 添加了sentiments
         #  1. word embedding
         # reviews:用户[128, 10, 214] ->  [128, 10, 214, 300]，物品[128, 27, 214] ->  [128, 27, 214, 300]
         reviews = self.word_embs(reviews)
