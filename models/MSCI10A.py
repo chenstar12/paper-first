@@ -50,7 +50,7 @@ class Net(nn.Module):
         self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
-        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.fc_layer = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
         self.mix_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
@@ -95,7 +95,7 @@ class Net(nn.Module):
         polarity_w = F.softmax(polarity_w, 1)
         r_fea = r_fea * polarity_w  # fea还是[128, 10/27, 32]
 
-        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,132]
+        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,32]
 
         # r_fea = self.mix_layer(r_fea)  # 降维 -> [128,100]
         '''
