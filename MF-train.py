@@ -12,7 +12,7 @@ import logging
 import os
 
 from dataset import ReviewData
-import baseline
+import baseline.models as models
 import config
 
 
@@ -56,7 +56,7 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-    model = baseline.models.MF(opt)  # opt.model: models文件夹的如DeepDoNN
+    model = models.MF(opt)  # opt.model: models文件夹的如DeepDoNN
     model.cuda()
 
     # 3 data
@@ -171,7 +171,7 @@ def test(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-    model = baseline.models.MF(opt).cuda()
+    model = models.MF(opt).cuda()
 
     model.load(opt.pth_path)
     logger.info(f"load model: {opt.pth_path}")
