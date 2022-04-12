@@ -10,8 +10,8 @@ class MF(BaseModel):
         super(MF, self).__init__()
         self.opt = opt
 
-        self.user_id_embs = nn.Embedding(opt.user_num, 32)
-        self.item_id_embs = nn.Embedding(opt.item_num, 32)
+        self.user_id_embs = nn.Embedding(opt.user_num, 100)
+        self.item_id_embs = nn.Embedding(opt.item_num, 100)
 
         self.reset_para()
 
