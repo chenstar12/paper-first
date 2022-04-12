@@ -5,7 +5,7 @@ import time
 
 class BaseModel(nn.Module):
     def __init__(self):
-        pass
+        super(BaseModel, self).__init__()
 
     def load(self, path):
         '''
