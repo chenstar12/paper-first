@@ -6,18 +6,14 @@ import time
 class BaseModel(nn.Module):
     def __init__(self):
         super(BaseModel, self).__init__()
-        self.model_name='BaseModel'
+        self.model_name = 'BaseModel'
 
     def load(self, path):
-        '''
-        加载指定模型
-        '''
+        # 加载模型
         self.load_state_dict(torch.load(path))
 
     def save(self, epoch=None, name=None, opt=None):
-        '''
-        保存模型
-        '''
+        # 保存模型
         prefix = 'checkpoints/'
         if name is None:
             name = prefix + self.model_name + '_'
