@@ -3,10 +3,6 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
-'''
-对7进行微调：relu变leaky
-'''
-
 
 class MSCI7A(nn.Module):
 
@@ -49,7 +45,9 @@ class Net(nn.Module):
         self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
                                 self.opt.id_emb_size)  # [100,32].用来给review特征降维
         # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
-        self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
+        self.attention_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, 1)
+        self.polarity_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, 1)
+        self.subj_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, 1)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.mix_layer = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num)
@@ -78,32 +76,38 @@ class Net(nn.Module):
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
             torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
         )
-        fea = F.relu(self.mix_layer(rs_mix))  # 降维 -> [128,10,100]
-
-        rs_mix = F.relu(self.linear(rs_mix))  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
-        att_score = F.relu(self.attention_linear(rs_mix))  # -> [128,10/27,1]，得到每条review注意力权重
-        att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
-
-        r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
-        # 矩阵的每个数都缩放了r_num倍；由于下面还要乘以weight，所以这里要乘r_num
-        r_fea = r_fea * r_num
 
         '''
         （1）先把情感权重归一化 ---- softmax
         （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
         （3）上一步的特征相加除以2或3
         '''
-        polarity_w = sentiments[:, :, 0]  # 获取第一列 ---- polarity
+        polarity_w = sentiments[:, :, 0]  # 获取第1列 ---- polarity
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
         polarity_w = F.softmax(polarity_w, 1)
-        # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
-        r_fea = r_fea * polarity_w  # fea还是[128, 10/27, 100]
-        r_fea = r_fea * r_num
 
-        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
+        subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
+        subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
+        subj_w = subj_w / 10000
+        subj_w = F.softmax(subj_w, 1)
+
+        rs_mix = F.relu(self.polarity_linear(rs_mix * polarity_w))
+        rs_mix = rs_mix * r_num
+        rs_mix = F.relu(self.subj_linear(rs_mix * subj_w))
+        rs_mix = rs_mix * r_num
+        # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
+
+        # = F.relu(self.linear(rs_mix))  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
+        att_score = F.relu(self.attention_linear(rs_mix))  # -> [128,10/27,1]，得到每条review注意力权重
+        att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
+
+        rs_mix = F.relu(rs_mix * att_weight)  # fea:[128, 10/27, 132]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
+
+        r_fea = rs_mix.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,132]
 
         r_fea = self.dropout(r_fea)
+        r_fea = F.relu(self.mix_layer(r_fea))  # 降维 -> [128,100]
 
         '''
         添加了doc特征
@@ -117,7 +121,7 @@ class Net(nn.Module):
         doc_fea = self.doc_linear(doc_fea)  # 降维 -> [128,32]
 
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
-        return torch.stack([F.relu(id_emb), doc_fea, F.relu(self.fc_layer(r_fea))], 1)  # 加入doc后 -> [128,3,32]
+        return torch.stack([F.relu(id_emb), doc_fea, r_fea], 1)  # 加入doc后 -> [128,3,32]
 
     def reset_para(self):
         if self.opt.use_word_embedding:
@@ -147,7 +151,11 @@ class Net(nn.Module):
         nn.init.constant_(self.doc_linear.bias, 0.1)
 
         nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
+        nn.init.uniform_(self.polarity_linear.weight, -0.1, 0.1)
+        nn.init.uniform_(self.subj_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.attention_linear.bias, 0.1)
+        nn.init.constant_(self.polarity_linear.bias, 0.1)
+        nn.init.constant_(self.subj_linear.bias, 0.1)
 
         nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
