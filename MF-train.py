@@ -99,6 +99,8 @@ def train(**kwargs):
             print(train_datas[3].shape)
             print(train_datas[4].shape)
             print(train_datas[5].shape)
+            print(train_datas[6].shape)
+            print(train_datas[7].shape)
             return
 
             optimizer.zero_grad()
