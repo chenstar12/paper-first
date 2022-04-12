@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from BaseModel import BaseModel
+from .BaseModel import BaseModel
 
 
 class MF(BaseModel):
