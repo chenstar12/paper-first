@@ -75,7 +75,7 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            F.relu(self.mix_layer(fea)) + F.relu(self.id_linear(u_i_id_emb))
+            self.mix_layer(fea) + self.id_linear(F.relu(u_i_id_emb))
         )
         r_fea = rs_mix
         # rs_mix = self.linear(rs_mix)  # 用于计算注意力权重，[128,10,132] -> [128,10,32]

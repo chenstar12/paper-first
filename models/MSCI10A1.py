@@ -8,10 +8,10 @@ sentiment权重加一层非线性变换
 '''
 
 
-class MSCI10A(nn.Module):
+class MSCI10A1(nn.Module):
 
     def __init__(self, opt):
-        super(MSCI10, self).__init__()
+        super(MSCI10A1, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
