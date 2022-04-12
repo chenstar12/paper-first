@@ -69,7 +69,7 @@ class Net(nn.Module):
         fea = F.avg_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
-        id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
+        #id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
         #  3. attention（linear attention）
