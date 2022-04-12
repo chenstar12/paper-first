@@ -46,8 +46,7 @@ class Net(nn.Module):
 
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
 
-        self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
-                                self.opt.id_emb_size)  # [100,32].用来给review特征降维
+        # self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,self.opt.id_emb_size)  # [100,32].用来给review特征降维
         self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
@@ -138,8 +137,8 @@ class Net(nn.Module):
         nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.id_linear.bias, 0.1)
 
-        nn.init.uniform_(self.linear.weight, -0.1, 0.1)
-        nn.init.constant_(self.linear.bias, 0.1)
+        # nn.init.uniform_(self.linear.weight, -0.1, 0.1)
+        # nn.init.constant_(self.linear.bias, 0.1)
 
         nn.init.uniform_(self.mix_layer.weight, -0.1, 0.1)
         nn.init.constant_(self.mix_layer.bias, 0.1)
