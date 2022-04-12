@@ -92,6 +92,10 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
+        print(rs_mix.shape)
+        print(polarity_w.shape)
+        print((rs_mix * polarity_w).shape)
+
         rs_mix = F.relu(self.polarity_linear(rs_mix * polarity_w))
         rs_mix = rs_mix * r_num
         rs_mix = F.relu(self.subj_linear(rs_mix * subj_w))

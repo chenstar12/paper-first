@@ -30,7 +30,7 @@ from .MSCI9C import MSCI9C
 from .MSCI10 import MSCI10
 from .MSCI10A import MSCI10A
 from .MSCI10B import MSCI10B
-from .MSCI11A import MSCI11A
-from .MSCI11C import MSCI11C
-from .MSCI11D import MSCI11D
+# from .MSCI11A import MSCI11A
+# from .MSCI11C import MSCI11C
+# from .MSCI11D import MSCI11D
 from .MSCI11 import MSCI11
