@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from .BaseModel import BaseModel
+import torch.nn.functional as F
 
 
 class MF(BaseModel):
@@ -22,7 +23,7 @@ class MF(BaseModel):
 
         output = torch.mul(user_id_embedding, item_id_embedding).sum(dim=1)
 
-        return output
+        return F.relu(output)
 
     def reset_para(self):
         for layer in [self.user_id_embs, self.item_id_embs]:
