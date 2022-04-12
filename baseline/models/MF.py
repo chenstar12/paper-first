@@ -19,7 +19,7 @@ class MF(nn.Module):
         user_id_embedding = self.user_id_embs(uids)
         item_id_embedding = self.item_id_embs(iids)
 
-        output = torch.matmul(user_id_embedding, item_id_embedding).sum(dim=1)  # predict
+        output = torch.mul(user_id_embedding, item_id_embedding).sum(dim=1)
 
         return output
 
