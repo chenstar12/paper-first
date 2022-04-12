@@ -11,6 +11,8 @@ from .mpcn import MPCN
 # mine
 from .MSCI import MSCI
 from .MSCI0 import MSCI0
+from .MSCI0A import MSCI0A
+from .MSCI0B import MSCI0B
 from .MSCI1 import MSCI1
 from .MSCI2 import MSCI2
 from .MSCI3 import MSCI3

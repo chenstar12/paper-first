@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0A(nn.Module):
+class MSCI0B(nn.Module):
     '''
-    重新开始：NARRE添加多次re-weighting
+    两个情感层的初始化：改为normal_
     '''
 
     def __init__(self, opt):
-        super(MSCI0A, self).__init__()
+        super(MSCI0B, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -95,9 +95,7 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
-        fea = F.relu(self.polarity_linear(fea * polarity_w))
-        fea = fea * r_num
-        fea = F.relu(self.subj_linear(fea * subj_w))
+        fea = fea * polarity_w
         fea = fea * r_num
 
         att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
@@ -133,9 +131,9 @@ class Net(nn.Module):
         nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.attention_linear.bias, 0.1)
 
-        nn.init.uniform_(self.polarity_linear.weight, -0.1, 0.1)
+        nn.init.normal_(self.polarity_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.polarity_linear.bias, 0.1)
-        nn.init.uniform_(self.subj_linear.weight, -0.1, 0.1)
+        nn.init.normal_(self.subj_linear.weight, -0.1, 0.1)
         nn.init.constant_(self.subj_linear.bias, 0.1)
 
         nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
