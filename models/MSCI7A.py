@@ -44,10 +44,12 @@ class Net(nn.Module):
 
         self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
                                 self.opt.id_emb_size)  # [100,32].用来给review特征降维
-        # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
+        self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, 1)
-        self.polarity_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num + self.opt.id_emb_size)
-        self.subj_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num + self.opt.id_emb_size)
+        self.polarity_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
+                                         self.opt.filters_num + self.opt.id_emb_size)
+        self.subj_linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
+                                     self.opt.filters_num + self.opt.id_emb_size)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.mix_layer = nn.Linear(self.opt.filters_num + self.opt.id_emb_size, self.opt.filters_num)
@@ -74,7 +76,7 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            torch.cat([fea, u_i_id_emb], dim=2)  # [128,10,132]
+            torch.cat([fea, F.relu(self.id_linear(u_i_id_emb))], dim=2)  # [128,10,132]
         )
 
         '''
@@ -141,7 +143,7 @@ class Net(nn.Module):
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.constant_(self.cnn.bias, 0.1)
 
-        # nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
+        nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
 
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)
         nn.init.constant_(self.linear.bias, 0.1)

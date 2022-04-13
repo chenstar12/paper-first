@@ -48,7 +48,7 @@ class Net(nn.Module):
 
         self.linear = nn.Linear(self.opt.filters_num + self.opt.id_emb_size,
                                 self.opt.id_emb_size)  # [100,32].用来给review特征降维
-        # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
+        self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
         self.doc_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
@@ -76,9 +76,9 @@ class Net(nn.Module):
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
         rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            torch.cat([fea, F.relu(u_i_id_emb)], dim=2)  # [128,10,132]
+            torch.cat([fea, F.relu(self.id_linear(u_i_id_emb))], dim=2)  # [128,10,132]
         )
-        fea = self.mix_layer(rs_mix)  # 降维 -> [128,10,100]
+        fea = F.relu(self.mix_layer(rs_mix))  # 降维 -> [128,10,100]
 
         rs_mix = self.linear(rs_mix)  # 用于计算注意力权重，[128,10,132] -> [128,10,32]
         att_score = self.attention_linear(rs_mix)  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
@@ -99,7 +99,6 @@ class Net(nn.Module):
         polarity_w = F.softmax(polarity_w, 1)
         # polarity_w把矩阵的每个数都缩放了r_num倍；由于下面还要乘以attention weight，所以这里要乘r_num
         r_fea = r_fea * polarity_w  # fea还是[128, 10/27, 100]
-        r_fea = r_fea * r_num
 
         r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
 
@@ -114,7 +113,7 @@ class Net(nn.Module):
         doc_fea = F.relu(self.cnn(doc.unsqueeze(1))).squeeze(3)
         # 最大池化：[] -> [128,100，1] ，squeeze(2): -> [128,100],作为fc层的输入
         doc_fea = F.max_pool1d(doc_fea, doc_fea.size(2)).squeeze(2)
-        doc_fea = self.doc_linear(doc_fea)  # 降维 -> [128,32]
+        doc_fea = F.relu(self.doc_linear(doc_fea))  # 降维 -> [128,32]
 
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([F.relu(id_emb), doc_fea, F.relu(self.fc_layer(r_fea))], 1)  # 加入doc后 -> [128,3,32]
@@ -135,7 +134,7 @@ class Net(nn.Module):
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.constant_(self.cnn.bias, 0.1)
 
-        # nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
+        nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
 
         nn.init.uniform_(self.linear.weight, -0.1, 0.1)
         nn.init.constant_(self.linear.bias, 0.1)
