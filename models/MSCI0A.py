@@ -49,8 +49,8 @@ class Net(nn.Module):
         self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
 
-        self.polarity_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
-        self.subj_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
+        self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
+        self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
 
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
