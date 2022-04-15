@@ -16,7 +16,7 @@ class Model(nn.Module):
 
         if self.opt.ui_merge == 'cat':
             if self.opt.r_id_merge == 'cat':
-                if opt.model[:5] in ['MSCI0F']:
+                if opt.model in ['MSCI0F']:
                     feature_dim = self.opt.id_emb_size * self.opt.num_fea * 4
                 else:
                     feature_dim = self.opt.id_emb_size * self.opt.num_fea * 2
