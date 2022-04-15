@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0C(nn.Module):
+class MSCI0D(nn.Module):
     '''
     删除attention
     '''
 
     def __init__(self, opt):
-        super(MSCI0C, self).__init__()
+        super(MSCI0D, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
