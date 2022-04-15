@@ -119,24 +119,24 @@ class Net(nn.Module):
         else:
             nn.init.xavier_normal_(self.word_embs.weight)
 
-        nn.init.uniform_(self.id_embedding.weight, a=-0.1, b=0.1)
-        nn.init.uniform_(self.u_i_id_embedding.weight, a=-0.1, b=0.1)
+        nn.init.xavier_normal_(self.id_embedding.weight)
+        nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
-        nn.init.constant_(self.cnn.bias, 0.1)
+        nn.init.xavier_normal_(self.cnn.bias, 0.1)
 
-        nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.id_linear.weight)
 
-        nn.init.uniform_(self.review_linear.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.review_linear.weight)
         nn.init.constant_(self.review_linear.bias, 0.1)
 
-        nn.init.uniform_(self.attention_linear.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.attention_linear.weight)
         nn.init.constant_(self.attention_linear.bias, 0.1)
 
-        nn.init.normal_(self.polarity_linear.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.polarity_linear.weight)
         nn.init.constant_(self.polarity_linear.bias, 0.1)
-        nn.init.normal_(self.subj_linear.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.subj_linear.weight)
         nn.init.constant_(self.subj_linear.bias, 0.1)
 
-        nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.fc_layer.weight)
         nn.init.constant_(self.fc_layer.bias, 0.1)
