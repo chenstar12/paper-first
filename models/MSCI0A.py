@@ -52,7 +52,7 @@ class Net(nn.Module):
         self.polarity_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
         self.subj_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
 
-        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.fc_layer = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
