@@ -47,7 +47,7 @@ class Net(nn.Module):
 
         self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)  # [100,32].用来给review特征降维
         self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
-        self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
+        self.attention_linear = nn.Linear(self.opt.filters_num, 1)
 
         self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
         self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
