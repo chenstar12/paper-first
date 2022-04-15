@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0G(nn.Module):
+class MSCI0Y(nn.Module):
     '''
-    (理论上说，效果变差！)真正意义上的DeepConn+NARRE ---- 删除id embedding
+    超参数 ---- gamma: 模仿pda，控制干预的强度
     '''
 
     def __init__(self, opt):
-        super(MSCI0G, self).__init__()
+        super(MSCI0Y, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -32,12 +32,12 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.opt = opt
 
-        if uori == 'user':
-            id_num = self.opt.user_num
-            ui_id_num = self.opt.item_num
-        else:  # item
-            id_num = self.opt.item_num
-            ui_id_num = self.opt.user_num
+        # if uori == 'user':
+        #     id_num = self.opt.user_num
+        #     ui_id_num = self.opt.item_num
+        # else:  # item
+        #     id_num = self.opt.item_num
+        #     ui_id_num = self.opt.user_num
 
         # self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user数/item数 * 32, 即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # 50000 * 300
@@ -96,10 +96,13 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
+        fea_raw = fea  # 未干预的fea
         fea = F.relu(self.polarity_linear(fea * polarity_w))
         fea = fea * r_num
         fea = F.relu(self.subj_linear(fea * subj_w))
         # rs_mix = rs_mix * r_num
+
+        fea = fea_raw * (1 - self.opt.gamma) + fea * (self.opt.gamma)  # 在这一步调参
 
         # att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         # att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]

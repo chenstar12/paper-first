@@ -21,6 +21,8 @@ from .MSCI0D import MSCI0D
 from .MSCI0E import MSCI0E
 from .MSCI0F import MSCI0F
 from .MSCI0G import MSCI0G
+from .MSCI0Y import MSCI0Y
+from .MSCI0Y1 import MSCI0Y1
 # from .MSCI1 import MSCI1
 # from .MSCI2 import MSCI2
 from .MSCI3 import MSCI3

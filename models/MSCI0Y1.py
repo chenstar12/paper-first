@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0G(nn.Module):
+class MSCI0Y1(nn.Module):
     '''
-    (理论上说，效果变差！)真正意义上的DeepConn+NARRE ---- 删除id embedding
+    升维：合并user的id，doc信息（导致信息量最大的review list维度加倍）
     '''
 
     def __init__(self, opt):
-        super(MSCI0G, self).__init__()
+        super(MSCI0Y1, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -21,8 +21,8 @@ class MSCI0G(nn.Module):
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
         user_doc, item_doc, user_sentiments, item_sentiments = datas
 
-        u_fea = self.user_net(user_doc, user_reviews, uids, user_item2id, user_sentiments)  # [128,2,32]
-        i_fea = self.item_net(item_doc, item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
+        u_fea = self.user_net(user_doc, user_reviews, uids, user_item2id, user_sentiments)  # [128,2,64]
+        i_fea = self.item_net(item_doc, item_reviews, iids, item_user2id, item_sentiments)  # [128,2,64]
 
         return u_fea, i_fea
 
@@ -39,9 +39,9 @@ class Net(nn.Module):
             id_num = self.opt.item_num
             ui_id_num = self.opt.user_num
 
-        # self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user数/item数 * 32, 即：[几万，32]
+        self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user数/item数 * 32, 即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # 50000 * 300
-        # self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # embedding的搜索空间：[几万，32]
+        self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # embedding的搜索空间：[几万，32]
 
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
         self.cnn_doc = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
@@ -53,7 +53,7 @@ class Net(nn.Module):
         self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
         self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
 
-        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size * 2)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
@@ -71,7 +71,7 @@ class Net(nn.Module):
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
-        # id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
+        id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         # u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
         #  3. attention（linear attention）
@@ -96,9 +96,14 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
+        fea_raw = fea  # 未干预的fea
+
         fea = F.relu(self.polarity_linear(fea * polarity_w))
         fea = fea * r_num
         fea = F.relu(self.subj_linear(fea * subj_w))
+
+        fea = fea_raw * (1 - self.opt.gamma) + fea * (self.opt.gamma)  # 在这一步调参
+
         # rs_mix = rs_mix * r_num
 
         # att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
@@ -120,7 +125,7 @@ class Net(nn.Module):
         doc_fea = F.max_pool1d(doc_fea, doc_fea.size(2)).squeeze(2)
         doc_fea = self.review_linear(doc_fea)  # 降维 -> [128,32]
 
-        return torch.stack([F.relu(doc_fea), F.relu(self.fc_layer(r_fea))], 1)
+        return torch.stack([torch.cat([F.relu(id_emb), F.relu(doc_fea)], dim=1), F.relu(self.fc_layer(r_fea))], 1)
 
     def reset_para(self):
         if self.opt.use_word_embedding:
@@ -132,8 +137,8 @@ class Net(nn.Module):
         else:
             nn.init.xavier_normal_(self.word_embs.weight)
 
-        # nn.init.xavier_normal_(self.id_embedding.weight)
-        # nn.init.xavier_normal_(self.u_i_id_embedding.weight)
+        nn.init.xavier_normal_(self.id_embedding.weight)
+        nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.xavier_normal_(self.cnn_doc.weight)
