@@ -12,7 +12,7 @@ class MSCI0F(nn.Module):
     def __init__(self, opt):
         super(MSCI0F, self).__init__()
         self.opt = opt
-        self.num_fea = 3  # 0,1,2 == id,doc,review
+        self.num_fea = 2  # 0,1,2 == id,doc,review
 
         self.user_net = Net(opt, 'user')
         self.item_net = Net(opt, 'item')
