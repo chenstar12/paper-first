@@ -18,21 +18,22 @@ from .MSCI0B1 import MSCI0B1
 from .MSCI0C import MSCI0C
 from .MSCI0C1 import MSCI0C1
 from .MSCI0D import MSCI0D
+from .MSCI0E import MSCI0E
 from .MSCI1 import MSCI1
-from .MSCI2 import MSCI2
+# from .MSCI2 import MSCI2
 from .MSCI3 import MSCI3
-from .MSCI4 import MSCI4
+# from .MSCI4 import MSCI4
 from .MSCI5 import MSCI5
-from .MSCI6 import MSCI6
+# from .MSCI6 import MSCI6
 from .MSCI7 import MSCI7
-from .MSCI7A import MSCI7A
-from .MSCI7B import MSCI7B
-from .MSCI7C import MSCI7C
+# from .MSCI7A import MSCI7A
+# from .MSCI7B import MSCI7B
+# from .MSCI7C import MSCI7C
 from .MSCI8 import MSCI8
-from .MSCI9 import MSCI9
-from .MSCI9A import MSCI9A
-from .MSCI9B import MSCI9B
-from .MSCI9C import MSCI9C
+# from .MSCI9 import MSCI9
+# from .MSCI9A import MSCI9A
+# from .MSCI9B import MSCI9B
+# from .MSCI9C import MSCI9C
 from .MSCI10 import MSCI10
 from .MSCI10B import MSCI10B
 # from .MSCI11A import MSCI11A
