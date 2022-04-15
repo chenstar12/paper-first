@@ -123,7 +123,7 @@ class Net(nn.Module):
         nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
-        nn.init.xavier_normal_(self.cnn.bias, 0.1)
+        nn.init.constant_(self.cnn.bias, 0.1)
 
         nn.init.xavier_normal_(self.id_linear.weight)
 
