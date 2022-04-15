@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 
 '''
-MSCI5：增加review list id embedding的利用率（获取fea）
+MSCI5：增加review list id embedding的利用率（获取fea）  ---- 几个实验证明，效果变差！！！！
 '''
 
 
