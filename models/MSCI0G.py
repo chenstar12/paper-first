@@ -21,8 +21,8 @@ class MSCI0G(nn.Module):
         user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
         user_doc, item_doc, user_sentiments, item_sentiments = datas
 
-        u_fea = self.user_net(user_doc, user_reviews, uids, user_item2id, user_sentiments)  # [128,3,32]
-        i_fea = self.item_net(item_doc, item_reviews, iids, item_user2id, item_sentiments)  # [128,3,32]
+        u_fea = self.user_net(user_doc, user_reviews, uids, user_item2id, user_sentiments)  # [128,2,32]
+        i_fea = self.item_net(item_doc, item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
 
         return u_fea, i_fea
 
