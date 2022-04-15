@@ -13,6 +13,7 @@ from .MSCI import MSCI
 from .MSCI0 import MSCI0
 from .MSCI0A import MSCI0A
 from .MSCI0B import MSCI0B
+from .MSCI0C import MSCI0C
 from .MSCI1 import MSCI1
 from .MSCI2 import MSCI2
 from .MSCI3 import MSCI3
@@ -22,6 +23,7 @@ from .MSCI6 import MSCI6
 from .MSCI7 import MSCI7
 from .MSCI7A import MSCI7A
 from .MSCI7B import MSCI7B
+from .MSCI7C import MSCI7C
 from .MSCI8 import MSCI8
 from .MSCI9 import MSCI9
 from .MSCI9A import MSCI9A
