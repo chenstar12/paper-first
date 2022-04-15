@@ -12,8 +12,11 @@ from .mpcn import MPCN
 from .MSCI import MSCI
 from .MSCI0 import MSCI0
 from .MSCI0A import MSCI0A
+from .MSCI0A1 import MSCI0A1
 from .MSCI0B import MSCI0B
+from .MSCI0B1 import MSCI0B1
 from .MSCI0C import MSCI0C
+from .MSCI0C1 import MSCI0C1
 from .MSCI0D import MSCI0D
 from .MSCI1 import MSCI1
 from .MSCI2 import MSCI2
@@ -31,7 +34,6 @@ from .MSCI9A import MSCI9A
 from .MSCI9B import MSCI9B
 from .MSCI9C import MSCI9C
 from .MSCI10 import MSCI10
-from .MSCI10A import MSCI10A
 from .MSCI10B import MSCI10B
 # from .MSCI11A import MSCI11A
 # from .MSCI11C import MSCI11C

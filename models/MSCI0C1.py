@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0B(nn.Module):
+class MSCI0C1(nn.Module):
     '''
-    初始化：改为normal_
+    linear不bias
     '''
 
     def __init__(self, opt):
-        super(MSCI0B, self).__init__()
+        super(MSCI0C1, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -75,10 +75,10 @@ class Net(nn.Module):
 
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
-        rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-            self.review_linear(fea) +  # review降维:[128,10/27,100]->[128,10/27,32]
-            F.relu(self.id_linear(F.relu(u_i_id_emb)))  # id降维后还是[128,10/27，32]
-        )
+        # rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
+        #     self.review_linear(fea) +  # review降维:[128,10/27,100]->[128,10/27,32]
+        #     F.relu(self.id_linear(F.relu(u_i_id_emb)))  # id降维后还是[128,10/27，32]
+        # )
 
         '''
         （1）先把情感权重归一化 ---- softmax
@@ -100,7 +100,7 @@ class Net(nn.Module):
         fea = F.relu(self.subj_linear(fea * subj_w))
         fea = fea * r_num
 
-        att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
+        att_score = F.relu(self.attention_linear(fea))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
 
         r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
@@ -123,20 +123,20 @@ class Net(nn.Module):
         nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
-        nn.init.constant_(self.cnn.bias, 0.1)
+        # nn.init.xavier_normal_(self.cnn.bias, 0.1)
 
         nn.init.xavier_normal_(self.id_linear.weight)
 
         nn.init.xavier_normal_(self.review_linear.weight)
-        nn.init.constant_(self.review_linear.bias, 0.1)
+        # nn.init.constant_(self.review_linear.bias, 0.1)
 
         nn.init.xavier_normal_(self.attention_linear.weight)
-        nn.init.constant_(self.attention_linear.bias, 0.1)
+        # nn.init.constant_(self.attention_linear.bias, 0.1)
 
         nn.init.xavier_normal_(self.polarity_linear.weight)
-        nn.init.constant_(self.polarity_linear.bias, 0.1)
+        # nn.init.constant_(self.polarity_linear.bias, 0.1)
         nn.init.xavier_normal_(self.subj_linear.weight)
-        nn.init.constant_(self.subj_linear.bias, 0.1)
+        # nn.init.constant_(self.subj_linear.bias, 0.1)
 
         nn.init.xavier_normal_(self.fc_layer.weight)
-        nn.init.constant_(self.fc_layer.bias, 0.1)
+        # nn.init.constant_(self.fc_layer.bias, 0.1)

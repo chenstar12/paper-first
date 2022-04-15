@@ -52,7 +52,7 @@ class Net(nn.Module):
         self.polarity_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
         self.subj_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
 
-        self.fc_layer = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size)
+        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
@@ -95,15 +95,15 @@ class Net(nn.Module):
         subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
-        rs_mix = F.relu(self.polarity_linear(rs_mix * polarity_w))
-        rs_mix = rs_mix * r_num
-        rs_mix = F.relu(self.subj_linear(rs_mix * subj_w))
-        rs_mix = rs_mix * r_num
+        fea = F.relu(self.polarity_linear(fea * polarity_w))
+        fea = fea * r_num
+        fea = F.relu(self.subj_linear(fea * subj_w))
+        fea = fea * r_num
 
         att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
         att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
 
-        r_fea = rs_mix * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
+        r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
         r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
