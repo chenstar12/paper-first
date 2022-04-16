@@ -68,7 +68,7 @@ class Model(nn.Module):
             print(polarity ** self.opt.lambda2)
             for i in np.arange(0.02, 0.25, 0.02):
                 print('i ===================== ', i)
-                print(polarity ** self.opt.lambda2)
+                print(polarity ** i)
             output = F.elu(output) * (polarity ** self.opt.lambda2)
 
         return output
