@@ -62,13 +62,9 @@ class Model(nn.Module):
         if self.opt.inference in ['ELU']:
             output = F.elu(output)
         elif self.opt.inference in ['PD']:
-            output = F.elu(output) + output * (self.opt.lambda1 * polarity + (1 - self.opt.lambda1) * subjectivity)
+            output = F.elu(output) + output * self.opt.lambda1 * (polarity - subjectivity)
+            print(polarity - subjectivity)
         elif self.opt.inference in ['PDA']:  # 调参：lambda2
-            print(polarity)
-            print(polarity ** self.opt.lambda2)
-            for i in np.arange(0.02, 0.25, 0.02):
-                print('i ===================== ', i)
-                print(polarity ** i)
             output = F.elu(output) * (polarity ** self.opt.lambda2)
 
         return output
