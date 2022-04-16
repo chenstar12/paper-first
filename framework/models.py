@@ -65,11 +65,8 @@ class Model(nn.Module):
             output = F.elu(output) + output * self.opt.lambda1 * (polarity - subjectivity)
             print(polarity - subjectivity)
         elif self.opt.inference in ['PDA']:  # 调参：lambda2
-            print(polarity)
             tmp = polarity ** self.opt.lambda2
-            print(tmp)
-            tmp[torch.isnan(tmp)] = torch.mean(tmp)
-            print(tmp)
+            tmp[torch.isnan(tmp)] = 0
             output = F.elu(output) * (tmp)
 
         return output
