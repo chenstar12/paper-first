@@ -53,10 +53,10 @@ class Model(nn.Module):
         polarity = user_sentiments[:, :, 0]  # 获取第1列 ---- polarity
         polarity = polarity.sum(dim=1)
         print(polarity.shape)
-        print(polarity)
+        print(polarity / 10000)
         print('期望')
-        print(polarity / polarity.shape(1))
-        print(polarity.shape(1))
+        print(polarity / polarity.shape[1])
+        print(polarity.shape[1])
 
         return output
 
