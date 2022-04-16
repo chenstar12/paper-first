@@ -50,13 +50,25 @@ class Model(nn.Module):
         '''
         调参：lambda1和lambda2
         '''
-        polarity = user_sentiments[:, :, 0]  # 获取第1列 ---- polarity
+        polarity = user_sentiments[:, :, 0]  # 获取第1列
+        subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+
         polarity = polarity.sum(dim=1)
+        subjectivity = subjectivity.sum(dim=1)
+
         print(polarity.shape)
+        print(subjectivity.shape)
+
         print(polarity / 10000)
+        print(subjectivity / 10000)
+
         print('期望')
+
         print(polarity / polarity.shape[1])
         print(polarity.shape[1])
+
+        print(subjectivity / subjectivity.shape[1])
+        print(subjectivity.shape[1])
 
         return output
 
