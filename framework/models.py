@@ -53,6 +53,8 @@ class Model(nn.Module):
         polarity = user_sentiments[:, :, 0]  # 获取第1列
         subjectivity = user_sentiments[:, :, 1]  # 获取第2列
         num = polarity.shape[1]
+        num1 = subjectivity.shape[1]
+        print('num,num1:', num, num1)
 
         polarity = polarity.sum(dim=1)
         subjectivity = subjectivity.sum(dim=1)
@@ -66,10 +68,8 @@ class Model(nn.Module):
         print('期望')
 
         print(polarity / num)
-        print(polarity.num)
 
         print(subjectivity / num)
-        print(subjectivity.num)
 
         return output
 
