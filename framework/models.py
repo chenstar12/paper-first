@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -65,7 +66,7 @@ class Model(nn.Module):
         elif self.opt.inference in ['PDA']:  # 调参：lambda2
             print(polarity)
             print(polarity ** self.opt.lambda2)
-            for i in range(0.02, 0.25, 0.02):
+            for i in np.arange(0.02, 0.25, 0.02):
                 print('i ===================== ', i)
                 print(polarity ** self.opt.lambda2)
             output = F.elu(output) * (polarity ** self.opt.lambda2)
