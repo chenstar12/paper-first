@@ -53,6 +53,10 @@ class DefaultConfig:
 
     gamma = 0  # 干预强度，拟取值范围[0.2,0.4,0.6,0.8]
 
+    # adjusting参数
+    lambda1 = 0.5  # 积极性（减掉）
+    lambda2 = 0.5  # 主观性（加）
+
     def set_path(self, name):
         '''
         specific
