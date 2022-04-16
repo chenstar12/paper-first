@@ -205,6 +205,16 @@ if __name__ == '__main__':
             users_id.append(value[0])
             items_id.append(value[1])
             ratings.append(value[3])
+
+            blob = TextBlob(value[2])
+
+            pola = blob.sentiment.polarity
+            pola = int(pola * 10000)  # 防止被floatTensor截断
+            polarity.append(pola)
+
+            subj = blob.sentiment.subjectivity
+            subj = int(subj * 10000)
+            subjectivity.append(subj)
     else:
         for line in file:
             js = json.loads(line)
