@@ -47,6 +47,14 @@ class Model(nn.Module):
         ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
+        '''
+        调参：lambda1和lambda2
+        '''
+        print('user_sentiments.shape')
+        print(user_sentiments.shape)
+        polarity_w = user_sentiments[:, :, 0]  # 获取第1列 ---- polarity
+        print(polarity_w.shape)
+
         return output
 
     def load(self, path):
