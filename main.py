@@ -227,8 +227,8 @@ def predict_ranking(model, data_loader, opt):
     model.eval()
     with torch.no_grad():
 
-        scores_matrix = torch.zero_(opt.user_num, opt.item_num)
-        output_matrix = torch.zero_(opt.user_num, opt.item_num)
+        scores_matrix = torch.zeros(opt.user_num, opt.item_num)
+        output_matrix = torch.zeros(opt.user_num, opt.item_num)
 
         for idx, (test_data, scores) in enumerate(data_loader):
             scores = torch.FloatTensor(scores).cuda()
