@@ -50,32 +50,31 @@ class Model(nn.Module):
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
-        if opt.stage == 'train':
-            return output
-        else:
-            '''
-            调参：lambda1和lambda2
-            '''
-            polarity = user_sentiments[:, :, 0]  # 获取第1列
-            subjectivity = user_sentiments[:, :, 1]  # 获取第2列
-            num = polarity.shape[1]
+        '''
+        调参：lambda1和lambda2
+        '''
+        polarity = user_sentiments[:, :, 0]  # 获取第1列
+        subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+        num = polarity.shape[1]
 
-            polarity = polarity.sum(dim=1) / (10000 * num)
-            subjectivity = subjectivity.sum(dim=1) / (10000 * num)
+        polarity = polarity.sum(dim=1) / (10000 * num)
+        subjectivity = subjectivity.sum(dim=1) / (10000 * num)
+        print(polarity)
+        print(subjectivity)
 
-            if self.opt.inference in ['PD']:
-                output = output + output * self.opt.lambda1 * polarity
-            if self.opt.inference in ['PD1']:
-                output = output + output * self.opt.lambda1 * polarity * subjectivity
-                # print(polarity - subjectivity)
-            elif self.opt.inference in ['PDA']:  # 调参：lambda2
-                tmp = polarity ** self.opt.lambda2
-                # print(tmp)
-                tmp[torch.isnan(tmp)] = 0.9
-                # print(tmp)
-                output = F.elu(output) * (tmp)
+        if self.opt.inference in ['PD']:
+            output = output + output * self.opt.lambda1 * polarity
+        if self.opt.inference in ['PD1']:
+            output = output + output * self.opt.lambda1 * polarity * subjectivity
+            # print(polarity - subjectivity)
+        elif self.opt.inference in ['PDA']:  # 调参：lambda2
+            tmp = polarity ** self.opt.lambda2
+            # print(tmp)
+            tmp[torch.isnan(tmp)] = 0.9
+            # print(tmp)
+            output = F.elu(output) * (tmp)
 
-            return output
+        return output
 
     def load(self, path):
         '''
