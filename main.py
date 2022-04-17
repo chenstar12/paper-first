@@ -244,7 +244,9 @@ def predict_ranking(model, data_loader, opt):
             output = model(test_data, opt)
             print(0)
             print(test_data[idx][0])
-            print(test_data.shape)
+            print(len(test_data))
+            print(len(test_data[0]))
+            print(len(test_data[0][0]))
 
             output_matrix[test_data[idx][0], test_data[idx][1]] = output[idx]
             print(1)
