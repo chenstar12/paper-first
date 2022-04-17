@@ -239,11 +239,15 @@ def predict_ranking(model, data_loader, opt):
             output = model(test_data1, opt)
 
             for i in range(len(test_data)):
+                if i %100==0:
+                    print(i)
+                    print(test_data[i][0])
+                    print(test_data[i][1])
                 output_matrix[test_data[i][0], test_data[i][1]] = output[i]
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
             print('scores')
-            print(output_matrix)
+            print(torch.tensor(output_matrix).norm(1))
             print(scores_matrix)
 
     data_len = len(data_loader.dataset)
