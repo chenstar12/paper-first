@@ -237,15 +237,13 @@ def predict_ranking(model, data_loader, opt):
             else:
                 test_data1 = unpack_input(opt, test_data)
             output = model(test_data1, opt)
-            print(test_data[idx][0])
-            print(test_data[idx][1])
-            output_matrix[test_data[idx][0], test_data[idx][1]] = output[idx]
-            scores_matrix[test_data[idx][0], test_data[idx][1]] = scores[idx]
-            print('预测')
-            print(output_matrix.shape)
-            print(torch.tensor(output_matrix).norm(1))
-            print(torch.tensor(scores).norm(1))
+
+            for i in range(len(test_data)):
+                output_matrix[test_data[i][0], test_data[i][1]] = output[i]
+                scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
+
             print('scores')
+            print(output_matrix)
             print(scores_matrix)
 
     data_len = len(data_loader.dataset)
