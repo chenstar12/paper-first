@@ -68,17 +68,15 @@ class Model(nn.Module):
         if self.opt.inference in ['PD1']:
             output = output + output * self.opt.lambda1 * polarity * subjectivity
             # print(polarity - subjectivity)
-        elif self.opt.inference in ['PDA']:  # 调参：lambda2
+        if self.opt.inference in ['PDA']:  # 调参：lambda2
             tmp = polarity ** self.opt.lambda2
 
             df = pd.DataFrame(tmp.cpu())
             df.fillna(df.mean(), inplace=True)  # 均值填充
-            tmp = torch.from_numpy(df.values).cuda()
-            print(tmp.shape)
+            tmp = torch.from_numpy(df.values).squeeze(1).cuda()
 
             # print(tmp)
             output = output * tmp
-            print(output.shape)
 
         return output
 
