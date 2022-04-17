@@ -241,12 +241,14 @@ def predict_ranking(model, data_loader, opt):
                 test_data = unpack_input_sentiment(opt, test_data)
             else:
                 test_data = unpack_input(opt, test_data)
-            print(1)
             output = model(test_data, opt)
-            print(2)
+            print(0)
+            print(test_data[idx][0])
 
             output_matrix[test_data[idx][0], test_data[idx][1]] = output[idx]
+            print(1)
             scores_matrix[test_data[idx][0], test_data[idx][1]] = scores[idx]
+            print(2)
             print('预测')
             print(output_matrix)
             print('scores')
