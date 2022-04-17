@@ -35,7 +35,7 @@ class Model(nn.Module):
         self.predict_net = PredictionLayer(opt)  # predict层！！！
         self.dropout = nn.Dropout(self.opt.drop_out)
 
-    def forward(self, datas):
+    def forward(self, datas, opt):
         if self.opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc, user_sentiments, item_sentiments = datas
@@ -49,27 +49,32 @@ class Model(nn.Module):
         ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
-        '''
-        调参：lambda1和lambda2
-        '''
-        polarity = user_sentiments[:, :, 0]  # 获取第1列
-        subjectivity = user_sentiments[:, :, 1]  # 获取第2列
-        num = polarity.shape[1]
 
-        polarity = polarity.sum(dim=1) / (10000 * num)
-        subjectivity = subjectivity.sum(dim=1) / (10000 * num)
+        print(opt.stage)
+        if opt.stage == 'train':
+            return output
+        else:
+            '''
+            调参：lambda1和lambda2
+            '''
+            polarity = user_sentiments[:, :, 0]  # 获取第1列
+            subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+            num = polarity.shape[1]
 
-        if self.opt.inference in ['ELU']:
-            output = F.elu(output)
-        elif self.opt.inference in ['PD']:
-            output = F.elu(output) + output * self.opt.lambda1 * (polarity - subjectivity)
-            print(polarity - subjectivity)
-        elif self.opt.inference in ['PDA']:  # 调参：lambda2
-            tmp = polarity ** self.opt.lambda2
-            tmp[torch.isnan(tmp)] = 0.8
-            output = F.elu(output) * (tmp)
+            polarity = polarity.sum(dim=1) / (10000 * num)
+            subjectivity = subjectivity.sum(dim=1) / (10000 * num)
 
-        return output
+            if self.opt.inference in ['ELU']:
+                output = F.elu(output)
+            elif self.opt.inference in ['PD']:
+                output = F.elu(output) + output * self.opt.lambda1 * (polarity - subjectivity)
+                print(polarity - subjectivity)
+            elif self.opt.inference in ['PDA']:  # 调参：lambda2
+                tmp = polarity ** self.opt.lambda2
+                tmp[torch.isnan(tmp)] = 0.8
+                output = F.elu(output) * (tmp)
+
+            return output
 
     def load(self, path):
         '''

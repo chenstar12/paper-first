@@ -50,7 +50,8 @@ def train(**kwargs):
                 'batch_size:' + str(opt.batch_size) + '\n' + 'num_epochs: ' + str(opt.num_epochs) + '\n' +
                 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n' +
                 'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'early_stop: ' + str(opt.early_stop) +
-                '\n' + 'gamma: ' + str(opt.gamma)+'\n' + 'lambda1: ' + str(opt.lambda1)+'\n' + 'lambda2: ' + str(opt.lambda2))
+                '\n' + 'gamma: ' + str(opt.gamma) + '\n' + 'lambda1: ' + str(opt.lambda1) + '\n' + 'lambda2: ' + str(
+        opt.lambda2))
 
     random.seed(opt.seed)
     np.random.seed(opt.seed)
@@ -79,7 +80,7 @@ def train(**kwargs):
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
 
-    optimizer = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay) # 相当于L2正则化
+    optimizer = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)  # 相当于L2正则化
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.8)
 
     # training
@@ -112,7 +113,7 @@ def train(**kwargs):
                 train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
 
             optimizer.zero_grad()
-            output = model(train_datas)
+            output = model(train_datas,opt)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
@@ -153,7 +154,9 @@ def train(**kwargs):
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
+        opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+        opt.stage = 'train'
         epoch_val_mse.append(val_mse)
 
         if val_mse < best_res:
@@ -180,39 +183,7 @@ def train(**kwargs):
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
     logger.info('train loss list: ' + str(epoch_train_mse))
 
-
-def test(**kwargs):
-    if 'dataset' not in kwargs:
-        opt = getattr(config, 'Video_Games_data_Config')()
-    else:
-        opt = getattr(config, kwargs['dataset'] + '_Config')()
-    opt.parse(kwargs)
-    assert (len(opt.pth_path) > 0)
-    random.seed(opt.seed)
-    np.random.seed(opt.seed)
-    torch.manual_seed(opt.seed)
-    if opt.use_gpu:
-        torch.cuda.manual_seed_all(opt.seed)
-
-    if len(opt.gpu_ids) == 0 and opt.use_gpu:
-        torch.cuda.set_device(opt.gpu_id)
-
-    model = Model(opt, getattr(models, opt.model))
-    if opt.use_gpu:
-        model.cuda()
-        if len(opt.gpu_ids) > 0:
-            model = nn.DataParallel(model, device_ids=opt.gpu_ids)
-    if model.net.num_fea != opt.num_fea:
-        raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
-
-    model.load(opt.pth_path)
-    logger.info(f"load model: {opt.pth_path}")
-    test_data = ReviewData(opt.data_root, mode="Test")
-    test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-    logger.info(f"{now()}: test in the test dataset")
-    predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
-
-
+# 模型评估
 def predict(model, data_loader, opt):
     total_loss = 0.0
     total_maeloss = 0.0
@@ -229,7 +200,7 @@ def predict(model, data_loader, opt):
             else:
                 test_data = unpack_input(opt, test_data)
 
-            output = model(test_data)
+            output = model(test_data,opt)
 
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
@@ -289,5 +260,37 @@ def unpack_input_sentiment(opt, x):
 
 if __name__ == "__main__":
     logger = logging.getLogger('')
-
+    opt = None
     fire.Fire()
+
+# def test(**kwargs):
+#     opt.stage = 'val'
+#     if 'dataset' not in kwargs:
+#         opt = getattr(config, 'Video_Games_data_Config')()
+#     else:
+#         opt = getattr(config, kwargs['dataset'] + '_Config')()
+#     opt.parse(kwargs)
+#     assert (len(opt.pth_path) > 0)
+#     random.seed(opt.seed)
+#     np.random.seed(opt.seed)
+#     torch.manual_seed(opt.seed)
+#     if opt.use_gpu:
+#         torch.cuda.manual_seed_all(opt.seed)
+#
+#     if len(opt.gpu_ids) == 0 and opt.use_gpu:
+#         torch.cuda.set_device(opt.gpu_id)
+#
+#     model = Model(opt, getattr(models, opt.model))
+#     if opt.use_gpu:
+#         model.cuda()
+#         if len(opt.gpu_ids) > 0:
+#             model = nn.DataParallel(model, device_ids=opt.gpu_ids)
+#     if model.net.num_fea != opt.num_fea:
+#         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
+#
+#     model.load(opt.pth_path)
+#     logger.info(f"load model: {opt.pth_path}")
+#     test_data = ReviewData(opt.data_root, mode="Test")
+#     test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
+#     logger.info(f"{now()}: test in the test dataset")
+#     predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)

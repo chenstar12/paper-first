@@ -59,6 +59,8 @@ class DefaultConfig:
     lambda1 = 0.5  # 积极性（减掉）
     lambda2 = 0.5  # 主观性（加）
 
+    stage = 'train'  # 模仿clickbait：在评估阶段（test和validation）进行微调
+
     def set_path(self, name):
         '''
         specific
