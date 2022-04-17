@@ -254,7 +254,6 @@ def predict_ranking(model, data_loader, opt):
 
             origin_items = set(torch.tensor(scores_matrix[user]))
             print(origin_items)
-            print(scores_matrix)
 
             num_origin_items = len(origin_items)
             items_list = index_rank_lists[user]
