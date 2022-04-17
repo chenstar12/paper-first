@@ -50,7 +50,6 @@ class Model(nn.Module):
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
-        print(opt.stage)
         if opt.stage == 'train':
             return output
         else:
