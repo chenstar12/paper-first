@@ -64,16 +64,16 @@ class Model(nn.Module):
             polarity = polarity.sum(dim=1) / (10000 * num)
             subjectivity = subjectivity.sum(dim=1) / (10000 * num)
 
-            if self.opt.inference in ['ELU']:
-                output = F.elu(output)
-            elif self.opt.inference in ['PD']:
-                output = F.elu(output) + output * self.opt.lambda1 * (polarity - subjectivity)
-                print(polarity - subjectivity)
+            if self.opt.inference in ['PD']:
+                output = output + output * self.opt.lambda1 * polarity
+            if self.opt.inference in ['PD1']:
+                output = output + output * self.opt.lambda1 * polarity * subjectivity
+                # print(polarity - subjectivity)
             elif self.opt.inference in ['PDA']:  # 调参：lambda2
                 tmp = polarity ** self.opt.lambda2
-                print(tmp)
+                # print(tmp)
                 tmp[torch.isnan(tmp)] = 0.8
-                print(tmp)
+                # print(tmp)
                 output = F.elu(output) * (tmp)
 
             return output
