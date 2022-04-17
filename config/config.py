@@ -56,8 +56,8 @@ class DefaultConfig:
     inference = ''
 
     # adjusting参数
-    lambda1 = 0.5  # 积极性（减掉）
-    lambda2 = 0.5  # 主观性（加）
+    lambda1 = 0.5  # PDA减法调参
+    lambda2 = 0.01  # PDA指数调参
 
     stage = 'train'  # 模仿clickbait：在评估阶段（test和validation）进行微调
 
