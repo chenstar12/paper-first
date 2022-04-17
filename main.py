@@ -242,7 +242,7 @@ def predict_ranking(model, data_loader, opt):
             scores_matrix[test_data[idx][0], test_data[idx][1]] = scores[idx]
             print('预测')
             print(output_matrix.shape)
-            print(output_matrix)
+            print(torch.tensor(output_matrix).norm(1))
             print('scores')
             print(scores_matrix)
 
