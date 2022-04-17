@@ -251,7 +251,7 @@ def predict_ranking(model, data_loader, opt):
     data_len = len(data_loader.dataset)
 
     logger.info("-------------------------------ranking metric:---------------------------")
-    logger.info(f"mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    # logger.info(f"mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     return 0
 
 
