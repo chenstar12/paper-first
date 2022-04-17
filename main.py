@@ -240,9 +240,10 @@ def predict_ranking(model, data_loader, opt):
 
             for i in range(len(test_data)):
                 output_matrix[test_data[i][0], test_data[i][1]] = output[i]
-                scores_matrix[test_data[i][0], test_data[i][1]] = test_data[i][1]
+                scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
+        _, index_scores_matrix = torch.topk(scores_matrix, opt.item_num)
 
         precision = np.array([0.0] * len(opt.topk))
         recall = np.array([0.0] * len(opt.topk))
@@ -252,7 +253,7 @@ def predict_ranking(model, data_loader, opt):
             user = data[0]
             print(user)
 
-            origin_items = set(torch.tensor(scores_matrix[user]))
+            origin_items = set(index_scores_matrix[user])
             print(origin_items)
 
             num_origin_items = len(origin_items)
