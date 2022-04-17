@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -69,8 +70,11 @@ class Model(nn.Module):
             # print(polarity - subjectivity)
         elif self.opt.inference in ['PDA']:  # 调参：lambda2
             tmp = polarity ** self.opt.lambda2
-            # print(tmp)
-            tmp[torch.isnan(tmp)] = 0.9
+
+            df = pd.DataFrame(tmp)
+            df.fillna(df.mean(), inplace=True)  # 均值填充
+            tmp = torch.from_numpy(df.values).cuda()
+
             # print(tmp)
             output = output * tmp
 
