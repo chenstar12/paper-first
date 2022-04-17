@@ -240,7 +240,7 @@ def predict_ranking(model, data_loader, opt):
 
             for i in range(len(test_data)):
                 output_matrix[test_data[i][0], test_data[i][1]] = output[i]
-                scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
+                scores_matrix[test_data[i][0], test_data[i][1]] = test_data[i][1]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
 
