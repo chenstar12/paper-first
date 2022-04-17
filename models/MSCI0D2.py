@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D2(nn.Module):
     '''
-    去掉subjectivity
+    去掉subjectivity  ---- 模型output那里也要去掉
     '''
 
     def __init__(self, opt):

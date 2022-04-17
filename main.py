@@ -50,8 +50,8 @@ def train(**kwargs):
                 'batch_size:' + str(opt.batch_size) + '\n' + 'num_epochs: ' + str(opt.num_epochs) + '\n' +
                 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n' +
                 'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'early_stop: ' + str(opt.early_stop) +
-                '\n' + 'gamma: ' + str(opt.gamma) + '\n' + 'lambda1: ' + str(opt.lambda1) + '\n' + 'lambda2: ' + str(
-        opt.lambda2))
+                '\n' + 'gamma: ' + str(opt.gamma) + '\n' + 'lambda1: ' + str(opt.lambda1) + '\n' + 'lambda2: ' +
+                str(opt.lambda2) + '\n' + 'inference: ' + str(opt.inference))
 
     random.seed(opt.seed)
     np.random.seed(opt.seed)
@@ -113,7 +113,7 @@ def train(**kwargs):
                 train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
 
             optimizer.zero_grad()
-            output = model(train_datas,opt)
+            output = model(train_datas, opt)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
@@ -183,6 +183,7 @@ def train(**kwargs):
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
     logger.info('train loss list: ' + str(epoch_train_mse))
 
+
 # 模型评估
 def predict(model, data_loader, opt):
     total_loss = 0.0
@@ -200,7 +201,7 @@ def predict(model, data_loader, opt):
             else:
                 test_data = unpack_input(opt, test_data)
 
-            output = model(test_data,opt)
+            output = model(test_data, opt)
 
             mse_loss = torch.sum((output - scores) ** 2)
             total_loss += mse_loss.item()
