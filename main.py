@@ -242,8 +242,8 @@ def predict_ranking(model, data_loader, opt):
                 output_matrix[test_data[i][0], test_data[i][1]] = output[i]
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
-        rank_lists = torch.topk(output_matrix,opt.topk)
-        print(rank_lists.shape)
+        _, rank_lists = torch.topk(output_matrix, opt.topk)
+        print(rank_lists)
         print(output_matrix.shape)
 
     data_len = len(data_loader.dataset)
