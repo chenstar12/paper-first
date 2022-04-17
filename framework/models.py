@@ -74,9 +74,11 @@ class Model(nn.Module):
             df = pd.DataFrame(tmp.cpu())
             df.fillna(df.mean(), inplace=True)  # 均值填充
             tmp = torch.from_numpy(df.values).cuda()
+            print(tmp.shape)
 
             # print(tmp)
             output = output * tmp
+            print(output.shape)
 
         return output
 
