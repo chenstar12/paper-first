@@ -71,7 +71,7 @@ class Model(nn.Module):
         elif self.opt.inference in ['PDA']:  # 调参：lambda2
             tmp = polarity ** self.opt.lambda2
 
-            df = pd.DataFrame(tmp)
+            df = pd.DataFrame(tmp.cpu())
             df.fillna(df.mean(), inplace=True)  # 均值填充
             tmp = torch.from_numpy(df.values).cuda()
 
