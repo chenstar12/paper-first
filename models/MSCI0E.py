@@ -41,7 +41,7 @@ class Net(nn.Module):
 
         self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user数/item数 * 32, 即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # 50000 * 300
-        self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # embedding的搜索空间：[几万，32]
+        # self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # embedding的搜索空间：[几万，32]
 
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
         self.cnn_doc = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
@@ -72,7 +72,7 @@ class Net(nn.Module):
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
-        u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
+        # u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
         #  3. attention（linear attention）
         #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
@@ -133,7 +133,7 @@ class Net(nn.Module):
             nn.init.xavier_normal_(self.word_embs.weight)
 
         nn.init.xavier_normal_(self.id_embedding.weight)
-        nn.init.xavier_normal_(self.u_i_id_embedding.weight)
+        # nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.xavier_normal_(self.cnn_doc.weight)

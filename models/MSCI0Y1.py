@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0Y1(nn.Module):
     '''
-    升维：合并user的id，doc信息（导致信息量最大的review list维度加倍）
+    (基于0F)升维：合并user的id，doc信息（导致信息量最大的review list维度加倍）
     '''
 
     def __init__(self, opt):
