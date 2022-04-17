@@ -135,7 +135,7 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
-            aaa = predict_ranking(model, val_data_loader, opt)
+            predict_ranking(model, val_data_loader, opt)
 
             # if opt.fine_step:  # 默认False。。。。。
             #     if idx % opt.print_step == 0 and idx > 0:
@@ -229,7 +229,10 @@ def predict_ranking(model, data_loader, opt):
 
         scores_matrix = torch.zeros(opt.user_num, opt.item_num)
         output_matrix = torch.zeros(opt.user_num, opt.item_num)
-
+        print('预测')
+        print(output_matrix)
+        print('scores')
+        print(scores_matrix)
         for idx, (test_data, scores) in enumerate(data_loader):
             # print(test_data)
             # print(scores)
