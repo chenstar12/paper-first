@@ -135,7 +135,7 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
-            # predict_ranking(model, val_data_loader, opt)
+            predict_ranking(model, val_data_loader, opt)
 
             # if opt.fine_step:  # 默认False。。。。。
             #     if idx % opt.print_step == 0 and idx > 0:
