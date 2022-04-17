@@ -250,18 +250,19 @@ def predict_ranking(model, data_loader, opt):
         for data in test_data:
             user = data[0]
             origin_items = set(scores_matrix[user])
+            num_origin_items=len(origin_items)
             items_list = index_rank_lists[user]
             for ind, k in enumerate(opt.topk):
                 items = set(items_list[0:k])
                 num_hit = len(origin_items.intersection(items))
 
                 precision[ind] += float(num_hit / k)
-                recall[ind] += float(num_hit / origin_items)
+                recall[ind] += float(num_hit / num_origin_items)
 
                 ndcg_score = 0.0
                 max_ndcg_score = 0.0
 
-                for i in range(min(origin_items, k)):
+                for i in range(min(num_origin_items, k)):
                     max_ndcg_score += 1 / math.log2(i + 2)
                 if max_ndcg_score == 0:
                     continue
