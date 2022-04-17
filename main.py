@@ -231,6 +231,8 @@ def predict_ranking(model, data_loader, opt):
         output_matrix = torch.zeros(opt.user_num, opt.item_num)
 
         for idx, (test_data, scores) in enumerate(data_loader):
+            print(test_data)
+            print(scores)
             scores = torch.FloatTensor(scores).cuda()
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
