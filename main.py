@@ -135,7 +135,6 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
-            predict_ranking(model, val_data_loader, opt)
 
             # if opt.fine_step:  # 默认False。。。。。
             #     if idx % opt.print_step == 0 and idx > 0:
@@ -155,9 +154,9 @@ def train(**kwargs):
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
+        predict_ranking(model, val_data_loader, opt)
         # opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
-        aaa = predict_ranking(model, val_data_loader, opt)
         # opt.stage = 'train'
         epoch_val_mse.append(val_mse)
 
@@ -242,15 +241,48 @@ def predict_ranking(model, data_loader, opt):
                 output_matrix[test_data[i][0], test_data[i][1]] = output[i]
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
-        _, rank_lists = torch.topk(output_matrix, opt.topk)
-        print(rank_lists)
-        print(output_matrix.shape)
+        _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
 
-    data_len = len(data_loader.dataset)
+        precision = np.array([0.0] * len(opt.topk))
+        recall = np.array([0.0] * len(opt.topk))
+        ndcg = np.array([0.0] * len(opt.topk))
 
-    logger.info("-------------------------------ranking metric:---------------------------")
-    # logger.info(f"mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
-    return 0
+        for data in test_data:
+            user = data[0]
+            origin_items = scores_matrix[user]
+            items_list = index_rank_lists[user]
+            for ind, k in enumerate(opt.topk):
+                items = set(items_list[0:k])
+                num_hit = len(origin_items.intersection(items))
+
+                precision[ind] += float(num_hit / k)
+                recall[ind] += float(num_hit / origin_items)
+
+                ndcg_score = 0.0
+                max_ndcg_score = 0.0
+
+                for i in range(min(origin_items, k)):
+                    max_ndcg_score += 1 / math.log2(i + 2)
+                if max_ndcg_score == 0:
+                    continue
+
+                for i, temp_item in enumerate(items_list[0:k]):
+                    if temp_item in origin_items:
+                        ndcg_score += 1 / math.log2(i + 2)
+
+                ndcg[ind] += ndcg_score / max_ndcg_score
+
+        data_len = len(data_loader.dataset)
+
+        precision = precision / data_len
+        recall = recall / data_len
+        ndcg = ndcg / data_len
+
+        logger.info(
+            'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
+        logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
+        logger.info(
+            'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
