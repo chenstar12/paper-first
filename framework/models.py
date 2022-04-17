@@ -59,8 +59,8 @@ class Model(nn.Module):
 
         polarity = polarity.sum(dim=1) / (10000 * num)
         subjectivity = subjectivity.sum(dim=1) / (10000 * num)
-        print(polarity)
-        print(subjectivity)
+        # print(polarity)
+        # print(subjectivity)
 
         if self.opt.inference in ['PD']:
             output = output + output * self.opt.lambda1 * polarity
@@ -72,7 +72,7 @@ class Model(nn.Module):
             # print(tmp)
             tmp[torch.isnan(tmp)] = 0.9
             # print(tmp)
-            output = F.elu(output) * (tmp)
+            output = output * tmp
 
         return output
 
