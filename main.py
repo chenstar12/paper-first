@@ -77,7 +77,6 @@ def train(**kwargs):
 
     val_data = ReviewData(opt.data_root, mode="Val")
     val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-    aaa = predict_ranking(model, val_data_loader, opt)
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
 
@@ -136,6 +135,7 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
+            aaa = predict_ranking(model, val_data_loader, opt)
 
             # if opt.fine_step:  # 默认False。。。。。
             #     if idx % opt.print_step == 0 and idx > 0:
