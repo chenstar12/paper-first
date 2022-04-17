@@ -60,6 +60,7 @@ class DefaultConfig:
     lambda2 = 0.01  # PDA指数调参
 
     stage = 'train'  # 模仿clickbait：在评估阶段（test和validation）进行微调
+    topk = 5  # 排序指标 ---- 与原论文一致
 
     def set_path(self, name):
         '''

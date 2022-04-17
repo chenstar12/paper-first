@@ -114,6 +114,7 @@ def train(**kwargs):
 
             optimizer.zero_grad()
             output = model(train_datas, opt)
+            aaa = predict_ranking(model, val_data_loader, opt)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
@@ -154,9 +155,10 @@ def train(**kwargs):
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
-        opt.stage = 'val'
+        # opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
-        opt.stage = 'train'
+        aaa = predict_ranking(model, val_data_loader, opt)
+        # opt.stage = 'train'
         epoch_val_mse.append(val_mse)
 
         if val_mse < best_res:
@@ -218,6 +220,37 @@ def predict(model, data_loader, opt):
     logger.info(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     model.train()
     return total_loss, mse, mae
+
+
+# 添加排序指标：ndcg，Diversity,MRR,HR,AUC,recall，acc....
+def predict_ranking(model, data_loader, opt):
+    model.eval()
+    with torch.no_grad():
+
+        scores_matrix = torch.zero_(opt.user_num, opt.item_num)
+        output_matrix = torch.zero_(opt.user_num, opt.item_num)
+
+        for idx, (test_data, scores) in enumerate(data_loader):
+            scores = torch.FloatTensor(scores).cuda()
+            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+                test_data = unpack_input_sentiment(opt, test_data)
+            else:
+                test_data = unpack_input(opt, test_data)
+
+            output = model(test_data, opt)
+
+            output_matrix[test_data[0], test_data[1]] = output[idx]
+            scores_matrix[test_data[0], test_data[1]] = scores[idx]
+            print('预测')
+            print(output_matrix)
+            print('scores')
+            print(scores_matrix)
+
+    data_len = len(data_loader.dataset)
+
+    logger.info("-------------------------------ranking metric:---------------------------")
+    logger.info(f"mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    return 0
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
