@@ -276,6 +276,26 @@ data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
 data = pd.DataFrame(data_frame)  # [['user_id', 'item_id', 'ratings', 'reviews']]
 del users_id, items_id, ratings, reviews, polarity, subjectivity
 
+'''
+yelp数据集
+'''
+if yelp_data:
+
+    df_u = data.groupby('user_id').count()
+    uid = df_u[df_u['item_id'] < 5].index
+    print('user with interacted item < 5 index: ', uid)
+    print('shape: ', data.shape)
+    for u in uid:
+        data.drop(data[data['user'] == u].index, inplace=True)
+    print('shape: ', data.shape)
+
+    df_i = data.groupby('item_id').count()
+    iid = df_i[df_i['user_id'] < 5].index
+    print('items with interacted user < 5 index: ', iid)
+    for i in iid:
+        data.drop(data[data['item_id'] == i].index, inplace=True)
+    print('shape: ', data.shape)
+
 uidList, iidList = get_count(data, 'user_id'), get_count(data, 'item_id')
 userNum_all = len(uidList)
 itemNum_all = len(iidList)
