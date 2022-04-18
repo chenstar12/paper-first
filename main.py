@@ -275,10 +275,8 @@ def predict_ranking(model, data_loader, opt):
         recall = recall / data_len
         ndcg = ndcg / data_len
 
-        logger.info('Precision: {:.4f}'.format(precision))
-        logger.info('Recall: {:.4f}'.format(recall))
-        logger.info('NDCG: {:.4f}'.format(ndcg))
-        logger.info('Diversity: {}'.format(diversity))
+        logger.info(
+            'Precision: {:.4f},Recall: {:.4f},NDCG: {:.4f},Diversity: {}'.format(precision, recall, ndcg, diversity))
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
