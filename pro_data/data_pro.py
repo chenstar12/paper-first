@@ -158,12 +158,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 2 and sys.argv[2] == 'yelp':
         # yelp dataset
         yelp_data = True
-        save_folder = '../dataset/' + filename[:-3] + "_data"
-        data_name = filename[:-3]
+        save_folder = '../dataset/' + filename[:4] + "_data"  # yelp_data
+        data_name = filename[:4]
     else:
         # amazon dataset
-        save_folder = '../dataset/' + filename[:4] + "_data"  # yelp_data
-        data_name = filename[:4]  # 'yelp'
+        save_folder = '../dataset/' + filename[:-3] + "_data"
+        data_name = filename[:-3]  # 'yelp'
 
     log_file_name = os.path.join('/content/drive/MyDrive/log/dataset',
                                  data_name + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')
