@@ -229,7 +229,7 @@ def predict_ranking(model, data_loader, opt):
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
         print(index_rank_lists)
-        _, index_scores_matrix = torch.topk(scores_matrix, opt.topk)  # k待定，先用100，不行再加
+        _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
 
         precision = 0.0
         recall = 0.0
@@ -260,7 +260,7 @@ def predict_ranking(model, data_loader, opt):
             ndcg_score = 0.0
             max_ndcg_score = 0.0
 
-            for i in range(min(num_origin_items, k)):
+            for i in range(min(opt.u_max_r, k)):
                 max_ndcg_score += 1 / math.log2(i + 2)
             if max_ndcg_score == 0:
                 continue
