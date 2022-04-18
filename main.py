@@ -180,14 +180,6 @@ def train(**kwargs):
 
     logger.info("-" * 150)
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
-    logger.info(
-        'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
-    logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
-    logger.info(
-        'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
-    logger.info(
-        'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
-
     logger.info("-" * 150)
     logger.info('train iteration loss list: ' + str(iter_loss))
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
@@ -332,6 +324,13 @@ def predict_ranking(model, data_loader, opt):
         #     'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
         # logger.info(
         #     'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
+        logger.info(
+            'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
+        logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
+        logger.info(
+            'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
+        logger.info(
+            'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
 
         return precision, recall, ndcg, diversity
 
