@@ -165,7 +165,7 @@ def train(**kwargs):
         logger.info("*" * 30)
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
-        logger.info('epoch : ' + epoch + '排序指标..............................')
+        logger.info('epoch : ' + str(epoch) + '排序指标..............................')
         predict_ranking(model, val_data_loader, opt)
 
     logger.info("-" * 150)
