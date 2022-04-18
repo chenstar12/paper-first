@@ -1,7 +1,6 @@
 #!/bin/bash
 
-for ((i=1;i<20;i++))
-do
-  # python xx.py --dataset=
+for i in `seq 1 20`; do
   echo $i
+  python main.py train --model=MSCI0D --num_fea=2 --dataset=Gourmet_Food_data --lambda2=0.001 --inference=PDA
 done
