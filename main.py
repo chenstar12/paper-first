@@ -247,7 +247,6 @@ def predict_ranking(model, data_loader, opt):
                     continue
                 else:
                     user_set.add(user)
-                    print(user_set)
 
                 origin_items_list = index_scores_matrix[user].tolist()
                 items_list = index_rank_lists[user].tolist()
