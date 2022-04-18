@@ -249,7 +249,7 @@ def predict_ranking(model, data_loader, opt):
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
-        _, index_scores_matrix = torch.topk(scores_matrix, opt.item_num)
+        _, index_scores_matrix = torch.topk(scores_matrix, opt.topk[-1])  # 验证机的k待定，先用100，不行再加
         # print('-' * 100)
         # print(index_rank_lists.shape)
         # print(output_matrix)
