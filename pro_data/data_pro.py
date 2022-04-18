@@ -156,6 +156,7 @@ if __name__ == '__main__':
 
     yelp_data = False
     if len(sys.argv) > 2 and sys.argv[2] == 'yelp':
+        print('yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeelpppppppppppppppppppppppppppppppppp')
         # yelp dataset
         yelp_data = True
         save_folder = '../dataset/' + filename[:4] + "_data"  # yelp_data
@@ -492,6 +493,7 @@ def padding_doc(doc):
         new_doc.append(d)
 
     return new_doc, pDocLen
+
 
 # 关键！！！重点！！！！
 userReview2Index = []
