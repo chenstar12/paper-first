@@ -268,8 +268,11 @@ def predict_ranking(model, data_loader, opt):
                 origin_items = index_scores_matrix[user].tolist()
                 num_origin_items = len(origin_items)
                 items_list = index_rank_lists[user].tolist()
+
                 for ind, k in enumerate(opt.topk):
                     items = set(items_list[0:k])
+                    print(type(origin_items))
+                    print(origin_items[0:k])
                     origin_items = set(origin_items[0:k])
                     num_hit = len(origin_items.intersection(items))
 
