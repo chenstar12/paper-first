@@ -65,8 +65,6 @@ def train(**kwargs):
     model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
     if opt.use_gpu:
         model.cuda()
-        if len(opt.gpu_ids) > 0:
-            model = nn.DataParallel(model, device_ids=opt.gpu_ids)
 
     if model.net.num_fea != opt.num_fea:
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
@@ -230,66 +228,57 @@ def predict_ranking(model, data_loader, opt):
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
+        print(index_rank_lists)
         _, index_scores_matrix = torch.topk(scores_matrix, opt.topk[-1])  # k待定，先用100，不行再加
 
-        precision = np.array([0.0] * len(opt.topk))
-        recall = np.array([0.0] * len(opt.topk))
-        ndcg = np.array([0.0] * len(opt.topk))
-        diversity = np.array([0.0] * len(opt.topk))
+        precision = 0.0
+        recall = 0.0
+        ndcg = 0.0
+        diversity = 0.0
+        diversity_items = set()
 
-        diversity_items = [set(), set(), set(), set()]
+        for i, data in enumerate(opt.user2itemid_list):
+            user = i
 
-        user_set = set()
-        for idx, (test_data, scores) in enumerate(data_loader):
-            for i, data in enumerate(test_data):
-                user = data[0]
-                if user in user_set:  # 避免重复计算同一个user
-                    continue
-                else:
-                    user_set.add(user)
+            origin_items_list = index_scores_matrix[user].tolist()
+            items_list = index_rank_lists[user].tolist()
 
-                origin_items_list = index_scores_matrix[user].tolist()
-                items_list = index_rank_lists[user].tolist()
+            k = opt.topk
 
-                for ind, k in enumerate(opt.topk):
-                    items = set(items_list[0:k])
-                    origin_items_list = origin_items_list[0:k]
-                    num_origin_items = len(origin_items_list)
-                    origin_items = set(origin_items_list)
-                    num_hit = len(origin_items.intersection(items))
+            items = set(items_list[0:k])
+            origin_items_list = origin_items_list[0:k]
+            num_origin_items = len(origin_items_list)
+            origin_items = set(origin_items_list[0:k])
 
-                    precision[ind] += float(num_hit / k)
-                    recall[ind] += float(num_hit / num_origin_items)
-                    diversity_items[ind] = diversity_items[ind].union(items)
-                    diversity[ind] = len(diversity_items[ind])
+            num_hit = len(origin_items.intersection(items))
+            precision += float(num_hit / k)
+            recall += float(num_hit / num_origin_items)
 
-                    ndcg_score = 0.0
-                    max_ndcg_score = 0.0
+            diversity_items = diversity_items.union(items)
+            diversity = len(diversity_items)
 
-                    for i in range(min(num_origin_items, k)):
-                        max_ndcg_score += 1 / math.log2(i + 2)
-                    if max_ndcg_score == 0:
-                        continue
+            ndcg_score = 0.0
+            max_ndcg_score = 0.0
 
-                    for i, temp_item in enumerate(items_list[0:k]):
-                        if temp_item in origin_items:
-                            ndcg_score += 1 / math.log2(i + 2)
+            for i in range(min(num_origin_items, k)):
+                max_ndcg_score += 1 / math.log2(i + 2)
+            if max_ndcg_score == 0:
+                continue
 
-                    ndcg[ind] += ndcg_score / max_ndcg_score
+            for i, temp_item in enumerate(items_list[0:k]):
+                if temp_item in origin_items:
+                    ndcg_score += 1 / math.log2(i + 2)
+            ndcg += ndcg_score / max_ndcg_score
 
         data_len = len(data_loader.dataset)
-
         precision = precision / data_len
         recall = recall / data_len
         ndcg = ndcg / data_len
 
-        logger.info(
-            'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
-        logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
-        logger.info(
-            'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
-        logger.info(
-            'Diversity: {}-{}-{}-{}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
+        logger.info('Precision: {:.4f}'.format(precision))
+        logger.info('Recall: {:.4f}'.format(recall))
+        logger.info('NDCG: {:.4f}'.format(ndcg))
+        logger.info('Diversity: {}'.format(diversity))
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据

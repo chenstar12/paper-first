@@ -493,7 +493,7 @@ def padding_doc(doc):
 
     return new_doc, pDocLen
 
-
+# 关键！！！重点！！！！
 userReview2Index = []
 userDoc2Index = []
 user_iid_list = []
