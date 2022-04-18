@@ -517,7 +517,7 @@ for i in range(userNum):
         wordTokens = text.strip().split()
         if len(wordTokens) == 0:
             wordTokens = ['<unk>']
-        text2index = [word_index[w] for w in wordTokens]
+        text2index = [word_index[w] for w in wordTokens]  # 每个单词转为vocab对应的索引值
         if len(text2index) < maxSentLen:
             text2index = text2index + [0] * (maxSentLen - len(text2index))
         else:

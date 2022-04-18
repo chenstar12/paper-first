@@ -154,10 +154,10 @@ def train(**kwargs):
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
-        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
-        predict_ranking(model, val_data_loader, opt)
         # opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
+        precision, recall, ndcg, diversity = predict_ranking(model, val_data_loader, opt)
         # opt.stage = 'train'
         epoch_val_mse.append(val_mse)
 
@@ -180,6 +180,14 @@ def train(**kwargs):
 
     logger.info("-" * 150)
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
+    logger.info(
+        'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
+    logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
+    logger.info(
+        'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
+    logger.info(
+        'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
+
     logger.info("-" * 150)
     logger.info('train iteration loss list: ' + str(iter_loss))
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
@@ -262,9 +270,15 @@ def predict_ranking(model, data_loader, opt):
         ndcg = np.array([0.0] * len(opt.topk))
         diversity = np.array([0.0] * len(opt.topk))
 
+        user_set = set()
         for idx, (test_data, scores) in enumerate(data_loader):
             for i, data in enumerate(test_data):
                 user = data[0]
+                if user in user_set:  # 避免重复计算同一个user
+                    continue
+                else:
+                    user_set.add(user)
+
                 origin_items_list = index_scores_matrix[user].tolist()
                 items_list = index_rank_lists[user].tolist()
 
@@ -314,6 +328,8 @@ def predict_ranking(model, data_loader, opt):
             'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
         logger.info(
             'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
+
+        return precision, recall, ndcg, diversity
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
