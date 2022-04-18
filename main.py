@@ -270,15 +270,16 @@ def predict_ranking(model, data_loader, opt):
                 items_list = index_rank_lists[user].tolist()
                 for ind, k in enumerate(opt.topk):
                     items = set(items_list[0:k])
+                    origin_items = set(origin_items[:k])
                     num_hit = len(origin_items.intersection(items))
 
-                    if i % 100 == 0:
-                        print('origin_items')
-                        print(origin_items)
-                        print('items')
-                        print(items)
-                        print('num_hit: ', num_hit)
-                        print('diversity: ', diversity)
+                    # if i % 100 == 0:
+                    #     print('origin_items')
+                    #     print(origin_items)
+                    #     print('items')
+                    #     print(items)
+                    #     print('num_hit: ', num_hit)
+                    #     print('diversity: ', diversity)
 
                     precision[ind] += float(num_hit / k)
                     recall[ind] += float(num_hit / num_origin_items)
