@@ -246,16 +246,18 @@ def predict_ranking(model, data_loader, opt):
 
             for i in range(len(test_data)):
                 output_matrix[test_data[i][0], test_data[i][1]] = output[i]
+                print(output_matrix[test_data[i][0], test_data[i][1]])
+                print(output[i])
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
         _, index_scores_matrix = torch.topk(scores_matrix, opt.item_num)
-        print('-' * 100)
-        print(index_rank_lists.shape)
-        print(output_matrix)
-        print(scores_matrix)
-        print(index_rank_lists)
-        print(index_scores_matrix)
+        # print('-' * 100)
+        # print(index_rank_lists.shape)
+        # print(output_matrix)
+        # print(scores_matrix)
+        # print(index_rank_lists)
+        # print(index_scores_matrix)
 
         precision = np.array([0.0] * len(opt.topk))
         recall = np.array([0.0] * len(opt.topk))
@@ -274,13 +276,13 @@ def predict_ranking(model, data_loader, opt):
                     num_hit = len(origin_items.intersection(items))
                     diversity_set = diversity_set.union(set(items_list))
 
-                    if i % 100 == 0:
-                        print('origin_items')
-                        print(origin_items)
-                        print('items')
-                        print(items)
-                        print('num_hit: ', num_hit)
-                        print('diversity_set: ', len(diversity_set))
+                    # if i % 100 == 0:
+                    #     print('origin_items')
+                    #     print(origin_items)
+                    #     print('items')
+                    #     print(items)
+                    #     print('num_hit: ', num_hit)
+                    #     print('diversity_set: ', len(diversity_set))
 
                     precision[ind] += float(num_hit / k)
                     recall[ind] += float(num_hit / num_origin_items)
