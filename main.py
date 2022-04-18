@@ -270,6 +270,8 @@ def predict_ranking(model, data_loader, opt):
         ndcg = np.array([0.0] * len(opt.topk))
         diversity = np.array([0.0] * len(opt.topk))
 
+        diversity_items = [set(), set(), set(), set()]
+
         user_set = set()
         for idx, (test_data, scores) in enumerate(data_loader):
             for i, data in enumerate(test_data):
@@ -278,6 +280,7 @@ def predict_ranking(model, data_loader, opt):
                     continue
                 else:
                     user_set.add(user)
+                    print(user_set)
 
                 origin_items_list = index_scores_matrix[user].tolist()
                 items_list = index_rank_lists[user].tolist()
@@ -299,7 +302,8 @@ def predict_ranking(model, data_loader, opt):
 
                     precision[ind] += float(num_hit / k)
                     recall[ind] += float(num_hit / num_origin_items)
-                    diversity[ind] += len(set(items))
+                    diversity_items[ind] = diversity_items[ind].union(items)
+                    diversity[ind] = len(diversity_items[ind])
 
                     ndcg_score = 0.0
                     max_ndcg_score = 0.0
