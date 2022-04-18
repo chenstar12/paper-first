@@ -133,6 +133,7 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
+            predict_ranking(model, val_data_loader, opt)
 
         scheduler.step()
 
