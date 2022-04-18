@@ -270,7 +270,7 @@ def predict_ranking(model, data_loader, opt):
 
                 for ind, k in enumerate(opt.topk):
                     items = set(items_list[0:k])
-                    origin_items_list = origin_items[0:k]
+                    origin_items_list = origin_items_list[0:k]
                     num_origin_items = len(origin_items_list)
                     origin_items = set(origin_items_list)
                     num_hit = len(origin_items.intersection(items))
