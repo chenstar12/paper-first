@@ -250,12 +250,12 @@ def predict_ranking(model, data_loader, opt):
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
         _, index_scores_matrix = torch.topk(scores_matrix, opt.item_num)
-        print('-' * 100)
-        print(index_rank_lists.shape)
-        print(output_matrix)
-        print(scores_matrix)
-        print(index_rank_lists)
-        print(index_scores_matrix)
+        # print('-' * 100)
+        # print(index_rank_lists.shape)
+        # print(output_matrix)
+        # print(scores_matrix)
+        # print(index_rank_lists)
+        # print(index_scores_matrix)
 
         precision = np.array([0.0] * len(opt.topk))
         recall = np.array([0.0] * len(opt.topk))
@@ -265,26 +265,24 @@ def predict_ranking(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             for i, data in enumerate(test_data):
                 user = data[0]
-                origin_items = set(index_scores_matrix[user])
+                origin_items = set(index_scores_matrix[user].tolist())
                 num_origin_items = len(origin_items)
-                items_list = index_rank_lists[user]
-                diversity_set = set()
+                items_list = index_rank_lists[user].tolist()
                 for ind, k in enumerate(opt.topk):
                     items = set(items_list[0:k])
                     num_hit = len(origin_items.intersection(items))
-                    diversity_set = diversity_set.union(set(items_list))
 
-                    # if i % 100 == 0:
-                    #     print('origin_items')
-                    #     print(origin_items)
-                    #     print('items')
-                    #     print(items)
-                    #     print('num_hit: ', num_hit)
-                    #     print('diversity_set: ', len(diversity_set))
+                    if i % 100 == 0:
+                        print('origin_items')
+                        print(origin_items)
+                        print('items')
+                        print(items)
+                        print('num_hit: ', num_hit)
+                        print('diversity: ', diversity)
 
                     precision[ind] += float(num_hit / k)
                     recall[ind] += float(num_hit / num_origin_items)
-                    diversity[ind] = len(diversity_set)
+                    diversity[ind] += len(set(items))
 
                     ndcg_score = 0.0
                     max_ndcg_score = 0.0
