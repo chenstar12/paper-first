@@ -163,6 +163,7 @@ def train(**kwargs):
                     '=======================Early Stop: ' + 'num_decline = ' + str(num_decline) + '==================')
                 break
         logger.info("*" * 30)
+
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
         logger.info('epoch : ' + epoch + '排序指标..............................')
         predict_ranking(model, val_data_loader, opt)
@@ -199,8 +200,6 @@ def predict(model, data_loader, opt):
 
             mae_loss = torch.sum(abs(output - scores))
             total_maeloss += mae_loss.item()
-
-        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
 
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
