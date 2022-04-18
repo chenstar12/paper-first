@@ -51,8 +51,8 @@ def clean_str(string):
     string = re.sub(r"\(", " \( ", string)
     string = re.sub(r"\)", " \) ", string)
     string = re.sub(r"\?", " \? ", string)
-    string = re.sub(r"\s{2,}", " ", string)
-    string = re.sub(r"\s{2,}", " ", string)
+    string = re.sub(r"\s{2,}", " ", string)  # \s 匹配任何空白字符，包括:空格、制表符、换页符
+    string = re.sub(r"\s{2,}", " ", string)  # {m,n} 最少匹配 m 次且最多匹配 n 次。
     string = re.sub(r"sssss ", " ", string)
     return string.strip().lower()
 
@@ -77,7 +77,7 @@ def build_doc(u_reviews_dict, i_reviews_dict):
     for ind in range(len(i_reviews_dict)):
         i_reviews.append('<SEP>'.join(i_reviews_dict[ind]))
 
-    vectorizer = TfidfVectorizer(max_df=MAX_DF, max_features=MAX_VOCAB)
+    vectorizer = TfidfVectorizer(max_df=MAX_DF, max_features=MAX_VOCAB)  # max document frequency: 最大词频（去掉无意义的词）
     vectorizer.fit(u_reviews)
     vocab = vectorizer.vocabulary_
     vocab[MAX_VOCAB] = '<SEP>'
@@ -87,7 +87,7 @@ def build_doc(u_reviews_dict, i_reviews_dict):
         for k, text in rDict.items():
             new_reviews = []
             for r in text:
-                words = ' '.join([w for w in r.split() if w in vocab])
+                words = ' '.join([w for w in r.split() if w in vocab])  # 只保留vocab(词表)中包含的词
                 new_reviews.append(words)
             new_dict[k] = new_reviews
         return new_dict
@@ -162,8 +162,8 @@ if __name__ == '__main__':
         data_name = filename[:-3]
     else:
         # amazon dataset
-        save_folder = '../dataset/' + filename[:-7] + "_data"
-        data_name = filename[:-7]
+        save_folder = '../dataset/' + filename[:4] + "_data"  # yelp_data
+        data_name = filename[:4]  # 'yelp'
 
     log_file_name = os.path.join('/content/drive/MyDrive/log/dataset',
                                  data_name + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')
@@ -199,22 +199,47 @@ if __name__ == '__main__':
     # vader待完成:
 
     if yelp_data:
+        # for line in file:
+        #     value = line.split('\t')
+        #     reviews.append(value[2])
+        #     users_id.append(value[0])
+        #     items_id.append(value[1])
+        #     ratings.append(value[3])
+        #
+        #     blob = TextBlob(value[2])
+        #
+        #     pola = blob.sentiment.polarity
+        #     pola = int(pola * 10000)  # 防止被floatTensor截断
+        #     polarity.append(pola)
+        #
+        #     subj = blob.sentiment.subjectivity
+        #     subj = int(subj * 10000)
+        #     subjectivity.append(subj)
         for line in file:
-            value = line.split('\t')
-            reviews.append(value[2])
-            users_id.append(value[0])
-            items_id.append(value[1])
-            ratings.append(value[3])
+            js = json.loads(line)
+            if str(js['user_id']) == 'unknown':
+                print("unknown user id")
+                continue
+            if str(js['business_id']) == 'unknown':
+                print("unkown item id")
+                continue
+            try:
+                reviews.append(js['text'])
+                users_id.append(str(js['user_id']))
+                items_id.append(str(js['business_id']))
+                ratings.append(str(js['stars']))
 
-            blob = TextBlob(value[2])
+                blob = TextBlob(js['text'])
 
-            pola = blob.sentiment.polarity
-            pola = int(pola * 10000)  # 防止被floatTensor截断
-            polarity.append(pola)
+                pola = blob.sentiment.polarity
+                pola = int(pola * 10000)  # 防止被floatTensor截断
+                polarity.append(pola)
 
-            subj = blob.sentiment.subjectivity
-            subj = int(subj * 10000)
-            subjectivity.append(subj)
+                subj = blob.sentiment.subjectivity
+                subj = int(subj * 10000)
+                subjectivity.append(subj)
+            except:
+                continue
     else:
         for line in file:
             js = json.loads(line)

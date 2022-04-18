@@ -51,34 +51,34 @@ class Model(nn.Module):
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
-        '''
-        调参：lambda1和lambda2
-        '''
-        polarity = user_sentiments[:, :, 0]  # 获取第1列
-        subjectivity = user_sentiments[:, :, 1]  # 获取第2列
-        num = polarity.shape[1]
+        if opt.inference == '':
+            return output
+        else:  # 调参
+            polarity = user_sentiments[:, :, 0]  # 获取第1列
+            subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+            num = polarity.shape[1]
 
-        polarity = polarity.sum(dim=1) / (10000 * num)
-        subjectivity = subjectivity.sum(dim=1) / (10000 * num)
-        # print(polarity)
-        # print(subjectivity)
+            polarity = polarity.sum(dim=1) / (10000 * num)
+            subjectivity = subjectivity.sum(dim=1) / (10000 * num)
+            # print(polarity)
+            # print(subjectivity)
 
-        if self.opt.inference in ['PD']:
-            output = output + output * self.opt.lambda1 * polarity
-        if self.opt.inference in ['PD1']:
-            output = output + output * self.opt.lambda1 * polarity * subjectivity
-            # print(polarity - subjectivity)
-        if self.opt.inference in ['PDA']:  # 调参：lambda2
-            tmp = polarity ** self.opt.lambda2
+            if self.opt.inference in ['PD']:
+                output = output + output * self.opt.lambda1 * polarity
+            if self.opt.inference in ['PD1']:
+                output = output + output * self.opt.lambda1 * polarity * subjectivity
+                # print(polarity - subjectivity)
+            if self.opt.inference in ['PDA']:  # 调参：lambda2
+                tmp = polarity ** self.opt.lambda2
 
-            df = pd.DataFrame(tmp.cpu())
-            df.fillna(df.mean(), inplace=True)  # 均值填充
-            tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+                df = pd.DataFrame(tmp.cpu())
+                df.fillna(df.mean(), inplace=True)  # 均值填充
+                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
 
-            # print(tmp)
-            output = output * tmp
+                # print(tmp)
+                output = output * tmp
 
-        return output
+            return output
 
     def load(self, path):
         '''

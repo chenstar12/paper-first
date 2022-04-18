@@ -223,6 +223,12 @@ def predict(model, data_loader, opt):
 
 
 # 添加排序指标：ndcg，Diversity,MRR,HR,AUC,recall，acc....
+'''
+Diversity@K：the number of unique items in all topK recommendation lists 
+（可用于干预的方法，但是调参后的方法不适用）
+'''
+
+
 def predict_ranking(model, data_loader, opt):
     model.eval()
     with torch.no_grad():
@@ -244,36 +250,49 @@ def predict_ranking(model, data_loader, opt):
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
         _, index_scores_matrix = torch.topk(scores_matrix, opt.item_num)
+        print('-' * 100)
+        print(index_rank_lists.shape)
+        print(output_matrix)
+        print(scores_matrix)
+        print(index_rank_lists)
+        print(index_scores_matrix)
 
         precision = np.array([0.0] * len(opt.topk))
         recall = np.array([0.0] * len(opt.topk))
         ndcg = np.array([0.0] * len(opt.topk))
+        diversity = np.array([0.0] * len(opt.topk))
 
-        for data in test_data:
-            user = data[0]
-            origin_items = set(index_scores_matrix[user])
-            num_origin_items = len(origin_items)
-            items_list = index_rank_lists[user]
-            for ind, k in enumerate(opt.topk):
-                items = set(items_list[0:k])
-                num_hit = len(origin_items.intersection(items))
+        for idx, (test_data, scores) in enumerate(data_loader):
+            for data in test_data:
+                user = data[0]
+                origin_items = set(index_scores_matrix[user])
+                num_origin_items = len(origin_items)
+                items_list = index_rank_lists[user]
+                diversity_set = set()
+                for ind, k in enumerate(opt.topk):
+                    items = set(items_list[0:k])
+                    num_hit = len(origin_items.intersection(items))
+                    diversity_set = diversity_set.union(set(items_list))
+                    print('num_hit: ', num_hit)
+                    print('diversity_set: ', len(diversity_set))
 
-                precision[ind] += float(num_hit / k)
-                recall[ind] += float(num_hit / num_origin_items)
+                    precision[ind] += float(num_hit / k)
+                    recall[ind] += float(num_hit / num_origin_items)
+                    diversity[ind] = len(diversity_set)
 
-                ndcg_score = 0.0
-                max_ndcg_score = 0.0
+                    ndcg_score = 0.0
+                    max_ndcg_score = 0.0
 
-                for i in range(min(num_origin_items, k)):
-                    max_ndcg_score += 1 / math.log2(i + 2)
-                if max_ndcg_score == 0:
-                    continue
+                    for i in range(min(num_origin_items, k)):
+                        max_ndcg_score += 1 / math.log2(i + 2)
+                    if max_ndcg_score == 0:
+                        continue
 
-                for i, temp_item in enumerate(items_list[0:k]):
-                    if temp_item in origin_items:
-                        ndcg_score += 1 / math.log2(i + 2)
+                    for i, temp_item in enumerate(items_list[0:k]):
+                        if temp_item in origin_items:
+                            ndcg_score += 1 / math.log2(i + 2)
 
-                ndcg[ind] += ndcg_score / max_ndcg_score
+                    ndcg[ind] += ndcg_score / max_ndcg_score
 
         data_len = len(data_loader.dataset)
 
@@ -286,6 +305,8 @@ def predict_ranking(model, data_loader, opt):
         logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
         logger.info(
             'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
+        logger.info(
+            'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
