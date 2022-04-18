@@ -232,6 +232,9 @@ def predict_ranking(model, data_loader, opt):
         print(index_rank_lists[:10,::])
         _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
         print(index_rank_lists[:10,::])
+        print('pointsssssssssssssssssss')
+        print(output_matrix[:10])
+        print(scores_matrix[:10])
 
         precision = 0.0
         recall = 0.0
