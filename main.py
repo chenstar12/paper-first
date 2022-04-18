@@ -265,7 +265,7 @@ def predict_ranking(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             for i, data in enumerate(test_data):
                 user = data[0]
-                origin_items = set(index_scores_matrix[user].tolist())
+                origin_items = index_scores_matrix[user].tolist()
                 num_origin_items = len(origin_items)
                 items_list = index_rank_lists[user].tolist()
                 for ind, k in enumerate(opt.topk):
