@@ -135,18 +135,6 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
-            # predict_ranking(model, val_data_loader, opt)
-
-            # if opt.fine_step:  # 默认False。。。。。
-            #     if idx % opt.print_step == 0 and idx > 0:
-            #         logger.info("\t{}, {} step finised;".format(now(), idx))
-            #         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
-            #         if val_loss < min_loss:
-            #             model.save(name=opt.dataset, opt=opt.print_opt)
-            #             min_loss = val_loss
-            #             logger.info("\tmodel save")
-            #         if val_loss > min_loss:
-            #             best_res = min_loss
 
         scheduler.step()
 
@@ -156,8 +144,6 @@ def train(**kwargs):
 
         # opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
-        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
-        precision, recall, ndcg, diversity = predict_ranking(model, val_data_loader, opt)
         # opt.stage = 'train'
         epoch_val_mse.append(val_mse)
 
@@ -177,6 +163,9 @@ def train(**kwargs):
                     '=======================Early Stop: ' + 'num_decline = ' + str(num_decline) + '==================')
                 break
         logger.info("*" * 30)
+        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
+        logger.info('epoch : ' + epoch + '排序指标..............................')
+        predict_ranking(model, val_data_loader, opt)
 
     logger.info("-" * 150)
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
@@ -222,13 +211,6 @@ def predict(model, data_loader, opt):
     return total_loss, mse, mae
 
 
-# 添加排序指标：ndcg，Diversity,MRR,HR,AUC,recall，acc....
-'''
-Diversity@K：the number of unique items in all topK recommendation lists 
-（可用于干预的方法，但是调参后的方法不适用; 好像也行，先看看效果如何）
-'''
-
-
 def predict_ranking(model, data_loader, opt):
     model.eval()
     with torch.no_grad():
@@ -249,13 +231,7 @@ def predict_ranking(model, data_loader, opt):
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk[-1])
-        _, index_scores_matrix = torch.topk(scores_matrix, opt.topk[-1])  # 验证机的k待定，先用100，不行再加
-        # print('-' * 100)
-        # print(index_rank_lists.shape)
-        # print(output_matrix)
-        # print(scores_matrix)
-        # print(index_rank_lists)
-        # print(index_scores_matrix)
+        _, index_scores_matrix = torch.topk(scores_matrix, opt.topk[-1])  # k待定，先用100，不行再加
 
         precision = np.array([0.0] * len(opt.topk))
         recall = np.array([0.0] * len(opt.topk))
@@ -284,14 +260,6 @@ def predict_ranking(model, data_loader, opt):
                     origin_items = set(origin_items_list)
                     num_hit = len(origin_items.intersection(items))
 
-                    # if i % 100 == 0:
-                    #     print('origin_items')
-                    #     print(origin_items)
-                    #     print('items')
-                    #     print(items)
-                    #     print('num_hit: ', num_hit)
-                    #     print('diversity: ', diversity)
-
                     precision[ind] += float(num_hit / k)
                     recall[ind] += float(num_hit / num_origin_items)
                     diversity_items[ind] = diversity_items[ind].union(items)
@@ -317,22 +285,13 @@ def predict_ranking(model, data_loader, opt):
         recall = recall / data_len
         ndcg = ndcg / data_len
 
-        # logger.info(
-        #     'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
-        # logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
-        # logger.info(
-        #     'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
-        # logger.info(
-        #     'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
         logger.info(
             'Precision: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(precision[0], precision[1], precision[2], precision[3]))
         logger.info('Recall: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(recall[0], recall[1], recall[2], recall[3]))
         logger.info(
             'NDCG: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(ndcg[0], ndcg[1], ndcg[2], ndcg[3]))
         logger.info(
-            'Diversity: {:.4f}-{:.4f}-{:.4f}-{:.4f}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
-
-        return precision, recall, ndcg, diversity
+            'Diversity: {}-{}-{}-{}'.format(diversity[0], diversity[1], diversity[2], diversity[3]))
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
