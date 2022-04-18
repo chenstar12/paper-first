@@ -225,7 +225,7 @@ def predict(model, data_loader, opt):
 # 添加排序指标：ndcg，Diversity,MRR,HR,AUC,recall，acc....
 '''
 Diversity@K：the number of unique items in all topK recommendation lists 
-（可用于干预的方法，但是调参后的方法不适用）
+（可用于干预的方法，但是调参后的方法不适用; 好像也行，先看看效果如何）
 '''
 
 
@@ -263,7 +263,7 @@ def predict_ranking(model, data_loader, opt):
         diversity = np.array([0.0] * len(opt.topk))
 
         for idx, (test_data, scores) in enumerate(data_loader):
-            for data in test_data:
+            for i, data in enumerate(test_data):
                 user = data[0]
                 origin_items = set(index_scores_matrix[user])
                 num_origin_items = len(origin_items)
@@ -273,8 +273,14 @@ def predict_ranking(model, data_loader, opt):
                     items = set(items_list[0:k])
                     num_hit = len(origin_items.intersection(items))
                     diversity_set = diversity_set.union(set(items_list))
-                    print('num_hit: ', num_hit)
-                    print('diversity_set: ', len(diversity_set))
+
+                    if i % 100 == 0:
+                        print('origin_items')
+                        print(origin_items)
+                        print('items')
+                        print(items)
+                        print('num_hit: ', num_hit)
+                        print('diversity_set: ', len(diversity_set))
 
                     precision[ind] += float(num_hit / k)
                     recall[ind] += float(num_hit / num_origin_items)
