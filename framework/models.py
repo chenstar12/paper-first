@@ -76,9 +76,10 @@ class Model(nn.Module):
                 output = output * tmp
             return output
         elif opt.inference in ['trans']:
-            po = ui_senti[:, 0]
-            sub = ui_senti[:, 1]
+            po = ui_senti[:, 0] / 10000
+            sub = ui_senti[:, 1] / 10000
             print('po')
+            print(po.shape)
             print(po)
             print(sub)
             output = output + output * self.opt.lambda1 * po * sub
