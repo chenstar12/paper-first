@@ -95,7 +95,6 @@ def train(**kwargs):
     epoch_val_mse = []
     num_decline = 0  # early_stop 指标
     train_data_len = len(train_data)
-    print('train data length: ', train_data_len)
     for epoch in range(opt.num_epochs):
         total_loss = 0.0
         total_maeloss = 0.0
@@ -365,17 +364,16 @@ def unpack_input_sentiment(opt, x):
     item_doc = opt.item_doc[iids]
     item_sentiments = opt.itemReview2Sentiment[iids]  # sentiment
 
-    s_train = opt.s_train[opt.index]
-    s_test = opt.s_test[opt.index]
-    s_val = opt.s_val[opt.index]
-
     if opt.stage == 'train':
+        s_train = opt.s_train[opt.index]
         data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
                 user_sentiments, item_sentiments, s_train]  # 添加了sentiment
     elif opt.stage == 'test':
+        s_test = opt.s_test[opt.index]
         data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
                 user_sentiments, item_sentiments, s_test]  # 添加了sentiment
     elif opt.stage == 'val':
+        s_val = opt.s_val[opt.index]
         data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
                 user_sentiments, item_sentiments, s_val]  # 添加了sentiment
 
