@@ -59,6 +59,8 @@ class DefaultConfig:
     # adjusting参数
     lambda1 = 0.5  # PDA减法调参
     lambda2 = 0.01  # PDA指数调参
+    lambda1C = 0.01  # 另一个评估函数PD,PD1
+    lambda2C = 0.01  # 另一个评估函数PDA
 
     stage = 'train'  # 模仿clickbait：在评估阶段（test和validation）进行微调
     # topk = [5, 10, 50, 100]  # 排序指标 ---- 与原论文一致

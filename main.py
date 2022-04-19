@@ -53,6 +53,8 @@ def train(**kwargs):
                 'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'early_stop: ' + str(opt.early_stop) +
                 '\n' + 'gamma: ' + str(opt.gamma) + '\n' + 'lambda1: ' + str(opt.lambda1) + '\n' + 'lambda2: ' +
                 str(opt.lambda2) + '\n' + 'inference: ' + str(opt.inference))
+    logger.info('\n' + 'lambda1C: ' + str(opt.lambda1C) + '\n' + 'lambda2C: ' +
+                str(opt.lambda2C))
 
     random.seed(opt.seed)
     np.random.seed(opt.seed)
@@ -228,13 +230,13 @@ def predict_inference(model, data_loader, opt):
             sub = ui_senti[:, 1] / 10000  # 获取第2列
 
             # PD
-            output_PD = output + output * opt.lambda1 * po
+            output_PD = output + output * opt.lambda1C * po
 
             # PD1
-            output_PD1 = output + output * opt.lambda1 * po * sub
+            output_PD1 = output + output * opt.lambda1C * po * sub
 
             # PDA
-            tmp = po ** opt.lambda2
+            tmp = po ** opt.lambda2C
             df = pd.DataFrame(tmp.cpu())
             df.fillna(df.mean(), inplace=True)  # 均值填充
             tmp = torch.from_numpy(df.values).squeeze(1).cuda()
