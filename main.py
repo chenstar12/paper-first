@@ -299,8 +299,6 @@ def predict_ranking(model, data_loader, opt):
             # origin_items_list = index_scores_matrix[user].tolist()
             # 改动：用user2itemid_list
             origin_items_list = data
-            print(type(origin_items_list))
-            print(origin_items_list)
             items_list = index_rank_lists[user].tolist()
 
             k = opt.topk
