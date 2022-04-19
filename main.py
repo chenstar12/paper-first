@@ -272,7 +272,7 @@ def predict_ranking(model, data_loader, opt):
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
-        _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
+        # _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
 
         precision = 0.0
         recall = 0.0
@@ -280,10 +280,14 @@ def predict_ranking(model, data_loader, opt):
         diversity = 0.0
         diversity_items = set()
 
-        for i, data in enumerate(opt.user2itemid_list):
+        for i, data in enumerate(opt.user2itemid_list):  # user2itemid_list只是为了获取user id
             user = i
 
-            origin_items_list = index_scores_matrix[user].tolist()
+            # origin_items_list = index_scores_matrix[user].tolist()
+            # 改动：用user2itemid_list
+            origin_items_list = data
+            print(type(origin_items_list))
+            print(origin_items_list)
             items_list = index_rank_lists[user].tolist()
 
             k = opt.topk
