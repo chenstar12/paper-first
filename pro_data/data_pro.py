@@ -289,7 +289,7 @@ if yelp_data:
     print('user with interacted item < 5 index: ', uid)
     print('shape: ', data.shape)
     for u in uid:
-        data.drop(data[data['user'] == u].index, inplace=True)
+        data.drop(data[data['user_id'] == u].index, inplace=True)
     print('shape: ', data.shape)
 
     df_i = data.groupby('item_id').count()
