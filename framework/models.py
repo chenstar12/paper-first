@@ -66,7 +66,7 @@ class Model(nn.Module):
                 df = pd.DataFrame(tmp.cpu())
                 df.fillna(df.mean(), inplace=True)  # 均值填充
                 tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-                output = output * F.sigmoid(tmp)  # 新增激活函数----sigmoid
+                output = output * torch.sigmoid(tmp)  # 新增激活函数----sigmoid
 
             return output
         elif opt.inference in ['PD', 'PD1', 'PDA']:  # 错误的调参。。。。。

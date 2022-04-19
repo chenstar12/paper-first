@@ -181,7 +181,6 @@ def predict(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             scores = torch.FloatTensor(scores).cuda()
-
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
             else:
@@ -202,6 +201,52 @@ def predict(model, data_loader, opt):
     model.train()
     opt.stage = 'train'
     return total_loss, mse, mae
+
+
+def predict_inference(model, data_loader, opt):
+    total_loss = 0.0
+    total_maeloss = 0.0
+    model.eval()
+    with torch.no_grad():
+        data_len = len(data_loader.dataset)
+        for idx, (test_data, scores) in enumerate(data_loader):
+            opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
+            scores = torch.FloatTensor(scores).cuda()
+            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+                test_data = unpack_input_sentiment(opt, test_data)
+            else:
+                test_data = unpack_input(opt, test_data)
+
+            output = model(test_data, opt)
+
+            _, _, _, _, _, _, _, _, _, _, ui_senti = test_data
+            po = ui_senti[:, 0] / 10000  # 获取第1列
+            sub = ui_senti[:, 1] / 10000  # 获取第2列
+
+            if opt.eval in ['PD']:
+                output = output + output * opt.lambda1 * po
+            if opt.eval in ['PD1']:
+                output = output + output * opt.lambda1 * po * sub
+                # print(polarity - subjectivity)
+            if opt.eval in ['PDA']:  # 调参：lambda2
+                tmp = po ** opt.lambda2
+                df = pd.DataFrame(tmp.cpu())
+                df.fillna(df.mean(), inplace=True)  # 均值填充
+                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+                output = output * tmp
+
+            mse_loss = torch.sum((output - scores) ** 2)
+            total_loss += mse_loss.item()
+
+            mae_loss = torch.sum(abs(output - scores))
+            total_maeloss += mae_loss.item()
+
+    mse = total_loss * 1.0 / data_len
+    mae = total_maeloss * 1.0 / data_len
+
+    logger.info(f"Inference eval: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    model.train()
+    opt.stage = 'train'
 
 
 def predict_ranking(model, data_loader, opt):
@@ -277,52 +322,6 @@ def predict_ranking(model, data_loader, opt):
             'Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
         model.train()
         opt.stage = 'train'
-
-
-def predict_inference(model, data_loader, opt):
-    total_loss = 0.0
-    total_maeloss = 0.0
-    model.eval()
-    with torch.no_grad():
-        data_len = len(data_loader.dataset)
-        for idx, (test_data, scores) in enumerate(data_loader):
-            scores = torch.FloatTensor(scores).cuda()
-            opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
-            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
-                test_data = unpack_input_sentiment(opt, test_data)
-            else:
-                test_data = unpack_input(opt, test_data)
-
-            output = model(test_data, opt)
-
-            _, _, _, _, _, _, _, _, _, _, ui_senti = test_data
-            po = ui_senti[:, 0] / 10000  # 获取第1列
-            sub = ui_senti[:, 1] / 10000  # 获取第2列
-
-            if opt.eval in ['PD']:
-                output = output + output * opt.lambda1 * po
-            if opt.eval in ['PD1']:
-                output = output + output * opt.lambda1 * po * sub
-                # print(polarity - subjectivity)
-            if opt.eval in ['PDA']:  # 调参：lambda2
-                tmp = po ** opt.lambda2
-                df = pd.DataFrame(tmp.cpu())
-                df.fillna(df.mean(), inplace=True)  # 均值填充
-                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-                output = output * tmp
-
-        mse_loss = torch.sum((output - scores) ** 2)
-        total_loss += mse_loss.item()
-
-        mae_loss = torch.sum(abs(output - scores))
-        total_maeloss += mae_loss.item()
-
-    mse = total_loss * 1.0 / data_len
-    mae = total_maeloss * 1.0 / data_len
-
-    logger.info(f"Inference eval: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
-    model.train()
-    opt.stage = 'train'
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
