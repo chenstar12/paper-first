@@ -287,7 +287,7 @@ def predict_ranking(model, data_loader, opt):
         ndcg = ndcg / data_len
 
         logger.info(
-            'Precision: {:.4f},Recall: {:.4f},NDCG: {:.4f},Diversity: {}'.format(precision, recall, ndcg, diversity))
+            'Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
 
 
 def predict_inference(model, data_loader, opt):
@@ -345,7 +345,7 @@ def predict_inference(model, data_loader, opt):
     mse = total_loss * 1.0 / data_len
     mae = total_maeloss * 1.0 / data_len
 
-    logger.info(f"Inference eval: \nmse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    logger.info(f"Inference eval: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
