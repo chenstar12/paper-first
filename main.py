@@ -4,6 +4,7 @@ import math
 import fire
 
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -133,7 +134,7 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
-            predict_ranking(model, val_data_loader, opt)
+            # predict_ranking(model, val_data_loader, opt)
 
         scheduler.step()
 
@@ -141,8 +142,14 @@ def train(**kwargs):
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
+        '''
+        三种评估方式
+        '''
         # opt.stage = 'val'
+        predict_ranking(model, val_data_loader, opt)
+        predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+
         # opt.stage = 'train'
         epoch_val_mse.append(val_mse)
 
@@ -165,7 +172,6 @@ def train(**kwargs):
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
         logger.info('epoch : ' + str(epoch) + '排序指标..............................')
-        predict_ranking(model, val_data_loader, opt)
 
     logger.info("-" * 150)
     logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
@@ -282,6 +288,64 @@ def predict_ranking(model, data_loader, opt):
 
         logger.info(
             'Precision: {:.4f},Recall: {:.4f},NDCG: {:.4f},Diversity: {}'.format(precision, recall, ndcg, diversity))
+
+
+def predict_inference(model, data_loader, opt):
+    total_loss = 0.0
+    total_maeloss = 0.0
+    model.eval()
+    with torch.no_grad():
+        for idx, (test_data, scores) in enumerate(data_loader):
+            if opt.use_gpu:
+                scores = torch.FloatTensor(scores).cuda()
+            else:
+                scores = torch.FloatTensor(scores)
+
+            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+                test_data = unpack_input_sentiment(opt, test_data)
+            else:
+                test_data = unpack_input(opt, test_data)
+
+            _, _, _, _, _, _, _, _, user_sentiments, _ = test_data
+
+            output = model(test_data, opt)
+
+            if opt.eval != '':  # 调参
+                polarity = user_sentiments[:, :, 0]  # 获取第1列
+                subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+                num = polarity.shape[1]
+
+                polarity = polarity.sum(dim=1) / (10000 * num)
+                subjectivity = subjectivity.sum(dim=1) / (10000 * num)
+                # print(polarity)
+                # print(subjectivity)
+
+                if opt.eval in ['PD']:
+                    output = output + output * opt.lambda1 * polarity
+                if opt.eval in ['PD1']:
+                    output = output + output * opt.lambda1 * polarity * subjectivity
+                    # print(polarity - subjectivity)
+                if opt.eval in ['PDA']:  # 调参：lambda2
+                    tmp = polarity ** opt.lambda2
+
+                    df = pd.DataFrame(tmp.cpu())
+                    df.fillna(df.mean(), inplace=True)  # 均值填充
+                    tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+
+                    # print(tmp)
+                    output = output * tmp
+
+            mse_loss = torch.sum((output - scores) ** 2)
+            total_loss += mse_loss.item()
+
+            mae_loss = torch.sum(abs(output - scores))
+            total_maeloss += mae_loss.item()
+
+    data_len = len(data_loader.dataset)
+    mse = total_loss * 1.0 / data_len
+    mae = total_maeloss * 1.0 / data_len
+
+    logger.info(f"Inference eval: \nmse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
