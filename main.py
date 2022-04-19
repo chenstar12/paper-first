@@ -160,19 +160,19 @@ def train(**kwargs):
 
             if val_mse < best_res:
                 num_decline = 0  # early_stop 指标
-            best_res = val_mse
-            logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
+                best_res = val_mse
+                logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
 
-            model.save(name=opt.dataset, opt=opt.print_opt)
-            min_loss = val_loss
-            logger.info("model save")
+                model.save(name=opt.dataset, opt=opt.print_opt)
+                min_loss = val_loss
+                logger.info("model save")
             else:
-            num_decline += 1
-            logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-            if num_decline >= opt.early_stop:
-                logger.info(
-                    '=======================Early Stop: ' + 'num_decline = ' + str(num_decline) + '==================')
-            break
+                num_decline += 1
+                logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
+                if num_decline >= opt.early_stop:
+                    logger.info('=======================Early Stop: ' + 'num_decline = ' + str(
+                        num_decline) + '==================')
+                break
         logger.info("*" * 30)
 
         # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
