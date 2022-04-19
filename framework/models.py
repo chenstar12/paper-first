@@ -61,6 +61,7 @@ class Model(nn.Module):
             if self.opt.inference in ['trans-PD']:
                 output = output + output * self.opt.lambda1 * po
             if self.opt.inference in ['trans-PD1']:
+                print(output)
                 output = output + output * self.opt.lambda1 * po * sub
             if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
                 tmp = po ** self.opt.lambda2
