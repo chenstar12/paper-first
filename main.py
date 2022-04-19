@@ -133,7 +133,7 @@ def train(**kwargs):
 
             loss.backward()
             optimizer.step()
-            # predict_ranking(model, val_data_loader, opt)
+            predict_ranking(model, val_data_loader, opt)
 
         scheduler.step()
         mse = total_loss * 1.0 / len(train_data)  # total_loss每轮都会置0； len(train_data)：几万
@@ -204,8 +204,12 @@ def predict(model, data_loader, opt):
 
 
 def predict_inference(model, data_loader, opt):
-    total_loss = 0.0
-    total_maeloss = 0.0
+    total_loss_PD = 0.0
+    total_loss_PD1 = 0.0
+    total_loss_PDA = 0.0
+    total_maeloss_PD = 0.0
+    total_maeloss_PD1 = 0.0
+    total_maeloss_PDA = 0.0
     model.eval()
     with torch.no_grad():
         data_len = len(data_loader.dataset)
@@ -223,28 +227,37 @@ def predict_inference(model, data_loader, opt):
             po = ui_senti[:, 0] / 10000  # 获取第1列
             sub = ui_senti[:, 1] / 10000  # 获取第2列
 
-            if opt.eval in ['PD']:
-                output = output + output * opt.lambda1 * po
-            if opt.eval in ['PD1']:
-                output = output + output * opt.lambda1 * po * sub
-                # print(polarity - subjectivity)
-            if opt.eval in ['PDA']:  # 调参：lambda2
-                tmp = po ** opt.lambda2
-                df = pd.DataFrame(tmp.cpu())
-                df.fillna(df.mean(), inplace=True)  # 均值填充
-                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-                output = output * tmp
+            # PD
+            output_PD = output + output * opt.lambda1 * po
 
-            mse_loss = torch.sum((output - scores) ** 2)
-            total_loss += mse_loss.item()
+            # PD1
+            output_PD1 = output + output * opt.lambda1 * po * sub
 
-            mae_loss = torch.sum(abs(output - scores))
-            total_maeloss += mae_loss.item()
+            # PDA
+            tmp = po ** opt.lambda2
+            df = pd.DataFrame(tmp.cpu())
+            df.fillna(df.mean(), inplace=True)  # 均值填充
+            tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+            output_PDA = output * torch.sigmoid(tmp)  # 新增激活函数----sigmoid
 
-    mse = total_loss * 1.0 / data_len
-    mae = total_maeloss * 1.0 / data_len
+            total_loss_PD += torch.sum((output_PD - scores) ** 2).item()
+            total_loss_PD1 += torch.sum((output_PD1 - scores) ** 2).item()
+            total_loss_PDA += torch.sum((output_PDA - scores) ** 2).item()
 
-    logger.info(f"Inference eval: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+            total_maeloss_PD += torch.sum(abs(output_PD - scores)).item()
+            total_maeloss_PD1 += torch.sum(abs(output_PD1 - scores)).item()
+            total_maeloss_PDA += torch.sum(abs(output_PDA - scores)).item()
+
+    mse = total_loss_PD * 1.0 / data_len
+    mse1 = total_loss_PD1 * 1.0 / data_len
+    mse2 = total_loss_PDA * 1.0 / data_len
+    mae = total_maeloss_PD * 1.0 / data_len
+    mae1 = total_maeloss_PD1 * 1.0 / data_len
+    mae2 = total_maeloss_PDA * 1.0 / data_len
+
+    logger.info(f"PD  ----- Inference eval: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    logger.info(f"PD1 ----- Inference eval: mse: {mse1:.4f}; rmse: {math.sqrt(mse1):.4f}; mae: {mae1:.4f};")
+    logger.info(f"PDA ----- Inference eval: mse: {mse2:.4f}; rmse: {math.sqrt(mse2):.4f}; mae: {mae2:.4f};")
     model.train()
     opt.stage = 'train'
 
