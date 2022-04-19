@@ -102,11 +102,7 @@ def train(**kwargs):
         logger.info(f"{now()}  Epoch {epoch}...")
         print(f"{now()}  Epoch {epoch}...")
         for idx, (train_datas, scores) in enumerate(train_data_loader):
-            if opt.use_gpu:
-                scores = torch.FloatTensor(scores).cuda()
-            else:
-                scores = torch.FloatTensor(scores)
-
+            scores = torch.FloatTensor(scores).cuda()
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 train_datas = unpack_input_sentiment(opt, train_datas)
@@ -120,6 +116,8 @@ def train(**kwargs):
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
             iter_loss.append(mse_loss.item() * len(scores))
+            print(len(scores))
+            print(len(output))
 
             mae_loss = mae_func(output, scores)
             total_maeloss += mae_loss.item()
@@ -157,20 +155,18 @@ def train(**kwargs):
             num_decline = 0  # early_stop 指标
             best_res = val_mse
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-
             model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
         else:
             num_decline += 1
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
             if num_decline >= opt.early_stop:
-                logger.info('=======================Early Stop: ' + 'num_decline = ' + str(
-                    num_decline) + '==================')
+                logger.info('Early Stop: ' + 'num_decline = ' + str(num_decline))
                 break
         logger.info("*" * 30)
 
     logger.info("-" * 150)
-    logger.info(f"{now()} {opt.dataset} {opt.print_opt} best_res:  {best_res}")
+    logger.info(f"{now()}  best_res:  {best_res}")
     logger.info("-" * 150)
     logger.info('train iteration loss list: ' + str(iter_loss))
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
