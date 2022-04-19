@@ -39,7 +39,7 @@ class Model(nn.Module):
     def forward(self, datas, opt):
         if self.opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-            user_doc, item_doc, user_sentiments, item_sentiments = datas
+            user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
         else:
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc = datas
@@ -53,15 +53,13 @@ class Model(nn.Module):
 
         if opt.inference == '':
             return output
-        else:  # 调参
+        elif opt.inference in ['PD', 'PD1', 'PDA']:  # 调参
             polarity = user_sentiments[:, :, 0]  # 获取第1列
             subjectivity = user_sentiments[:, :, 1]  # 获取第2列
             num = polarity.shape[1]
 
             polarity = polarity.sum(dim=1) / (10000 * num)
             subjectivity = subjectivity.sum(dim=1) / (10000 * num)
-            # print(polarity)
-            # print(subjectivity)
 
             if self.opt.inference in ['PD']:
                 output = output + output * self.opt.lambda1 * polarity
@@ -75,9 +73,15 @@ class Model(nn.Module):
                 df.fillna(df.mean(), inplace=True)  # 均值填充
                 tmp = torch.from_numpy(df.values).squeeze(1).cuda()
 
-                # print(tmp)
                 output = output * tmp
-
+            return output
+        elif opt.inference in ['trans']:
+            po = ui_senti[:, 0]
+            sub = ui_senti[:, 1]
+            print('po')
+            print(po)
+            print(sub)
+            output = output + output * self.opt.lambda1 * po * sub
             return output
 
     def load(self, path):

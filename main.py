@@ -115,9 +115,7 @@ def train(**kwargs):
 
             optimizer.zero_grad()
 
-            index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
-            print('索引')
-            print(index)
+            opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
 
             output = model(train_datas, opt)
 
@@ -148,9 +146,11 @@ def train(**kwargs):
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
-        # opt.stage = 'val'
+        opt.stage = 'val'
         predict_ranking(model, val_data_loader, opt)
+        opt.stage = 'val'
         predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
+        opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
 
         epoch_val_mse.append(val_mse)
@@ -185,11 +185,10 @@ def predict(model, data_loader, opt):
     total_maeloss = 0.0
     model.eval()
     with torch.no_grad():
+        data_len = len(data_loader.dataset)
         for idx, (test_data, scores) in enumerate(data_loader):
-            if opt.use_gpu:
-                scores = torch.FloatTensor(scores).cuda()
-            else:
-                scores = torch.FloatTensor(scores)
+            opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
+            scores = torch.FloatTensor(scores).cuda()
 
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
@@ -204,28 +203,31 @@ def predict(model, data_loader, opt):
             mae_loss = torch.sum(abs(output - scores))
             total_maeloss += mae_loss.item()
 
-    data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
     mae = total_maeloss * 1.0 / data_len
 
     logger.info(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     model.train()
+    opt.stage = 'train'
     return total_loss, mse, mae
 
 
 def predict_ranking(model, data_loader, opt):
     model.eval()
     with torch.no_grad():
+        data_len = len(data_loader.dataset)
 
         scores_matrix = torch.zeros(opt.user_num, opt.item_num)
         output_matrix = torch.zeros(opt.user_num, opt.item_num)
 
         for idx, (test_data, scores) in enumerate(data_loader):
             scores = torch.FloatTensor(scores).cuda()
+            opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 test_data1 = unpack_input_sentiment(opt, test_data)
             else:
                 test_data1 = unpack_input(opt, test_data)
+
             output = model(test_data1, opt)
 
             for i in range(len(test_data)):
@@ -233,12 +235,7 @@ def predict_ranking(model, data_loader, opt):
                 scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
-        # print(index_rank_lists[:10,::])
         _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
-        # print(index_scores_matrix[:10,::])
-        # print('pointsssssssssssssssssss')
-        # print(output_matrix[:10])
-        # print(scores_matrix[:10])
 
         precision = 0.0
         recall = 0.0
@@ -286,6 +283,8 @@ def predict_ranking(model, data_loader, opt):
 
         logger.info(
             'Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
+        model.train()
+        opt.stage = 'train'
 
 
 def predict_inference(model, data_loader, opt):
@@ -293,18 +292,16 @@ def predict_inference(model, data_loader, opt):
     total_maeloss = 0.0
     model.eval()
     with torch.no_grad():
+        data_len = len(data_loader.dataset)
         for idx, (test_data, scores) in enumerate(data_loader):
-            if opt.use_gpu:
-                scores = torch.FloatTensor(scores).cuda()
-            else:
-                scores = torch.FloatTensor(scores)
-
+            scores = torch.FloatTensor(scores).cuda()
+            opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
             else:
                 test_data = unpack_input(opt, test_data)
 
-            _, _, _, _, _, _, _, _, user_sentiments, _ = test_data
+            _, _, _, _, _, _, _, _, _, _, ui_senti = test_data
 
             output = model(test_data, opt)
 
@@ -344,6 +341,8 @@ def predict_inference(model, data_loader, opt):
     mae = total_maeloss * 1.0 / data_len
 
     logger.info(f"Inference eval: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    model.train()
+    opt.stage = 'train'
 
 
 def unpack_input(opt, x):  # 打包一个batch所有数据
@@ -379,8 +378,20 @@ def unpack_input_sentiment(opt, x):
     item_doc = opt.item_doc[iids]
     item_sentiments = opt.itemReview2Sentiment[iids]  # sentiment
 
-    data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
-            user_sentiments, item_sentiments]  # 添加了sentiment
+    s_train = opt.s_train[opt.index]
+    s_test = opt.s_test[opt.index]
+    s_val = opt.s_val[opt.index]
+
+    if opt.stage == 'train':
+        data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
+                user_sentiments, item_sentiments, s_train]  # 添加了sentiment
+    elif opt.stage == 'test':
+        data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
+                user_sentiments, item_sentiments, s_test]  # 添加了sentiment
+    elif opt.stage == 'val':
+        data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
+                user_sentiments, item_sentiments, s_val]  # 添加了sentiment
+
     data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
     return data
 
