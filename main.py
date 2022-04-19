@@ -94,6 +94,8 @@ def train(**kwargs):
     epoch_train_mse = []
     epoch_val_mse = []
     num_decline = 0  # early_stop 指标
+    train_data_len = len(train_data)
+    print('train data length: ', train_data_len)
     for epoch in range(opt.num_epochs):
         total_loss = 0.0
         total_maeloss = 0.0
@@ -113,7 +115,7 @@ def train(**kwargs):
 
             optimizer.zero_grad()
 
-            index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), len(train_data_loader.dataset)))
+            index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
             print('索引')
             print(index)
 
@@ -142,7 +144,6 @@ def train(**kwargs):
             # predict_ranking(model, val_data_loader, opt)
 
         scheduler.step()
-
         mse = total_loss * 1.0 / len(train_data)  # total_loss每轮都会置0； len(train_data)：几万
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
