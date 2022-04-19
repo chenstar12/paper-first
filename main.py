@@ -53,8 +53,8 @@ def train(**kwargs):
                 'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'early_stop: ' + str(opt.early_stop) +
                 '\n' + 'gamma: ' + str(opt.gamma) + '\n' + 'lambda1: ' + str(opt.lambda1) + '\n' + 'lambda2: ' +
                 str(opt.lambda2) + '\n' + 'inference: ' + str(opt.inference))
-    logger.info('\n' + 'lambda1C: ' + str(opt.lambda1C) + '\n' + 'lambda2C: ' +
-                str(opt.lambda2C))
+    # logger.info('\n' + 'lambda1C: ' + str(opt.lambda1C) + '\n' + 'lambda2C: ' +
+    #             str(opt.lambda2C))
 
     random.seed(opt.seed)
     np.random.seed(opt.seed)
@@ -144,8 +144,8 @@ def train(**kwargs):
 
         opt.stage = 'val'
         predict_ranking(model, val_data_loader, opt)
-        opt.stage = 'val'
-        predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
+        # opt.stage = 'val'
+        # predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
         opt.stage = 'val'
         val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
 
@@ -205,6 +205,7 @@ def predict(model, data_loader, opt):
     return total_loss, mse, mae
 
 
+# 不需要了，性能可以了
 def predict_inference(model, data_loader, opt):
     total_loss_PD = 0.0
     total_loss_PD1 = 0.0
