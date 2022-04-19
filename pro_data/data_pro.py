@@ -166,8 +166,8 @@ if __name__ == '__main__':
         data_name = filename[:4]
     else:
         # amazon dataset
-        save_folder = '../dataset/' + filename[:-3] + "_data"
-        data_name = filename[:-3]  # 'yelp'
+        save_folder = '../dataset/' + filename[:-7] + "_data"
+        data_name = filename[:-7]  # 'yelp'
 
     log_file_name = os.path.join('/content/drive/MyDrive/log/dataset',
                                  data_name + time.strftime("-%m%d-%H%M%S", time.localtime()) + '.txt')

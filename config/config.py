@@ -85,7 +85,7 @@ class DefaultConfig:
 
         self.s_train_path = f'{prefix}/train/S_Train.npy'
         self.s_test_path = f'{prefix}/test/S_Test.npy'
-        self.s_val_path = f'{prefix}/train/S_Val.npy'
+        self.s_val_path = f'{prefix}/val/S_Val.npy'
 
         self.w2v_path = f'{prefix}/train/w2v.npy'
 
