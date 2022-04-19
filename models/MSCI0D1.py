@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D1(nn.Module):
     '''
-    正经科研；去除两个线性层
+    最容易解释 ---- 去除线性层
     '''
 
     def __init__(self, opt):
