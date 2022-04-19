@@ -56,8 +56,7 @@ class Model(nn.Module):
         elif opt.inference[:5] == 'trans':  # 正确的调参
             po = ui_senti[:, 0] / 10000
             sub = ui_senti[:, 1] / 10000
-            print('po')
-            print(po)
+
             if self.opt.inference in ['trans-PD']:
                 output = output + output * self.opt.lambda1 * po
             if self.opt.inference in ['trans-PD1']:
