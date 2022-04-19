@@ -300,42 +300,30 @@ def predict_inference(model, data_loader, opt):
             else:
                 test_data = unpack_input(opt, test_data)
 
-            _, _, _, _, _, _, _, _, _, _, ui_senti = test_data
-
             output = model(test_data, opt)
 
-            if opt.eval != '':  # 调参
-                polarity = user_sentiments[:, :, 0]  # 获取第1列
-                subjectivity = user_sentiments[:, :, 1]  # 获取第2列
-                num = polarity.shape[1]
+            _, _, _, _, _, _, _, _, _, _, ui_senti = test_data
+            po = ui_senti[:, 0] / 10000  # 获取第1列
+            sub = ui_senti[:, 1] / 10000  # 获取第2列
 
-                polarity = polarity.sum(dim=1) / (10000 * num)
-                subjectivity = subjectivity.sum(dim=1) / (10000 * num)
-                # print(polarity)
-                # print(subjectivity)
+            if opt.eval in ['PD']:
+                output = output + output * opt.lambda1 * po
+            if opt.eval in ['PD1']:
+                output = output + output * opt.lambda1 * po * sub
+                # print(polarity - subjectivity)
+            if opt.eval in ['PDA']:  # 调参：lambda2
+                tmp = po ** opt.lambda2
+                df = pd.DataFrame(tmp.cpu())
+                df.fillna(df.mean(), inplace=True)  # 均值填充
+                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+                output = output * tmp
 
-                if opt.eval in ['PD']:
-                    output = output + output * opt.lambda1 * polarity
-                if opt.eval in ['PD1']:
-                    output = output + output * opt.lambda1 * polarity * subjectivity
-                    # print(polarity - subjectivity)
-                if opt.eval in ['PDA']:  # 调参：lambda2
-                    tmp = polarity ** opt.lambda2
+        mse_loss = torch.sum((output - scores) ** 2)
+        total_loss += mse_loss.item()
 
-                    df = pd.DataFrame(tmp.cpu())
-                    df.fillna(df.mean(), inplace=True)  # 均值填充
-                    tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+        mae_loss = torch.sum(abs(output - scores))
+        total_maeloss += mae_loss.item()
 
-                    # print(tmp)
-                    output = output * tmp
-
-            mse_loss = torch.sum((output - scores) ** 2)
-            total_loss += mse_loss.item()
-
-            mae_loss = torch.sum(abs(output - scores))
-            total_maeloss += mae_loss.item()
-
-    data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
     mae = total_maeloss * 1.0 / data_len
 
