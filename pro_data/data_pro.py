@@ -13,6 +13,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from textblob import TextBlob
 
 import logging
+import torch  # 防止gpu断开
 
 P_REVIEW = 0.85
 MAX_DF = 0.7
@@ -149,6 +150,8 @@ def countNum(xDict):
 
 if __name__ == '__main__':
     logger = logging.getLogger('')
+
+    t01 = torch.zeros(1, 1).cuda()  # 防断gpu
 
     start_time = time.time()
     assert (len(sys.argv) >= 2)
