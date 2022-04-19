@@ -141,7 +141,7 @@ def train(**kwargs):
             optimizer.step()
             # predict_ranking(model, val_data_loader, opt)
 
-            scheduler.step()
+        scheduler.step()
 
         mse = total_loss * 1.0 / len(train_data)  # total_loss每轮都会置0； len(train_data)：几万
         epoch_train_mse.append(mse)
