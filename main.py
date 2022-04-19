@@ -109,9 +109,14 @@ def train(**kwargs):
             if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
                 train_datas = unpack_input_sentiment(opt, train_datas)
             else:
-                train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
+                train_datas = unpack_input(opt, train_datas)
 
             optimizer.zero_grad()
+
+            index = train_data_loader.dataset.scores.index(scores)  # ui_sentiment的索引
+            print('索引')
+            print(index)
+
             output = model(train_datas, opt)
 
             mse_loss = mse_func(output, scores)

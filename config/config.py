@@ -69,21 +69,25 @@ class DefaultConfig:
         specific
         '''
         self.data_root = f'./dataset/{name}'
-        prefix = f'{self.data_root}/train'
+        prefix = self.data_root
 
-        self.user_list_path = f'{prefix}/userReview2Index.npy'
-        self.item_list_path = f'{prefix}/itemReview2Index.npy'
+        self.user_list_path = f'{prefix}/train/userReview2Index.npy'
+        self.item_list_path = f'{prefix}/train/itemReview2Index.npy'
 
-        self.user2itemid_path = f'{prefix}/user_item2id.npy'
-        self.item2userid_path = f'{prefix}/item_user2id.npy'
+        self.user2itemid_path = f'{prefix}/train/user_item2id.npy'
+        self.item2userid_path = f'{prefix}/train/item_user2id.npy'
 
-        self.user_doc_path = f'{prefix}/userDoc2Index.npy'
-        self.item_doc_path = f'{prefix}/itemDoc2Index.npy'
+        self.user_doc_path = f'{prefix}/train/userDoc2Index.npy'
+        self.item_doc_path = f'{prefix}/train/itemDoc2Index.npy'
 
-        self.user_sentiment_path = f'{prefix}/userReview2Sentiment.npy'
-        self.item_sentiment_path = f'{prefix}/itemReview2Sentiment.npy'
+        self.user_sentiment_path = f'{prefix}/train/userReview2Sentiment.npy'
+        self.item_sentiment_path = f'{prefix}/train/itemReview2Sentiment.npy'
 
-        self.w2v_path = f'{prefix}/w2v.npy'
+        self.s_train_path = f'{prefix}/train/S_Train.npy'
+        self.s_test_path = f'{prefix}/test/S_Test.npy'
+        self.s_val_path = f'{prefix}/train/S_Val.npy'
+
+        self.w2v_path = f'{prefix}/train/w2v.npy'
 
     def parse(self, kwargs):
         '''
@@ -98,6 +102,10 @@ class DefaultConfig:
         self.item_doc = np.load(self.item_doc_path, encoding='bytes')
         self.userReview2Sentiment = np.load(self.user_sentiment_path, encoding='bytes')
         self.itemReview2Sentiment = np.load(self.item_sentiment_path, encoding='bytes')
+
+        self.s_train = np.load(self.s_train_path, encoding='bytes')
+        self.s_test = np.load(self.s_test_path, encoding='bytes')
+        self.s_val = np.load(self.s_val_path, encoding='bytes')
 
         for k, v in kwargs.items():
             if not hasattr(self, k):

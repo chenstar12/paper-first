@@ -377,6 +377,21 @@ x_train, y_train = extract(data_train)
 x_val, y_val = extract(data_val)
 x_test, y_test = extract(data_test)
 
+
+def extract_sentiment(data_dict):
+    senti = []
+    for i in data_dict.values:
+        senti.append([i[4], i[5]])
+    return senti
+
+
+s_train = extract_sentiment(data_train)
+s_test = extract_sentiment(data_test)
+s_val = extract_sentiment(data_val)
+np.save(f"{save_folder}/train/S_Train.npy", s_train)
+np.save(f"{save_folder}/test/S_Test.npy", s_test)
+np.save(f"{save_folder}/val/S_Val.npy", s_val)
+
 np.save(f"{save_folder}/train/Train.npy", x_train)
 np.save(f"{save_folder}/train/Train_Score.npy", y_train)
 np.save(f"{save_folder}/val/Val.npy", x_val)
@@ -388,16 +403,6 @@ logger.info(now())
 logger.info(f"Train data size: {len(x_train)}")
 logger.info(f"Val data size: {len(x_val)}")
 logger.info(f"Test data size: {len(x_test)}")
-
-# def extract_sentiment(data_dict):
-#     senti = []
-#     for i in data_dict.values:
-#         senti.append([i[4], i[5]])
-#     return senti
-
-
-# sentiments = extract_sentiment(data_train)
-# np.save(f"{save_folder}/train/Sentiments.npy", sentiments)
 
 logger.info(f"-" * 60)
 logger.info(f"{now()} Step3: Construct the vocab and user/item reviews from training set.")
