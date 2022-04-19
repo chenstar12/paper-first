@@ -143,35 +143,31 @@ def train(**kwargs):
 
             scheduler.step()
 
-            mse = total_loss * 1.0 / len(train_data)  # total_loss每轮都会置0； len(train_data)：几万
-            epoch_train_mse.append(mse)
-            logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
+        mse = total_loss * 1.0 / len(train_data)  # total_loss每轮都会置0； len(train_data)：几万
+        epoch_train_mse.append(mse)
+        logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
-            '''
-            三种评估方式
-            '''
-            # opt.stage = 'val'
-            predict_ranking(model, val_data_loader, opt)
-            predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
-            val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
+        # opt.stage = 'val'
+        predict_ranking(model, val_data_loader, opt)
+        predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
+        val_loss, val_mse, val_mae = predict(model, val_data_loader, opt)
 
-            # opt.stage = 'train'
-            epoch_val_mse.append(val_mse)
+        epoch_val_mse.append(val_mse)
 
-            if val_mse < best_res:
-                num_decline = 0  # early_stop 指标
-                best_res = val_mse
-                logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
+        if val_mse < best_res:
+            num_decline = 0  # early_stop 指标
+            best_res = val_mse
+            logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
 
-                model.save(name=opt.dataset, opt=opt.print_opt)
-                logger.info("model save")
-            else:
-                num_decline += 1
-                logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-                if num_decline >= opt.early_stop:
-                    logger.info('=======================Early Stop: ' + 'num_decline = ' + str(
-                        num_decline) + '==================')
-                    break
+            model.save(name=opt.dataset, opt=opt.print_opt)
+            logger.info("model save")
+        else:
+            num_decline += 1
+            logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
+            if num_decline >= opt.early_stop:
+                logger.info('=======================Early Stop: ' + 'num_decline = ' + str(
+                    num_decline) + '==================')
+                break
         logger.info("*" * 30)
 
     logger.info("-" * 150)
