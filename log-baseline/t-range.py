@@ -9,3 +9,5 @@ print(d[index])
 
 s= 'trans--'
 print(s[:5]=='trans')
+
+print(1e4)

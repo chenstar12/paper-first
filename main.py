@@ -50,9 +50,8 @@ def train(**kwargs):
     logger.info('\n' + 'model: ' + opt.model + '\n' + 'dataset: ' + opt.dataset + '\n' +
                 'batch_size:' + str(opt.batch_size) + '\n' + 'num_epochs: ' + str(opt.num_epochs) + '\n' +
                 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n' +
-                'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'early_stop: ' + str(opt.early_stop) +
-                '\n' + 'gamma: ' + str(opt.gamma) + '\n' + 'lambda1: ' + str(opt.lambda1) + '\n' + 'lambda2: ' +
-                str(opt.lambda2) + '\n' + 'inference: ' + str(opt.inference))
+                'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'lambda1: ' +
+                str(opt.lambda1) + '\n' + 'inference: ' + str(opt.inference))
     # logger.info('\n' + 'lambda1C: ' + str(opt.lambda1C) + '\n' + 'lambda2C: ' +
     #             str(opt.lambda2C))
 
