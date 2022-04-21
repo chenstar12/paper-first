@@ -283,7 +283,6 @@ del users_id, items_id, ratings, reviews, polarity, subjectivity
 yelp数据集
 '''
 if yelp_data:
-
     df_u = data.groupby('user_id').count()
     uid = df_u[df_u['item_id'] < 5].index
     print('user with interacted item < 5 index: ', uid)
@@ -325,7 +324,7 @@ logger.info("userNum: {}".format(userNum))
 logger.info("itemNum: {}".format(itemNum))
 logger.info("===============End: no-preprocess: trainData size========================")
 
-# 添加train data（从test data移除train中没有的）
+# train data添加数据（test data移除数据）
 uidMiss = []
 iidMiss = []
 if userNum != userNum_all or itemNum != itemNum_all:
@@ -335,6 +334,7 @@ if userNum != userNum_all or itemNum != itemNum_all:
     for iid in range(itemNum_all):
         if iid not in iids_train:
             iidMiss.append(iid)
+
 uid_index = []
 for uid in uidMiss:
     index = data_test.index[data_test['user_id'] == uid].tolist()
