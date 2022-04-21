@@ -106,7 +106,6 @@ def train(**kwargs):
             scores = torch.FloatTensor(scores).cuda()
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
             if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-                print(opt.model)
                 train_datas = unpack_input_sentiment(opt, train_datas)
             else:
                 train_datas = unpack_input(opt, train_datas)
@@ -183,7 +182,7 @@ def predict(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             scores = torch.FloatTensor(scores).cuda()
-            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+            if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
             else:
                 test_data = unpack_input(opt, test_data)
@@ -219,7 +218,7 @@ def predict_inference(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             scores = torch.FloatTensor(scores).cuda()
-            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+            if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
                 test_data = unpack_input_sentiment(opt, test_data)
             else:
                 test_data = unpack_input(opt, test_data)
@@ -276,7 +275,7 @@ def predict_ranking(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             scores = torch.FloatTensor(scores).cuda()
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
-            if opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+            if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
                 test_data1 = unpack_input_sentiment(opt, test_data)
             else:
                 test_data1 = unpack_input(opt, test_data)
