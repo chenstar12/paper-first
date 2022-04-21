@@ -37,7 +37,7 @@ class Model(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
 
     def forward(self, datas, opt):
-        if self.opt.model[:4] == 'MSCI':  # 获取所有数据(添加sentiment数据)
+        if self.opt.model[:4] == 'MSCI' or self.opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
         else:
