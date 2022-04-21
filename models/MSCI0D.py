@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D(nn.Module):
     '''
-    删除attention
+    删除attention , re-weighting同时考虑polarity和subjectivity
     '''
 
     def __init__(self, opt):
