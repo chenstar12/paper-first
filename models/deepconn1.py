@@ -70,7 +70,7 @@ class Net(nn.Module):
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
-        id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
+        # id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         # u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
 
         #  3. attention（linear attention）
@@ -109,7 +109,7 @@ class Net(nn.Module):
         r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
-        return torch.stack([F.relu(id_emb), F.relu(self.fc_layer(r_fea))], 1)
+        return F.relu(self.fc_layer(r_fea))
 
     def reset_para(self):
         if self.opt.use_word_embedding:
