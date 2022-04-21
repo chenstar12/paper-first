@@ -106,6 +106,7 @@ def train(**kwargs):
             scores = torch.FloatTensor(scores).cuda()
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
             if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
+                print(opt.model)
                 train_datas = unpack_input_sentiment(opt, train_datas)
             else:
                 train_datas = unpack_input(opt, train_datas)
