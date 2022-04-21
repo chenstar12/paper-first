@@ -58,15 +58,15 @@ class Model(nn.Module):
             sub = ui_senti[:, 1] / 10000
 
             if self.opt.inference in ['trans-PD']:
-                output = output + output * self.opt.lambda1 * torch.sigmoid(po)
+                output = output + output * self.opt.lambda1 * F.tanh(po)
             if self.opt.inference in ['trans-PD1']:
-                output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
+                output = output + output * self.opt.lambda1 * F.tanh(po * sub)
             if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
                 tmp = po ** self.opt.lambda2
                 df = pd.DataFrame(tmp.cpu())
                 df.fillna(df.mean(), inplace=True)  # 均值填充
                 tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-                output = output * torch.sigmoid(tmp)  # 新增激活函数----sigmoid
+                output = output * F.tanh(tmp)  # 新增激活函数----sigmoid
             return output
         elif opt.inference in ['PD', 'PD1', 'PDA']:  # 错误的调参。。。。。
             polarity = user_sentiments[:, :, 0]  # 获取第1列
