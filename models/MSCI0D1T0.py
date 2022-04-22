@@ -67,7 +67,7 @@ class Net(nn.Module):
         '''
         subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
         subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
-        subj_w = subj_w / 10000
+        subj_w = 1 - subj_w / 10000  # 越主观，权值越低
         subj_w = F.softmax(subj_w, 1)
 
         fea = fea * subj_w
