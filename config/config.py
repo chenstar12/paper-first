@@ -200,6 +200,23 @@ class Gourmet_Food_data_Config(DefaultConfig):
     user_num = 14681 + 2
     item_num = 8713 + 2
 
+class Gourmet_Food_data_Config(DefaultConfig):
+
+    def __init__(self):
+        self.dataset = 'Gourmet_Food_data'
+        self.set_path('Gourmet_Food_data')
+
+    r_max_len = 123
+
+    u_max_r = 10
+    i_max_r = 29
+
+    train_data_size = 1351527
+    test_data_size = 168830
+    val_data_size = 168831
+
+    user_num = 192403 + 2
+    item_num = 63001 + 2
 
 class Yelp_data_Config(DefaultConfig):
     def __init__(self):
