@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0D0(nn.Module):
+class MSCI0D0T1(nn.Module):
     '''
     case study 1: 初始化（还原之前的）
     '''
 
     def __init__(self, opt):
-        super(MSCI0D0, self).__init__()
+        super(MSCI0D0T1, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
