@@ -10,7 +10,7 @@ T系列：一律均匀分布linear+bias
 
 class MSCI0D1T0(nn.Module):
     '''
-    case study 0: 不re-weighting
+    仅利用主观性（对每条评论：越主观，权值应该越低）
     '''
 
     def __init__(self, opt):
@@ -63,12 +63,15 @@ class Net(nn.Module):
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         '''
-        （1）先把情感权重归一化 ---- softmax
-        （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
-        （3）上一步的特征相加除以2或3
+        权重归一化 ---- softmax
         '''
+        subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
+        subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
+        subj_w = subj_w / 10000
+        subj_w = F.softmax(subj_w, 1)
 
-        r_fea = fea
+        fea = fea * subj_w
+        r_fea = fea.sum(1)
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([F.relu(id_emb), F.relu(self.fc_layer(r_fea))], 1)
