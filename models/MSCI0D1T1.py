@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0D0T1(nn.Module):
+class MSCI0D1T1(nn.Module):
     '''
     case study 1: 初始化（还原之前的）
     '''
 
     def __init__(self, opt):
-        super(MSCI0D0T1, self).__init__()
+        super(MSCI0D1T1, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -49,8 +49,8 @@ class Net(nn.Module):
         # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
         # self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
 
-        self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
-        self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
+        # self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
+        # self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
 
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
@@ -90,13 +90,15 @@ class Net(nn.Module):
         polarity_w = polarity_w / 10000
         polarity_w = F.softmax(polarity_w, 1)
 
-        # subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
-        # subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
-        # subj_w = subj_w / 10000
-        # subj_w = F.softmax(subj_w, 1)
+        subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
+        subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
+        subj_w = subj_w / 10000
+        subj_w = F.softmax(subj_w, 1)
 
-        fea = F.relu(self.polarity_linear(fea * polarity_w))
-        # fea = fea * r_num
+        # fea = F.relu(self.polarity_linear(fea * polarity_w))
+        fea = fea * polarity_w
+        fea = fea * r_num
+        fea = fea * subj_w
         # fea = F.relu(self.subj_linear(fea * subj_w))
         # rs_mix = rs_mix * r_num
 
@@ -119,14 +121,13 @@ class Net(nn.Module):
         else:
             nn.init.xavier_normal_(self.word_embs.weight)
 
-        nn.init.uniform_(self.id_embedding.weight, -0.1, 0.1)
+        nn.init.xavier_normal_(self.id_embedding.weight)
         # nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
-        nn.init.xavier_normal_(self.cnn.bias, 0.1)
+        # nn.init.xavier_normal_(self.cnn.bias, 0.1)
 
-        nn.init.uniform_(self.id_linear.weight, -0.1, 0.1)
-        nn.init.constant_(self.id_linear.bias, 0.1)
+        # nn.init.xavier_normal_(self.id_linear.weight)
 
         # nn.init.xavier_normal_(self.review_linear.weight)
         # nn.init.constant_(self.review_linear.bias, 0.1)
@@ -134,10 +135,10 @@ class Net(nn.Module):
         # nn.init.xavier_normal_(self.attention_linear.weight)
         # nn.init.constant_(self.attention_linear.bias, 0.1)
 
-        nn.init.xavier_normal_(self.polarity_linear.weight)
+        # nn.init.xavier_normal_(self.polarity_linear.weight)
         # nn.init.constant_(self.polarity_linear.bias, 0.1)
-        nn.init.xavier_normal_(self.subj_linear.weight)
+        # nn.init.xavier_normal_(self.subj_linear.weight)
         # nn.init.constant_(self.subj_linear.bias, 0.1)
 
-        nn.init.xavier_normal_(self.fc_layer.weight)
-        # nn.init.constant_(self.fc_layer.bias, 0.1)
+        nn.init.normal_(self.fc_layer.weight,-0.1,0.1)
+        nn.init.constant_(self.fc_layer.bias, 0.1)
