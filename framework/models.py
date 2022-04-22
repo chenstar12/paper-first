@@ -85,7 +85,7 @@ class Model(nn.Module):
             polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
             subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
 
-            output = output + output * self.opt.lambda1 * polarity * subjectivity
+            output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
             return output
 
     def load(self, path):
