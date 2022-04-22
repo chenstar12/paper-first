@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D0(nn.Module):
     '''
-    (为了A会，放弃，不能用线性层)删除subjectivity（由于tran-PD结果太好！为了方便解释，简化一些）
+    (不用线性层)只用polarity；删除subjectivity（trans-PD）
     '''
 
     def __init__(self, opt):
