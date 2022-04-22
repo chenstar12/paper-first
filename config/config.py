@@ -200,11 +200,11 @@ class Gourmet_Food_data_Config(DefaultConfig):
     user_num = 14681 + 2
     item_num = 8713 + 2
 
-class Gourmet_Food_data_Config(DefaultConfig):
+class Electronics_data_Config(DefaultConfig):
 
     def __init__(self):
-        self.dataset = 'Gourmet_Food_data'
-        self.set_path('Gourmet_Food_data')
+        self.dataset = 'Electronics_data'
+        self.set_path('Electronics_data')
 
     r_max_len = 123
 
