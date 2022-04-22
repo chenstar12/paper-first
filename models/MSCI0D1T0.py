@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0D1T1(nn.Module):
+class MSCI0D1T0(nn.Module):
     '''
-    case study 1: 初始化（还原之前的）
+    case study 0: 不re-weighting
     '''
 
     def __init__(self, opt):
-        super(MSCI0D1T1, self).__init__()
+        super(MSCI0D1T0, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -85,28 +85,29 @@ class Net(nn.Module):
         （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
         （3）上一步的特征相加除以2或3
         '''
-        polarity_w = sentiments[:, :, 0]  # 获取第1列 ---- polarity
-        polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
-        polarity_w = polarity_w / 10000
-        polarity_w = F.softmax(polarity_w, 1)
-
-        subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
-        subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
-        subj_w = subj_w / 10000
-        subj_w = F.softmax(subj_w, 1)
-
-        # fea = F.relu(self.polarity_linear(fea * polarity_w))
-        fea = fea * polarity_w
-        fea = fea * r_num
-        fea = fea * subj_w
-        # fea = F.relu(self.subj_linear(fea * subj_w))
-        # rs_mix = rs_mix * r_num
-
-        # att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
-        # att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
+        # polarity_w = sentiments[:, :, 0]  # 获取第1列 ---- polarity
+        # polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
+        # polarity_w = polarity_w / 10000
+        # polarity_w = F.softmax(polarity_w, 1)
         #
-        # r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
-        r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
+        # subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
+        # subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
+        # subj_w = subj_w / 10000
+        # subj_w = F.softmax(subj_w, 1)
+        #
+        # # fea = F.relu(self.polarity_linear(fea * polarity_w))
+        # fea = fea * polarity_w
+        # fea = fea * r_num
+        # fea = fea * subj_w
+        # # fea = F.relu(self.subj_linear(fea * subj_w))
+        # # rs_mix = rs_mix * r_num
+        #
+        # # att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
+        # # att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
+        # #
+        # # r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
+        # r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
+        r_fea = fea
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([F.relu(id_emb), F.relu(self.fc_layer(r_fea))], 1)
@@ -140,5 +141,5 @@ class Net(nn.Module):
         # nn.init.xavier_normal_(self.subj_linear.weight)
         # nn.init.constant_(self.subj_linear.bias, 0.1)
 
-        nn.init.uniform_(self.fc_layer.weight,-0.1,0.1)
-        nn.init.constant_(self.fc_layer.bias, 0.1)
+        nn.init.normal_(self.fc_layer.weight)
+        # nn.init.constant_(self.fc_layer.bias, 0.1)

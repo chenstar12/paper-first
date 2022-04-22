@@ -141,4 +141,4 @@ class Net(nn.Module):
         # nn.init.constant_(self.subj_linear.bias, 0.1)
 
         nn.init.xavier_normal_(self.fc_layer.weight)
-        # nn.init.constant_(self.fc_layer.bias, 0.1)
+        nn.init.constant_(self.fc_layer.bias, 0.1)
