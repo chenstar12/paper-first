@@ -141,8 +141,8 @@ def train(**kwargs):
         epoch_train_mse.append(mse)
         logger.info(f"\ttrain loss:{total_loss:.4f}, mse: {mse:.4f};")
 
-        opt.stage = 'val'
-        predict_ranking(model, val_data_loader, opt)
+        # opt.stage = 'val'
+        # predict_ranking(model, val_data_loader, opt)
         # opt.stage = 'val'
         # predict_inference(model, val_data_loader, opt)  # 模仿clickbait：在inference阶段注入sentiment/subjectivity
         opt.stage = 'val'
