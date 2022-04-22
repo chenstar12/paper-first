@@ -324,7 +324,10 @@ logger.info("userNum: {}".format(userNum))
 logger.info("itemNum: {}".format(itemNum))
 logger.info("===============End: no-preprocess: trainData size========================")
 
-# train data添加数据（test data移除数据）
+'''
+train data添加数据（test data移除数据） 
+-> 数据处理完成后的训练集不含test set中ui pair对应的评论文本！！！（因为后面user_reviews_dict是用的训练集）
+'''
 uidMiss = []
 iidMiss = []
 if userNum != userNum_all or itemNum != itemNum_all:
@@ -386,11 +389,11 @@ def extract_sentiment(data_dict):
 
 
 s_train = extract_sentiment(data_train)
-s_test = extract_sentiment(data_test)
-s_val = extract_sentiment(data_val)
+# s_test = extract_sentiment(data_test)
+# s_val = extract_sentiment(data_val)
 np.save(f"{save_folder}/train/S_Train.npy", s_train)
-np.save(f"{save_folder}/test/S_Test.npy", s_test)
-np.save(f"{save_folder}/val/S_Val.npy", s_val)
+# np.save(f"{save_folder}/test/S_Test.npy", s_test)
+# np.save(f"{save_folder}/val/S_Val.npy", s_val)
 
 np.save(f"{save_folder}/train/Train.npy", x_train)
 np.save(f"{save_folder}/train/Train_Score.npy", y_train)
@@ -417,7 +420,7 @@ item_len = defaultdict(int)
 user_sentiments_dict = {}
 item_sentiments_dict = {}
 
-for i in data_train.values:
+for i in data_train.values:  # 关键！！！用train set获取user_reviews_dict！！！
     str_review = clean_str(i[3].encode('ascii', 'ignore').decode('ascii'))
 
     if len(str_review.strip()) == 0:
@@ -523,7 +526,7 @@ def padding_doc(doc):
     return new_doc, pDocLen
 
 
-# 关键！！！重点！！！！
+# 关键逻辑！！！
 userReview2Index = []
 userDoc2Index = []
 user_iid_list = []

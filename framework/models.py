@@ -37,12 +37,17 @@ class Model(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
 
     def forward(self, datas, opt):
-        if self.opt.model[:4] == 'MSCI' or self.opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-            user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
+        if opt.stage == 'train':
+            if self.opt.model[:4] == 'MSCI' or self.opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
+                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+                user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
+            else:
+                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+                user_doc, item_doc = datas
         else:
-            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-            user_doc, item_doc = datas
+            if self.opt.model[:4] == 'MSCI' or self.opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
+                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+                user_doc, item_doc, user_sentiments, item_sentiments = datas
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
 
@@ -51,24 +56,25 @@ class Model(nn.Module):
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
-        if opt.inference == '':
-            return output
-        elif opt.inference[:5] == 'trans':  # 正确的调参
-            po = ui_senti[:, 0] / 10000  # 1e4装个逼
-            sub = ui_senti[:, 1] / 10000
+        if opt.stage == 'train':
+            if opt.inference == '':
+                return output
+            elif opt.inference[:5] == 'trans':  # 正确的调参
+                po = ui_senti[:, 0] / 10000  # 1e4装个逼
+                sub = ui_senti[:, 1] / 10000
 
-            if self.opt.inference in ['trans-PD']:
-                output = output + output * self.opt.lambda1 * torch.tanh(po)
-            if self.opt.inference in ['trans-PD1']:
-                output = output + output * self.opt.lambda1 * torch.tanh(po * sub)
-            if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
-                tmp = po ** self.opt.lambda2
-                df = pd.DataFrame(tmp.cpu())
-                df.fillna(df.mean(), inplace=True)  # 均值填充
-                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-                output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
-            return output
-        elif opt.inference in ['PD', 'PD1', 'PDA']:  # 错误的调参。。。。。
+                if self.opt.inference in ['trans-PD']:
+                    output = output + output * self.opt.lambda1 * torch.tanh(po)
+                if self.opt.inference in ['trans-PD1']:
+                    output = output + output * self.opt.lambda1 * torch.tanh(po * sub)
+                if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
+                    tmp = po ** self.opt.lambda2
+                    df = pd.DataFrame(tmp.cpu())
+                    df.fillna(df.mean(), inplace=True)  # 均值填充
+                    tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+                    output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
+                return output
+        else:
             polarity = user_sentiments[:, :, 0]  # 获取第1列
             subjectivity = user_sentiments[:, :, 1]  # 获取第2列
             num = polarity.shape[1]
@@ -76,19 +82,7 @@ class Model(nn.Module):
             polarity = polarity.sum(dim=1) / (10000 * num)
             subjectivity = subjectivity.sum(dim=1) / (10000 * num)
 
-            if self.opt.inference in ['PD']:
-                output = output + output * self.opt.lambda1 * polarity
-            if self.opt.inference in ['PD1']:
-                output = output + output * self.opt.lambda1 * polarity * subjectivity
-                # print(polarity - subjectivity)
-            if self.opt.inference in ['PDA']:  # 调参：lambda2
-                tmp = polarity ** self.opt.lambda2
-
-                df = pd.DataFrame(tmp.cpu())
-                df.fillna(df.mean(), inplace=True)  # 均值填充
-                tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-
-                output = output * tmp
+            output = output + output * self.opt.lambda1 * polarity * subjectivity
             return output
 
     def load(self, path):

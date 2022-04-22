@@ -378,14 +378,10 @@ def unpack_input_sentiment(opt, x):
         s_train = opt.s_train[opt.index]
         data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
                 user_sentiments, item_sentiments, s_train]  # 添加了sentiment
-    elif opt.stage == 'test':
-        s_test = opt.s_test[opt.index]
+    else:
+        # s_test = opt.s_test[opt.index]
         data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
-                user_sentiments, item_sentiments, s_test]  # 添加了sentiment
-    elif opt.stage == 'val':
-        s_val = opt.s_val[opt.index]
-        data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
-                user_sentiments, item_sentiments, s_val]  # 添加了sentiment
+                user_sentiments, item_sentiments]
 
     data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
     return data
