@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D1(nn.Module):
     '''
-    最容易解释 ---- 去除线性层
+    最容易解释 ---- 去除线性层 ---- 已改用T1
     '''
 
     def __init__(self, opt):
@@ -45,12 +45,12 @@ class Net(nn.Module):
 
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
 
-        self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)  # [100,32].用来给review特征降维
+        # self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)  # [100,32].用来给review特征降维
         self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
-        self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
+        # self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
 
-        self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
-        self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
+        # self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
+        # self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
 
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
@@ -129,16 +129,16 @@ class Net(nn.Module):
 
         nn.init.xavier_normal_(self.id_linear.weight)
 
-        nn.init.xavier_normal_(self.review_linear.weight)
+        # nn.init.xavier_normal_(self.review_linear.weight)
         # nn.init.constant_(self.review_linear.bias, 0.1)
 
-        nn.init.xavier_normal_(self.attention_linear.weight)
+        # nn.init.xavier_normal_(self.attention_linear.weight)
         # nn.init.constant_(self.attention_linear.bias, 0.1)
 
-        nn.init.xavier_normal_(self.polarity_linear.weight)
+        # nn.init.xavier_normal_(self.polarity_linear.weight)
         # nn.init.constant_(self.polarity_linear.bias, 0.1)
-        nn.init.xavier_normal_(self.subj_linear.weight)
+        # nn.init.xavier_normal_(self.subj_linear.weight)
         # nn.init.constant_(self.subj_linear.bias, 0.1)
 
         nn.init.xavier_normal_(self.fc_layer.weight)
-        nn.init.constant_(self.fc_layer.bias, 0.1)
+        # nn.init.constant_(self.fc_layer.bias, 0.1)

@@ -34,26 +34,13 @@ class Net(nn.Module):
 
         if uori == 'user':
             id_num = self.opt.user_num
-            # ui_id_num = self.opt.item_num
         else:  # item
             id_num = self.opt.item_num
-            # ui_id_num = self.opt.user_num
 
         self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user数/item数 * 32, 即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # 50000 * 300
-        # self.u_i_id_embedding = nn.Embedding(ui_id_num, self.opt.id_emb_size)  # embedding的搜索空间：[几万，32]
-
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
-
-        # self.review_linear = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)  # [100,32].用来给review特征降维
-        # self.id_linear = nn.Linear(self.opt.id_emb_size, self.opt.id_emb_size, bias=False)  # [32,32]
-        # self.attention_linear = nn.Linear(self.opt.id_emb_size, 1)
-
-        # self.polarity_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
-        # self.subj_linear = nn.Linear(self.opt.filters_num, self.opt.filters_num)
-
         self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
-
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
 
@@ -71,14 +58,6 @@ class Net(nn.Module):
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
-        # u_i_id_emb = self.u_i_id_embedding(ids_list)  # [128,10/27] -> [128, 10/27, 32]
-
-        #  3. attention（linear attention）
-        #  rs_mix维度：user为[128,10,32]，item为[128,27，32]
-        # rs_mix = F.relu(  # 这一步的目的：把user(或item)的review特征表示和对应item(或user)ids embedding特征表示统一维度
-        #     self.review_linear(fea) +  # review降维:[128,10/27,100]->[128,10/27,32]
-        #     F.relu(self.id_linear(F.relu(u_i_id_emb)))  # id降维后还是[128,10/27，32]
-        # )
 
         '''
         （1）先把情感权重归一化 ---- softmax
@@ -99,13 +78,6 @@ class Net(nn.Module):
         fea = fea * polarity_w
         fea = fea * r_num
         fea = fea * subj_w
-        # fea = F.relu(self.subj_linear(fea * subj_w))
-        # rs_mix = rs_mix * r_num
-
-        # att_score = F.relu(self.attention_linear(rs_mix))  # 用全连接层实现 -> [128,10/27,1]，得到：某个user/item的每条review注意力权重
-        # att_weight = F.softmax(att_score, 1)  # 对第1维softmax，还是[128,10/27,1]
-        #
-        # r_fea = fea * att_weight  # fea:[128, 10/27, 100]; 得到r_fea也是[128, 10, 100]；原理：最后一维attention自动扩展100次
         r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
@@ -122,23 +94,9 @@ class Net(nn.Module):
             nn.init.xavier_normal_(self.word_embs.weight)
 
         nn.init.xavier_normal_(self.id_embedding.weight)
-        # nn.init.xavier_normal_(self.u_i_id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
-        # nn.init.xavier_normal_(self.cnn.bias, 0.1)
+        nn.init.constant_(self.cnn.bias, 0.1)
 
-        # nn.init.xavier_normal_(self.id_linear.weight)
-
-        # nn.init.xavier_normal_(self.review_linear.weight)
-        # nn.init.constant_(self.review_linear.bias, 0.1)
-
-        # nn.init.xavier_normal_(self.attention_linear.weight)
-        # nn.init.constant_(self.attention_linear.bias, 0.1)
-
-        # nn.init.xavier_normal_(self.polarity_linear.weight)
-        # nn.init.constant_(self.polarity_linear.bias, 0.1)
-        # nn.init.xavier_normal_(self.subj_linear.weight)
-        # nn.init.constant_(self.subj_linear.bias, 0.1)
-
-        nn.init.uniform_(self.fc_layer.weight,-0.1,0.1)
+        nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
