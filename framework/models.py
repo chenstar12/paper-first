@@ -75,21 +75,19 @@ class Model(nn.Module):
                     output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
                 return output
         else:
-            if opt.inference == '':
-                return output
-            else:
-                polarity = user_sentiments[:, :, 0]  # 获取第1列
-                subjectivity = user_sentiments[:, :, 1]  # 获取第2列
-                polarity_i = item_sentiments[:, :, 0]  # 获取第1列
-                # subjectivity_i = item_sentiments[:, :, 1]  # 获取第2列
-                num = polarity.shape[1]
-                num_i = polarity_i.shape[1]
+            polarity = user_sentiments[:, :, 0]  # 获取第1列
+            subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+            polarity_i = item_sentiments[:, :, 0]  # 获取第1列
+            # subjectivity_i = item_sentiments[:, :, 1]  # 获取第2列
+            num = polarity.shape[1]
+            num_i = polarity_i.shape[1]
 
-                polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
-                subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
+            polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
+            subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
 
-                output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
-                return output
+            output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
+            return output
+
 
     def load(self, path):
         '''
