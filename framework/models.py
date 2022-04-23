@@ -66,7 +66,7 @@ class Model(nn.Module):
                 if self.opt.inference in ['trans-PD']:
                     output = output + output * self.opt.lambda1 * torch.tanh(po)
                 if self.opt.inference in ['trans-PD1']:
-                    output = output + output * self.opt.lambda1 * F.sigmoid(po * sub)
+                    output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
                 if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
                     tmp = po ** self.opt.lambda2
                     df = pd.DataFrame(tmp.cpu())
