@@ -6,6 +6,8 @@ import numpy as np
 '''
 id_embedding:50
 '''
+
+
 class MSCI0D1T2(nn.Module):
 
     def __init__(self, opt):
@@ -74,7 +76,7 @@ class Net(nn.Module):
 
         subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
         subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
-        subj_w = 1 - subj_w / 10000
+        subj_w = subj_w / 10000
         subj_w = F.softmax(subj_w, 1)
 
         # fea = F.relu(self.polarity_linear(fea * polarity_w))
