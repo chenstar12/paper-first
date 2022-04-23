@@ -23,7 +23,7 @@ class DefaultConfig:
 
     use_word_embedding = True
 
-    id_emb_size = 32
+    id_emb_size = 50
     query_mlp_size = 128
     fc_dim = 32
 
@@ -66,7 +66,6 @@ class DefaultConfig:
     # topk = [5, 10, 50, 100]  # 排序指标 ---- 与原论文一致
     topk = 5  # 排序指标 ---- 与原论文一致
     index = range(128)  # 用于获取ui-sentiment
-
 
     def set_path(self, name):
         '''
@@ -200,6 +199,7 @@ class Gourmet_Food_data_Config(DefaultConfig):
     user_num = 14681 + 2
     item_num = 8713 + 2
 
+
 class Electronics_data_Config(DefaultConfig):
 
     def __init__(self):
@@ -217,6 +217,7 @@ class Electronics_data_Config(DefaultConfig):
 
     user_num = 192403 + 2
     item_num = 63001 + 2
+
 
 class Yelp_data_Config(DefaultConfig):
     def __init__(self):

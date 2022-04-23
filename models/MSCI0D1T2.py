@@ -40,10 +40,10 @@ class Net(nn.Module):
         else:  # item
             id_num = self.opt.item_num
 
-        self.id_embedding = nn.Embedding(id_num, 50)  # user数/item数 * 32, 即：[几万，32]
+        self.id_embedding = nn.Embedding(id_num, self.opt.id_emb_size)  # user数/item数 * 32, 即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # 50000 * 300
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
-        self.fc_layer = nn.Linear(self.opt.filters_num, 50)
+        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
 
