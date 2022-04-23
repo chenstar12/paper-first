@@ -61,7 +61,7 @@ class Model(nn.Module):
                 return output
             elif opt.inference[:5] == 'trans':  # 正确的调参
                 po = ui_senti[:, 0] / 10000  # 1e4装个逼
-                sub = 1 - ui_senti[:, 1] / 10000  # 越主观，权值越低
+                sub = ui_senti[:, 1] / 10000
 
                 if self.opt.inference in ['trans-PD']:
                     output = output + output * self.opt.lambda1 * torch.tanh(po)
@@ -86,7 +86,7 @@ class Model(nn.Module):
                 num_i = polarity_i.shape[1]
 
                 polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
-                subjectivity = (1 - subjectivity).sum(dim=1) / (10000 * num)  # user的主观性
+                subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
 
                 output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
                 return output
