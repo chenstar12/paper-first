@@ -17,12 +17,8 @@ from .MSCI0B import MSCI0B
 # from .MSCI0B1 import MSCI0B1
 from .MSCI0C import MSCI0C
 # from .MSCI0C1 import MSCI0C1
-from .MSCI0D import MSCI0D
-from .MSCI0D0 import MSCI0D0
-from .MSCI0D1T0 import MSCI0D1T0
 from .MSCI0D1T1 import MSCI0D1T1
 from .MSCI0D1T2 import MSCI0D1T2
-from .MSCI0D1 import MSCI0D1
 from .MSCI0E import MSCI0E
 from .MSCI0F import MSCI0F
 from .MSCI0G import MSCI0G

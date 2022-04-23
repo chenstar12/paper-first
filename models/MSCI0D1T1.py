@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D1T1(nn.Module):
     '''
-    case study 1: 初始化（还原之前的）
+    初始化（还原之前的）
     '''
 
     def __init__(self, opt):

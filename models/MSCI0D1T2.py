@@ -3,11 +3,10 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 
-
+'''
+id_embedding:50
+'''
 class MSCI0D1T2(nn.Module):
-    '''
-    删除id，但review维度加倍
-    '''
 
     def __init__(self, opt):
         super(MSCI0D1T2, self).__init__()
@@ -36,10 +35,15 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.opt = opt
 
+        if uori == 'user':
+            id_num = self.opt.user_num
+        else:  # item
+            id_num = self.opt.item_num
+
+        self.id_embedding = nn.Embedding(id_num, 50)  # user数/item数 * 32, 即：[几万，32]
         self.word_embs = nn.Embedding(self.opt.vocab_size, self.opt.word_dim)  # 50000 * 300
         self.cnn = nn.Conv2d(1, opt.filters_num, (opt.kernel_size, opt.word_dim))  # 卷积
-        self.fc_layer = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
-        self.fc_layer1 = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
+        self.fc_layer = nn.Linear(self.opt.filters_num, 50)
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
 
@@ -56,7 +60,7 @@ class Net(nn.Module):
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
-        # id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
+        id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
 
         '''
         （1）先把情感权重归一化 ---- softmax
@@ -80,7 +84,7 @@ class Net(nn.Module):
         r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
-        return torch.stack([F.relu(self.fc_layer1(r_fea)), F.relu(self.fc_layer(r_fea))], 1)
+        return torch.stack([F.relu(id_emb), F.relu(self.fc_layer(r_fea))], 1)
 
     def reset_para(self):
         if self.opt.use_word_embedding:
@@ -92,12 +96,10 @@ class Net(nn.Module):
         else:
             nn.init.xavier_normal_(self.word_embs.weight)
 
-        # nn.init.xavier_normal_(self.id_embedding.weight)
+        nn.init.xavier_normal_(self.id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.constant_(self.cnn.bias, 0.1)
 
-        nn.init.uniform_(self.fc_layer1.weight, -0.1, 0.1)
         nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
-        nn.init.constant_(self.fc_layer1.bias, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
