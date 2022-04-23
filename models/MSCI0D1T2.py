@@ -92,7 +92,7 @@ class Net(nn.Module):
         else:
             nn.init.xavier_normal_(self.word_embs.weight)
 
-        nn.init.xavier_normal_(self.id_embedding.weight)
+        # nn.init.xavier_normal_(self.id_embedding.weight)
 
         nn.init.xavier_normal_(self.cnn.weight)
         nn.init.constant_(self.cnn.bias, 0.1)
