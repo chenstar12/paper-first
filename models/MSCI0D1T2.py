@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 
 '''
-id_embedding:50
+id_embedding测试
 '''
 
 

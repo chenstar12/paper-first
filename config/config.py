@@ -11,7 +11,7 @@ class DefaultConfig:
     multi_gpu = False
     gpu_ids = []
 
-    seed = 2022
+    seed = 1234
     num_epochs = 200
     num_workers = 0
 

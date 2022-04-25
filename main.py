@@ -80,7 +80,7 @@ def train(**kwargs):
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
 
-    optimizer = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)  # 相当于L2正则化
+    optimizer = optim.Adam(model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)  # weight_decay:相当于L2正则化
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.8)
 
     # training
