@@ -9,10 +9,10 @@ from .prediction import PredictionLayer
 from .fusion import FusionLayer
 
 
-class Model(nn.Module):
+class ModelVader(nn.Module):
 
     def __init__(self, opt, Net):
-        super(Model, self).__init__()
+        super(ModelVader, self).__init__()
         self.opt = opt
         self.model_name = self.opt.model
         self.net = Net(opt)

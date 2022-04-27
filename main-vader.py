@@ -11,7 +11,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from dataset import ReviewData
-from framework import Model
+from framework import ModelVader
 import models
 import config
 
@@ -58,7 +58,7 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-    model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
+    model = ModelVader(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
     model.cuda()
 
     if model.net.num_fea != opt.num_fea:
