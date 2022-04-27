@@ -68,6 +68,24 @@ class Net(nn.Module):
         （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
         （3）上一步的特征相加除以2或3
         '''
+        polarity_w = sentiments[:, :, 0]  # 获取第1列 ---- polarity
+        polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
+        polarity_w = polarity_w / 10000
+        polarity_w = F.softmax(polarity_w, 1)
+
+        subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
+        subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
+        subj_w = subj_w / 10000
+        subj_w = F.softmax(subj_w, 1)
+
+        r_fea=fea
+        r_fea = r_fea * polarity_w
+        r_fea = self.dropout(r_fea)
+        r_fea = r_fea * r_num
+
+        r_fea = r_fea * subj_w
+        r_fea = r_fea * r_num
+        r_fea = self.dropout(r_fea)
 
         c = sentiments[:, :, 2]  # 获取第2列 ---- subj
         c = c.unsqueeze(2)  # -> [128,10,1]
@@ -75,8 +93,8 @@ class Net(nn.Module):
         c = F.softmax(c, 1)
 
         # fea = F.relu(self.polarity_linear(fea * polarity_w))
-        fea = fea * c
-        r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
+        r_fea = r_fea * c
+        r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([F.relu(id_emb), F.relu(self.fc_layer(r_fea))], 1)
