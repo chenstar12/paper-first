@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0D1T1(nn.Module):
+class MSCI0D1T4(nn.Module):
     '''
     用vader的compound
     '''
 
     def __init__(self, opt):
-        super(MSCI0D1T1, self).__init__()
+        super(MSCI0D1T4, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
