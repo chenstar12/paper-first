@@ -597,6 +597,8 @@ for i in range(itemNum):
     i_reviewLen = []  # 待添加
     item_uid_list.append(padding_ids(i_uids, i_pReviewLen, userNum + 1))
     doc2index = [word_index[w] for w in item_review2doc[i]]
+    vs = analyzer.polarity_scores(item_review2doc[i])
+    doc2index[-1] = int(vs['compound'] * 10000)  # 把sentiment存放在最后一位
 
     for text in textList:
         text2index = []
