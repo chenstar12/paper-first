@@ -104,8 +104,8 @@ class DefaultConfig:
         self.item2userid_list = np.load(self.item2userid_path, encoding='bytes')
         self.user_doc = np.load(self.user_doc_path, encoding='bytes')
         self.item_doc = np.load(self.item_doc_path, encoding='bytes')
-        self.userReview2Sentiment = np.load(self.user_sentiment_path, encoding='bytes')
-        self.itemReview2Sentiment = np.load(self.item_sentiment_path, encoding='bytes')
+        self.userReview2Sentiment = np.load(self.user_sentiment_path, encoding='bytes', allow_pickle=True)
+        self.itemReview2Sentiment = np.load(self.item_sentiment_path, encoding='bytes', allow_pickle=True)
 
         self.s_train = np.load(self.s_train_path, encoding='bytes')
         self.s_test = np.load(self.s_test_path, encoding='bytes')
