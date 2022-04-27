@@ -544,6 +544,8 @@ userReview2Index = []
 userDoc2Index = []
 user_iid_list = []
 userReview2Sentiment = []
+analyzer = SentimentIntensityAnalyzer()
+
 for i in range(userNum):
 
     count_user = 0
@@ -557,6 +559,8 @@ for i in range(userNum):
 
     user_iid_list.append(padding_ids(u_iids, u_pReviewLen, itemNum + 1))
     doc2index = [word_index[w] for w in user_review2doc[i]]
+    vs = analyzer.polarity_scores(user_review2doc[i])
+    doc2index[-1] = int(vs['compound'] * 10000)  # 把sentiment存放在最后一位
 
     for text in textList:
         text2index = []
