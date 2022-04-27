@@ -513,7 +513,7 @@ def padding_sentiment(sentiList, num):
     if len(sentiList) >= num:
         new_list = sentiList[:num]
     else:
-        padding = [[0.0, 0.0] for _ in range(num - len(sentiList))]
+        padding = [[0.0, 0.0, 0.0] for _ in range(num - len(sentiList))]
         new_list = sentiList + padding
     return new_list
 
