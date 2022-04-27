@@ -11,6 +11,7 @@ import gensim
 from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer
 from textblob import TextBlob
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 import logging
 import torch  # 防止gpu断开
@@ -201,6 +202,8 @@ if __name__ == '__main__':
     polarity = []
     subjectivity = []
     # vader待完成:
+    compound = []
+    analyzer = SentimentIntensityAnalyzer()
 
     if yelp_data:
         # for line in file:
@@ -242,6 +245,11 @@ if __name__ == '__main__':
                 subj = blob.sentiment.subjectivity
                 subj = int(subj * 10000)
                 subjectivity.append(subj)
+
+                vs = analyzer.polarity_scores(js['text'])
+                c = int(vs['compound'] * 10000)
+                compound.append(c)
+
             except:
                 continue
     else:
@@ -268,16 +276,21 @@ if __name__ == '__main__':
                 subj = blob.sentiment.subjectivity
                 subj = int(subj * 10000)
                 subjectivity.append(subj)
+
+                vs = analyzer.polarity_scores(js['reviewText'])
+                c = int(vs['compound'] * 10000)
+                compound.append(c)
             except:
                 continue
 
 data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
               'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews),
-              'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity)
+              'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity),
+              'compound': pd.Series(compound)
               }
 
 data = pd.DataFrame(data_frame)  # [['user_id', 'item_id', 'ratings', 'reviews']]
-del users_id, items_id, ratings, reviews, polarity, subjectivity
+del users_id, items_id, ratings, reviews, polarity, subjectivity, compound
 
 '''
 yelp数据集
@@ -384,7 +397,7 @@ x_test, y_test = extract(data_test)
 def extract_sentiment(data_dict):
     senti = []
     for i in data_dict.values:
-        senti.append([i[4], i[5]])
+        senti.append([i[4], i[5], i[6]])
     return senti
 
 
@@ -441,14 +454,14 @@ for i in data_train.values:  # 关键！！！用train set获取user_reviews_dic
         item_uid_dict[i[1]] = [i[0]]
     # sentiment:
     if i[0] not in user_sentiments_dict:
-        user_sentiments_dict[i[0]] = [[i[4], i[5]]]
+        user_sentiments_dict[i[0]] = [[i[4], i[5], i[6]]]
     else:
-        user_sentiments_dict[i[0]].append([i[4], i[5]])
+        user_sentiments_dict[i[0]].append([i[4], i[5], i[6]])
 
     if i[1] not in item_sentiments_dict:
-        item_sentiments_dict[i[1]] = [[i[4], i[5]]]
+        item_sentiments_dict[i[1]] = [[i[4], i[5], i[6]]]
     else:
-        item_sentiments_dict[i[1]].append([i[4], i[5]])
+        item_sentiments_dict[i[1]].append([i[4], i[5], i[6]])
 
 # np.save(f"{save_folder}/train/userReview2Sentiment.npy", user_sentiments_dict)
 # np.save(f"{save_folder}/train/itemReview2Sentiment.npy", item_sentiments_dict)

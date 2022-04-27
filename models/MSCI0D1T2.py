@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 
 '''
-id_embedding测试
+两次dropout
 '''
 
 
