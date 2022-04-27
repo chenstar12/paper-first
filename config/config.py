@@ -108,8 +108,8 @@ class DefaultConfig:
         self.itemReview2Sentiment = np.load(self.item_sentiment_path, encoding='bytes', allow_pickle=True)
 
         self.s_train = np.load(self.s_train_path, encoding='bytes')
-        self.s_test = np.load(self.s_test_path, encoding='bytes')
-        self.s_val = np.load(self.s_val_path, encoding='bytes')
+        #self.s_test = np.load(self.s_test_path, encoding='bytes')
+        #self.s_val = np.load(self.s_val_path, encoding='bytes')
 
         for k, v in kwargs.items():
             if not hasattr(self, k):
