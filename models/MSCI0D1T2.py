@@ -82,7 +82,7 @@ class Net(nn.Module):
         # fea = F.relu(self.polarity_linear(fea * polarity_w))
         fea = fea * polarity_w
         fea = fea * r_num
-        self.dropout(fea)
+        fea = self.dropout(fea)
         fea = fea * subj_w
         r_fea = fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
