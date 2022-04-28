@@ -70,7 +70,7 @@ class Model(nn.Module):
                 if self.opt.inference in ['trans-PD']:
                     output = output + output * self.opt.lambda1 * torch.tanh(c)  # T4
                 if self.opt.inference in ['trans-PD1']:
-                    output = output + output * self.opt.lambda1 * torch.tanh(po * sub)
+                    output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
                 if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
                     tmp = po ** self.opt.lambda2
                     df = pd.DataFrame(tmp.cpu())
@@ -91,7 +91,7 @@ class Model(nn.Module):
                 polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
                 subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
 
-                output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
+                output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
                 return output
 
     def load(self, path):
