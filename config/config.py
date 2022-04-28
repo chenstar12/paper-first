@@ -23,7 +23,7 @@ class DefaultConfig:
 
     use_word_embedding = True
 
-    id_emb_size = 50
+    id_emb_size = 36
     query_mlp_size = 128
     fc_dim = 32
 
