@@ -64,7 +64,7 @@ class Net(nn.Module):
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
         bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
-        r_fea=bn2(fea)
+        fea=bn2(fea)
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
 
