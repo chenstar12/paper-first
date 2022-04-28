@@ -82,13 +82,13 @@ class Net(nn.Module):
 
         r_fea = fea
         r_fea = r_fea * polarity_w
-        bn2 = nn.BatchNorm1d(self.opt.filters_num, affine=True).cuda()
+        bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
         r_fea=bn2(r_fea)
         # r_fea = self.dropout(r_fea)
         r_fea = r_fea * r_num
 
         r_fea = r_fea * subj_w
-        bn3 = nn.BatchNorm1d(self.opt.filters_num, affine=True).cuda()
+        bn3 = nn.BatchNorm1d(r_num, affine=True).cuda()
         r_fea=bn3(r_fea)
         r_fea = r_fea * r_num
         # r_fea = self.dropout(r_fea)
