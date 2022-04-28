@@ -222,5 +222,18 @@ class Electronics_data_Config(DefaultConfig):
 
 class Yelp_data_Config(DefaultConfig):
     def __init__(self):
-        self.dataset = ''
-        self.set_path('')
+        self.dataset = 'yelp_data'
+        self.set_path('yelp_data')
+
+    # 数据处理未完成；先照抄Electronics
+    r_max_len = 123
+
+    u_max_r = 10
+    i_max_r = 29
+
+    train_data_size = 1351527
+    test_data_size = 168830
+    val_data_size = 168831
+
+    user_num = 192403 + 2
+    item_num = 63001 + 2
