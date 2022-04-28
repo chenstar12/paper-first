@@ -59,6 +59,8 @@ class Net(nn.Module):
         # 先unsqueeze(1) -> [1280,1,214,300]，再cnn -> [1280, 100, 212,1],最后squeeze(3) -> [1280, 100, 212]
         fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
+        bn1 = nn.BatchNorm1d(self.opt.filters_num, affine=True)
+        fea = bn1(fea)
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
@@ -80,12 +82,14 @@ class Net(nn.Module):
 
         r_fea = fea
         r_fea = r_fea * polarity_w
-        nn.BatchNorm1d(r_fea)
+        bn2 = nn.BatchNorm1d(self.opt.filters_num, affine=True)
+        r_fea=bn2(r_fea)
         # r_fea = self.dropout(r_fea)
         r_fea = r_fea * r_num
 
         r_fea = r_fea * subj_w
-        nn.BatchNorm1d(r_fea)
+        bn3 = nn.BatchNorm1d(self.opt.filters_num, affine=True)
+        r_fea=bn3(r_fea)
         r_fea = r_fea * r_num
         # r_fea = self.dropout(r_fea)
 
