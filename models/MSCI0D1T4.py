@@ -85,15 +85,9 @@ class Net(nn.Module):
 
         r_fea = fea
         r_fea = r_fea * polarity_w
-
-        # r_fea = self.dropout(r_fea)
         r_fea = r_fea * r_num
 
         r_fea = r_fea * subj_w
-        # bn3 = nn.BatchNorm1d(r_num, affine=True).cuda()
-        # r_fea=bn3(r_fea)
-        r_fea = r_fea * r_num
-        # r_fea = self.dropout(r_fea)
 
         r_fea = r_fea.sum(1)  # 每个user的10条特征(经过加权的特征)相加，相当于池化？ -> [128,100]
         r_fea = self.dropout(r_fea)
