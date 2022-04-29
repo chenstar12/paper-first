@@ -53,7 +53,7 @@ class DefaultConfig:
 
     gamma = 0  # 干预强度，拟取值范围[0.2,0.4,0.6,0.8]
 
-    inference = ''
+    inference = 'trans-PD1'
     ei = ''
     eval = ''
 
