@@ -9,6 +9,8 @@ import random
 
 注 ---- 参考MACR：有交互/评分为1；为交互为0；！！！！！！
 '''
+
+
 class RankReviewData(Dataset):
 
     def __init__(self, opt, mode):
@@ -29,9 +31,10 @@ class RankReviewData(Dataset):
 
         self.all_items = set()
         for idx in range(len(opt.user2itemid_list)):
-            self.all_items.union(set(opt.user2itemid_list[idx]))
+            self.all_items = self.all_items.union(set(opt.user2itemid_list[idx]))
             print(len(self.all_items), end='')
-            if idx % 100 == 0: print()
+            if idx % 100 == 0:
+                print()
 
     def __getitem__(self, idx):
         assert idx < len(self.x)
