@@ -91,6 +91,8 @@ class Net(nn.Module):
         r_fea = r_fea * polarity_w
         r_fea = r_fea * r_num
         r_fea = r_fea * subj_w
+        r_fea = self.dropout(r_fea)
+
         r_fea = r_fea.sum(1)  # 每个user的10条特征相加，相当于池化？ -> [128,100]
 
         bn = nn.BatchNorm1d(self.opt.id_emb_size).cuda()
