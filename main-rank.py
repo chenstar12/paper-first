@@ -86,14 +86,13 @@ def train(**kwargs):
 
     # training
     logger.info("start training.........................................................")
-    best_res = 1e+10
+    best_res = 1e-10
 
     iter_loss = []  # 每个iteration的loss，用来画图
     num_decline = 0  # early_stop 指标
     train_data_len = len(train_data)
     for epoch in range(opt.num_epochs):
         total_loss = 0.0
-        total_maeloss = 0.0
         model.train()
         logger.info(f"{now()}  Epoch {epoch}...")
         print(f"{now()}  Epoch {epoch}...")
