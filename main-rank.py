@@ -108,8 +108,6 @@ def train(**kwargs):
 
             loss_BPR = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
 
-            iter_loss.append(loss_BPR.item() * len(user))
-
             loss = loss_BPR
             loss.backward()
             optimizer.step()
