@@ -20,6 +20,7 @@ from .MSCI0C import MSCI0C
 from .MSCI0D1T1 import MSCI0D1T1
 from .MSCI0D1T2 import MSCI0D1T2
 from .MSCI0D1T3 import MSCI0D1T3
+from .MSCI0D1T3A import MSCI0D1T3A
 from .MSCI0D1T4 import MSCI0D1T4
 from .MSCI0E import MSCI0E
 from .MSCI0F import MSCI0F
