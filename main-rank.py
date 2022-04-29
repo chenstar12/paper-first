@@ -109,7 +109,6 @@ def train(**kwargs):
 
             loss_BPR = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
 
-            total_loss += loss_BPR.item() * len(user)  # mse_loss默认取mean
             iter_loss.append(loss_BPR.item() * len(user))
 
             loss = loss_BPR
