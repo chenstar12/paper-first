@@ -32,9 +32,6 @@ class RankReviewData(Dataset):
         self.all_items = set()
         for idx in range(len(opt.user2itemid_list)):
             self.all_items = self.all_items.union(set(opt.user2itemid_list[idx]))
-            print(len(self.all_items), end='')
-            if idx % 100 == 0:
-                print()
 
     def __getitem__(self, idx):
         assert idx < len(self.x)
