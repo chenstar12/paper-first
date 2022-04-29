@@ -14,7 +14,7 @@ from dataset import RankReviewData
 from framework import Model
 import models
 import config
-from config import *
+from config.utils import *
 
 import logging
 import os
