@@ -138,7 +138,7 @@ def train(**kwargs):
 
 
 def predict_ranking(model, data_loader, opt):
-    print('###########################ranking#######################################')
+    print('###########################ranking ecal#######################################')
     model.eval()
     with torch.no_grad():
         data_len = len(data_loader.dataset)
