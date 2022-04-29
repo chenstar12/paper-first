@@ -72,10 +72,10 @@ def train(**kwargs):
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
 
     # 3 data
-    train_data = ReviewData(opt.data_root, mode="Train")
+    train_data = ReviewData(opt, mode="Train")
     train_data_loader = DataLoader(train_data, batch_size=opt.batch_size, shuffle=True, collate_fn=collate_fn)
 
-    val_data = ReviewData(opt.data_root, mode="Val")
+    val_data = ReviewData(opt, mode="Val")
     val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')

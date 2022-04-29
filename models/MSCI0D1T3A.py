@@ -93,9 +93,8 @@ class Net(nn.Module):
         r_fea = r_fea * polarity_w
         r_fea = r_fea * r_num
         r_fea = r_fea * subj_w
-        r_fea = self.dropout(r_fea)
-
         r_fea = r_fea.sum(1)  # 每个user的10条特征相加，相当于池化？ -> [128,100]
+        r_fea = self.dropout(r_fea)
 
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
         return torch.stack([id_emb, r_fea], 1)
