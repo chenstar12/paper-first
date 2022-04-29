@@ -98,8 +98,8 @@ def train(**kwargs):
         for idx, (user, pos_item, neg_item) in enumerate(train_data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
 
-            pos_train_datas = unpack_input_sentiment(opt, zip(user,pos_item))
-            neg_train_datas = unpack_input_sentiment(opt, zip(user,neg_item))
+            pos_train_datas = unpack_input_sentiment(opt, zip(user, pos_item))
+            neg_train_datas = unpack_input_sentiment(opt, zip(user, neg_item))
 
             optimizer.zero_grad()
 
@@ -115,7 +115,7 @@ def train(**kwargs):
         scheduler.step()
 
         opt.stage = 'val'
-        precision,recall,ndcg = predict_ranking(model, val_data_loader, opt)
+        precision, recall, ndcg = predict_ranking(model, val_data_loader, opt)
 
         if ndcg > best_res:
             num_decline = 0  # early_stop 指标
@@ -138,6 +138,7 @@ def train(**kwargs):
 
 
 def predict_ranking(model, data_loader, opt):
+    print('###########################ranking#######################################')
     model.eval()
     with torch.no_grad():
         data_len = len(data_loader.dataset)
@@ -213,7 +214,8 @@ def predict_ranking(model, data_loader, opt):
         model.train()
         opt.stage = 'train'
 
-        return precision,recall,ndcg
+        return precision, recall, ndcg
+
 
 # 不需要了，性能可以了
 def predict_inference(model, data_loader, opt):
@@ -273,6 +275,7 @@ def predict_inference(model, data_loader, opt):
     logger.info(f"PDA ----- Inference eval: mse: {mse2:.4f}; rmse: {math.sqrt(mse2):.4f}; mae: {mae2:.4f};")
     model.train()
     opt.stage = 'train'
+
 
 if __name__ == "__main__":
     logger = logging.getLogger('')
