@@ -14,7 +14,7 @@ class RankReviewData(Dataset):
     def __init__(self, opt, mode):
         self.opt = opt
         if mode == 'Train':
-            path = os.path.join(opt.root_path, 'train/')
+            path = os.path.join(opt.data_root, 'train/')
             self.data = np.load(path + 'Train.npy', encoding='bytes')
             self.scores = np.load(path + 'Train_Score.npy')
         elif mode == 'Val':

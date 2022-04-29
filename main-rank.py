@@ -86,11 +86,7 @@ def train(**kwargs):
 
     # training
     logger.info("start training.........................................................")
-    min_loss = 1e+10
     best_res = 1e+10
-    mse_func = nn.MSELoss()
-    mae_func = nn.L1Loss()
-    smooth_mae_func = nn.SmoothL1Loss()
 
     iter_loss = []  # 每个iteration的loss，用来画图
     num_decline = 0  # early_stop 指标

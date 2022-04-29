@@ -44,7 +44,6 @@ class DefaultConfig:
     early_stop = 10  # 在验证集连续10轮mse下降时early stop
     pth_path = ""  # the saved pth path for test
     print_opt = 'default'
-    root_path=''
 
     batch_size = 512
     print_step = 100
