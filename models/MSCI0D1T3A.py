@@ -73,7 +73,7 @@ class Net(nn.Module):
 
         r_fea = self.fc_layer(fea)
 
-        bn = nn.BatchNorm1d(r_num).cuda()
+        bn = nn.BatchNorm1d(r_num,affine=True).cuda()
         r_fea = bn(r_fea)
 
         '''
