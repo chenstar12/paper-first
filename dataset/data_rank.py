@@ -28,7 +28,7 @@ class RankReviewData(Dataset):
         self.x = list(zip(self.data, self.scores))
 
         self.all_items = set()
-        for idx in len(opt.user2itemid_list):
+        for idx in range(len(opt.user2itemid_list)):
             self.all_items.union(set(opt.user2itemid_list[idx]))
             print(len(self.all_items), end='')
             if idx % 100 == 0: print()
