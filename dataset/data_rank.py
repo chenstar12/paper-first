@@ -20,11 +20,11 @@ class RankReviewData(Dataset):
             self.data = np.load(path + 'Train.npy', encoding='bytes')
             self.scores = np.load(path + 'Train_Score.npy')
         elif mode == 'Val':
-            path = os.path.join(opt.root_path, 'val/')
+            path = os.path.join(opt.data_root, 'val/')
             self.data = np.load(path + 'Val.npy', encoding='bytes')
             self.scores = np.load(path + 'Val_Score.npy')
         else:
-            path = os.path.join(opt.root_path, 'test/')
+            path = os.path.join(opt.data_root, 'test/')
             self.data = np.load(path + 'Test.npy', encoding='bytes')
             self.scores = np.load(path + 'Test_Score.npy')
         self.x = list(zip(self.data, self.scores))
