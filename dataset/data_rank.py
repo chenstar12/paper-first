@@ -3,7 +3,12 @@ import numpy as np
 from torch.utils.data import Dataset
 import random
 
+'''
+正样本：rating >= 4 或 rating >= 3.5
+负采样：在剩余样本中random sampling 、（备选方案）优先选择已交互的低rating样本
 
+注 ---- 参考MACR：有交互/评分为1；为交互为0；！！！！！！
+'''
 class RankReviewData(Dataset):
 
     def __init__(self, opt, mode):
