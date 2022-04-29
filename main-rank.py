@@ -103,8 +103,8 @@ def train(**kwargs):
 
             optimizer.zero_grad()
 
-            pos_scores = model(pos_train_datas, opt)
-            neg_scores = model(neg_train_datas, opt)
+            pos_scores = torch.sigmoid(model(pos_train_datas, opt))
+            neg_scores = torch.sigmoid(model(neg_train_datas, opt))
 
             loss_BPR = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
 
@@ -149,10 +149,8 @@ def predict_ranking(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             scores = torch.FloatTensor(scores).cuda()
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
-            if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-                test_data1 = unpack_input_sentiment(opt, test_data)
-            else:
-                test_data1 = unpack_input(opt, test_data)
+
+            test_data1 = unpack_input_sentiment(opt, test_data)
 
             output = model(test_data1, opt)
 
