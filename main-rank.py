@@ -92,7 +92,6 @@ def train(**kwargs):
     num_decline = 0  # early_stop 指标
     train_data_len = len(train_data)
     for epoch in range(opt.num_epochs):
-        total_loss = 0.0
         model.train()
         logger.info(f"{now()}  Epoch {epoch}...")
         print(f"{now()}  Epoch {epoch}...")
