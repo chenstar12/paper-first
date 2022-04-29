@@ -25,8 +25,8 @@ def now():
 
 
 def collate_fn(batch):
-    data, label = zip(*batch)
-    return data, label
+    user, pos, neg = zip(*batch)
+    return user, pos, neg
 
 
 def train(**kwargs):
@@ -98,7 +98,6 @@ def train(**kwargs):
         logger.info(f"{now()}  Epoch {epoch}...")
         print(f"{now()}  Epoch {epoch}...")
         for idx, (user, pos_item, neg_item) in enumerate(train_data_loader):
-            scores = torch.FloatTensor(scores).cuda()
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
 
             pos_train_datas = unpack_input_sentiment(opt, zip(user,pos_item))
