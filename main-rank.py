@@ -98,8 +98,8 @@ def train(**kwargs):
         for idx, (user, pos_item, neg_item) in enumerate(train_data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
 
-            pos_train_datas = unpack_input_sentiment(opt, zip(user, pos_item))
-            neg_train_datas = unpack_input_sentiment(opt, zip(user, neg_item))
+            pos_train_datas = unpack_input_sentiment(opt, np.array(list(zip(user, pos_item))))
+            neg_train_datas = unpack_input_sentiment(opt, np.array(list(zip(user, neg_item))))
 
             optimizer.zero_grad()
 

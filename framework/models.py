@@ -38,19 +38,11 @@ class Model(nn.Module):
 
     def forward(self, datas, opt):
         if opt.stage == 'train':
-            if self.opt.model[:4] == 'MSCI' or self.opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
                 user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
-            else:
-                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-                user_doc, item_doc = datas
         else:
-            if self.opt.model[:4] == 'MSCI' or self.opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
                 user_doc, item_doc, user_sentiments, item_sentiments = datas
-            else:
-                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-                user_doc, item_doc = datas
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
 
