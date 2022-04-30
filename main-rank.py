@@ -152,6 +152,8 @@ def predict_ranking(model, data_loader, opt):
 
             output = model(pos_train_datas, opt)
             print(len(pos_train_datas))
+            print(pos_train_datas[0][0])
+            print(pos_train_datas[0][1])
 
             for i in range(len(pos_train_datas)):
                 print(output[i])
