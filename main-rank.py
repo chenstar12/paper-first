@@ -186,7 +186,7 @@ def predict_ranking(model, data_loader, opt):
             print(items)
 
             num_origin_items = len(origin_items_list)
-            origin_items = set(origin_items_list)
+            origin_items = set(list(origin_items_list))
             print(origin_items)
 
             num_hit = len(origin_items.intersection(items))
