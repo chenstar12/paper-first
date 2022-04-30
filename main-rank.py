@@ -136,14 +136,16 @@ def train(**kwargs):
 
 
 def predict_ranking(model, data_loader, opt):
-    print('###########################ranking ecal#######################################')
+    print('###########################ranking eval#######################################')
     model.eval()
     with torch.no_grad():
+        print(1)
+
         data_len = len(data_loader.dataset)
 
         scores_matrix = torch.zeros(opt.user_num, opt.item_num)
         output_matrix = torch.zeros(opt.user_num, opt.item_num)
-
+        print(2)
         for idx, (user, pos_item, neg_item) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
 
@@ -158,6 +160,7 @@ def predict_ranking(model, data_loader, opt):
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
         # _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
+        print(3)
 
         precision = 0.0
         recall = 0.0
@@ -209,7 +212,6 @@ def predict_ranking(model, data_loader, opt):
             'Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
         model.train()
         opt.stage = 'train'
-
         return precision, recall, ndcg
 
 

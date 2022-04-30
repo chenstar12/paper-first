@@ -30,7 +30,7 @@ class RankReviewData(Dataset):
         self.x = list(zip(self.data, self.scores))
 
         self.all_items = set(range(len(opt.item2userid_list)))
-        print('len(self.all_items): ',len(self.all_items))
+        # print('len(self.all_items): ',len(self.all_items))
 
     def __getitem__(self, idx):
         assert idx < len(self.x)
