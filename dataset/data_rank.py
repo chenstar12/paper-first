@@ -41,7 +41,7 @@ class RankReviewData(Dataset):
         # 负采样
         neg_item = random.sample(self.all_items.difference(self.opt.user2itemid_list[user]), 1)[0]
 
-        return [user, pos_item, neg_item]
+        return [user, pos_item, neg_item-1]
 
     def __len__(self):
         return len(self.x)
