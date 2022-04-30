@@ -144,7 +144,7 @@ def predict_ranking(model, data_loader, opt):
 
         scores_matrix = torch.zeros(opt.user_num, opt.item_num)
         output_matrix = torch.zeros(opt.user_num, opt.item_num)
-        for idx, (user, pos_item, neg_item) in enumerate(data_loader):
+        for idx, (user, pos_item, neg_item, scores) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
 
             pos_train_datas = unpack_input_sentiment(opt, list(zip(user, pos_item)))
@@ -155,7 +155,7 @@ def predict_ranking(model, data_loader, opt):
             for i in range(len(user)):
                 print(output[i])
                 output_matrix[user[i], pos_item[i]] = output[i]
-                scores_matrix[user[i], pos_item[i]] = 1
+                scores_matrix[user[i], pos_item[i]] = scores[i]
             print(2)
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
