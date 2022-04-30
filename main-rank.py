@@ -109,6 +109,7 @@ def train(**kwargs):
             neg_scores = model(neg_train_datas, opt)
 
             loss = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
+            opt.stage = 'val'
             precision, recall, ndcg = predict_ranking(model, val_data_loader, opt)
 
             loss.backward()
