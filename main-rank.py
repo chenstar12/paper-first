@@ -144,17 +144,17 @@ def predict_ranking(model, data_loader, opt):
         scores_matrix = torch.zeros(opt.user_num, opt.item_num)
         output_matrix = torch.zeros(opt.user_num, opt.item_num)
 
-        for idx, (test_data, scores) in enumerate(data_loader):
-            scores = torch.FloatTensor(scores).cuda()
+        for idx, (user, pos_item, neg_item) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
 
-            test_data1 = unpack_input_sentiment(opt, test_data)
+            pos_train_datas = unpack_input_sentiment(opt, list(zip(user, pos_item)))
+            # neg_train_datas = unpack_input_sentiment(opt, list(zip(user, neg_item)))
 
-            output = model(test_data1, opt)
+            output = model(pos_train_datas, opt)
 
-            for i in range(len(test_data)):
-                output_matrix[test_data[i][0], test_data[i][1]] = output[i]
-                scores_matrix[test_data[i][0], test_data[i][1]] = scores[i]
+            for i in range(len(pos_train_datas)):
+                output_matrix[pos_train_datas[i][0], pos_train_datas[i][1]] = output[i]
+                scores_matrix[pos_train_datas[i][0], pos_train_datas[i][1]] = pos_train_datas[i]
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
         # _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
