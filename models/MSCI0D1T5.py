@@ -66,8 +66,6 @@ class Net(nn.Module):
         # 先unsqueeze(1) -> [1280,1,214,300]，再cnn -> [1280, 100, 212,1],最后squeeze(3) -> [1280, 100, 212]
         fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
-        # bn1 = nn.BatchNorm1d(self.opt.filters_num, affine=True).cuda()
-        # fea = bn1(fea)
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
         bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
@@ -75,11 +73,6 @@ class Net(nn.Module):
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 10/23, 32]
 
-        '''
-        （1）先把情感权重归一化 ---- softmax
-        （2）乘以sentiment，subjectivity，vader的compound； 或者选其中一两个
-        （3）上一步的特征相加除以2或3
-        '''
         polarity_w = sentiments[:, :, 0]  # 获取第1列 ---- polarity
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
@@ -95,7 +88,7 @@ class Net(nn.Module):
         r_fea = r_fea * r_num
         r_fea = r_fea * subj_w
 
-        r_fea = r_fea.view(r_fea.size(0), -1)  # 每个user的10条特征(经过加权的特征)拼接 -> [128,10/27 * 32]
+        r_fea = r_fea.view(r_fea.size(0), -1)  # 拼接 -> [128,10/27 * 32]
         if self.uori == 'user':
             r_fea = self.fc_layer_u(r_fea)
         else:
