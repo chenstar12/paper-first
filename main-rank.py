@@ -112,7 +112,7 @@ def train(**kwargs):
 
             loss = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
             opt.stage = 'val'
-            precision, recall, ndcg = predict_ranking(model, val_data_loader, opt)
+            # precision, recall, ndcg = predict_ranking(model, val_data_loader, opt)
 
             loss.backward()
             optimizer.step()
@@ -205,7 +205,7 @@ def predict_ranking(model, data_loader, opt):
                     ndcg_score += 1 / math.log2(i + 2)
             ndcg += ndcg_score / max_ndcg_score
 
-            print('Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
+            # print('Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
 
 
         data_len = len(data_loader.dataset)
