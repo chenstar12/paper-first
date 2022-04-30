@@ -106,6 +106,7 @@ def train(**kwargs):
             neg_scores = model(neg_train_datas, opt)
 
             loss = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
+            precision, recall, ndcg = predict_ranking(model, val_data_loader, opt)
 
             loss.backward()
             optimizer.step()
@@ -147,9 +148,11 @@ def predict_ranking(model, data_loader, opt):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
 
             pos_train_datas = unpack_input_sentiment(opt, list(zip(user, pos_item)))
+            print(pos_train_datas)
             # neg_train_datas = unpack_input_sentiment(opt, list(zip(user, neg_item)))
 
             output = model(pos_train_datas, opt)
+            print(output)
 
             for i in range(len(pos_train_datas)):
                 print(output[i])
