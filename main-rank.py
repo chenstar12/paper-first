@@ -173,26 +173,27 @@ def predict_ranking(model, data_loader, opt):
 
         for i, data in enumerate(opt.user2itemid_list):  # user2itemid_list只是为了获取user id
             user = i
+            k = opt.topk
 
             # origin_items_list = index_scores_matrix[user].tolist()
             # 改动：用user2itemid_list
-            origin_items_list = data
+            origin_items_list = data.tolist()
             print(origin_items_list)
+
             items_list = index_rank_lists[user].tolist()
-
-            k = opt.topk
-
+            print(items_list)
             items = set(items_list[:k])
             print(items)
 
-            num_origin_items = len(origin_items_list)
             origin_items = set(list(origin_items_list))
             print(origin_items)
 
             num_hit = len(origin_items.intersection(items))
             print(num_hit, end=' ')
             if i % 80 == 0: print()
+
             precision += float(num_hit / k)
+            num_origin_items = len(origin_items_list)
             recall += float(num_hit / num_origin_items)
 
             diversity_items = diversity_items.union(items)
