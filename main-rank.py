@@ -79,7 +79,7 @@ def train(**kwargs):
     train_data_loader = DataLoader(train_data, batch_size=opt.batch_size, shuffle=True, collate_fn=collate_fn)
 
     val_data = RankReviewData(opt, mode="Val")
-    val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn_eval())
+    val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn_eval)
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
 
