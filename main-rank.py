@@ -103,10 +103,12 @@ def train(**kwargs):
 
             optimizer.zero_grad()
 
-            pos_scores = torch.sigmoid(model(pos_train_datas, opt))
-            neg_scores = torch.sigmoid(model(neg_train_datas, opt))
+            pos_scores = model(pos_train_datas, opt)
+            neg_scores = model(neg_train_datas, opt)
 
-            loss_BPR = -torch.sum(torch.log2(torch.sigmoid(pos_scores - neg_scores)))
+            tmp1 = torch.sigmoid(pos_scores - neg_scores)
+            tmp2 = torch.log2(tmp1)
+            loss_BPR = -torch.sum(tmp2)
 
             loss = loss_BPR
             loss.backward()
