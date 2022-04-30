@@ -28,9 +28,11 @@ def collate_fn(batch):
     user, pos, neg = zip(*batch)
     return user, pos, neg
 
+
 def collate_fn_eval(batch):
-    user, pos, neg ,scores= zip(*batch)
-    return user, pos, neg,scores
+    user, pos, neg, scores = zip(*batch)
+    return user, pos, neg, scores
+
 
 def train(**kwargs):
     # torch.backends.cudnn.benchmark = True
@@ -186,6 +188,8 @@ def predict_ranking(model, data_loader, opt):
             origin_items = set(origin_items_list)
 
             num_hit = len(origin_items.intersection(items))
+            print(num_hit, end=' ')
+            if i % 80 == 0: print()
             precision += float(num_hit / k)
             recall += float(num_hit / num_origin_items)
 
