@@ -51,6 +51,7 @@ class Net(nn.Module):
         self.fc_layer_i = nn.Linear(self.opt.i_max_r * self.opt.id_emb_size, self.opt.id_emb_size * 4)
 
         self.fc_layer1 = nn.Linear(self.opt.id_emb_size * 4, self.opt.id_emb_size * 2)
+        self.fc_layer0 = nn.Linear(self.opt.filters_num, self.opt.id_emb_size)
 
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
@@ -67,6 +68,8 @@ class Net(nn.Module):
         fea = F.relu(self.cnn(reviews.unsqueeze(1))).squeeze(3)
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
+
+        fea = self.fc_layer0(fea)
 
         bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
         fea = bn2(fea)
@@ -120,7 +123,9 @@ class Net(nn.Module):
         nn.init.uniform_(self.fc_layer1.weight, -0.1, 0.1)
         nn.init.uniform_(self.fc_layer_u.weight, -0.1, 0.1)
         nn.init.uniform_(self.fc_layer_i.weight, -0.1, 0.1)
+        nn.init.uniform_(self.fc_layer0.weight, -0.1, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
         nn.init.constant_(self.fc_layer1.bias, 0.1)
         nn.init.constant_(self.fc_layer_u.bias, 0.1)
         nn.init.constant_(self.fc_layer_i.bias, 0.1)
+        nn.init.constant_(self.fc_layer0.bias, 0.1)
