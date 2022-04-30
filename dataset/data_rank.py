@@ -29,9 +29,7 @@ class RankReviewData(Dataset):
             self.scores = np.load(path + 'Test_Score.npy')
         self.x = list(zip(self.data, self.scores))
 
-        self.all_items = set()
-        for idx in range(len(opt.user2itemid_list)):
-            self.all_items = self.all_items.union(set(opt.user2itemid_list[idx]))
+        self.all_items = set(range(len(opt.item2userid_list)))
         print('len(self.all_items): ',len(self.all_items))
 
     def __getitem__(self, idx):
