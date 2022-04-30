@@ -151,6 +151,7 @@ def predict_ranking(model, data_loader, opt):
             # neg_train_datas = unpack_input_sentiment(opt, list(zip(user, neg_item)))
 
             output = model(pos_train_datas, opt)
+            print(output)
             print(len(pos_train_datas))
             print(pos_train_datas[0][0])
             print(pos_train_datas[0][1])
