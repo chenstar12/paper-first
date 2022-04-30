@@ -155,7 +155,7 @@ def predict_ranking(model, data_loader, opt):
             for i in range(len(user)):
                 print(output[i])
                 output_matrix[user[i], pos_item[i]] = output[i]
-                scores_matrix[user[i], pos_item[i]] = pos_train_datas[i]
+                scores_matrix[user[i], pos_item[i]] = 1
             print(2)
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
