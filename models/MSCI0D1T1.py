@@ -63,7 +63,6 @@ class Net(nn.Module):
 
         print(ids.shape)
         print(max(ids))
-        print(ids)
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
         print(id_emb.shape)
         print('='*20)
