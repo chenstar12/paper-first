@@ -184,8 +184,6 @@ def predict_ranking(model, data_loader, opt):
             items = set(items_list)
 
             num_hit = len(origin_items.intersection(items))
-            print(num_hit, end=' ')
-            if i % 80 == 0: print()
 
             precision += float(num_hit / k)
             num_origin_items = len(origin_items_list)
@@ -206,6 +204,9 @@ def predict_ranking(model, data_loader, opt):
                 if temp_item in origin_items:
                     ndcg_score += 1 / math.log2(i + 2)
             ndcg += ndcg_score / max_ndcg_score
+
+            print('Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
+
 
         data_len = len(data_loader.dataset)
         precision = precision / data_len
