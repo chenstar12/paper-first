@@ -71,8 +71,8 @@ class Net(nn.Module):
 
         fea = self.fc_layer0(fea)
 
-        bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
-        fea = bn2(fea)
+        # bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
+        # fea = bn2(fea)
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 10/23, 32]
 
