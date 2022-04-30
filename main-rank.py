@@ -178,15 +178,10 @@ def predict_ranking(model, data_loader, opt):
             # origin_items_list = index_scores_matrix[user].tolist()
             # 改动：用user2itemid_list
             origin_items_list = data.tolist()
-            print(origin_items_list)
+            origin_items = set(list(origin_items_list))
 
             items_list = index_rank_lists[user].tolist()
-            print(items_list)
-            items = set(items_list[:k])
-            print(items)
-
-            origin_items = set(list(origin_items_list))
-            print(origin_items)
+            items = set(items_list)
 
             num_hit = len(origin_items.intersection(items))
             print(num_hit, end=' ')
