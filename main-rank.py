@@ -28,6 +28,9 @@ def collate_fn(batch):
     user, pos, neg = zip(*batch)
     return user, pos, neg
 
+def collate_fn_eval(batch):
+    user, pos, neg ,scores= zip(*batch)
+    return user, pos, neg,scores
 
 def train(**kwargs):
     # torch.backends.cudnn.benchmark = True
@@ -76,7 +79,7 @@ def train(**kwargs):
     train_data_loader = DataLoader(train_data, batch_size=opt.batch_size, shuffle=True, collate_fn=collate_fn)
 
     val_data = RankReviewData(opt, mode="Val")
-    val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
+    val_data_loader = DataLoader(val_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn_eval())
 
     logger.info(f'train data: {len(train_data)}; test data: {len(val_data)}')
 
@@ -156,11 +159,9 @@ def predict_ranking(model, data_loader, opt):
                 print(output[i])
                 output_matrix[user[i], pos_item[i]] = output[i]
                 scores_matrix[user[i], pos_item[i]] = scores[i]
-            print(2)
 
         _, index_rank_lists = torch.topk(output_matrix, opt.topk)
         # _, index_scores_matrix = torch.topk(scores_matrix, opt.u_max_r)  # k待定，先用100，不行再加
-        print(3)
 
         precision = 0.0
         recall = 0.0
