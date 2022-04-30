@@ -124,4 +124,10 @@ class Net(nn.Module):
         nn.init.constant_(self.cnn.bias, 0.1)
 
         nn.init.uniform_(self.fc_layer.weight, -0.1, 0.1)
+        nn.init.uniform_(self.fc_layer1.weight, -0.1, 0.1)
+        nn.init.uniform_(self.fc_layer_u.weight, -0.1, 0.1)
+        nn.init.uniform_(self.fc_layer_i.weight, -0.1, 0.1)
         nn.init.constant_(self.fc_layer.bias, 0.1)
+        nn.init.constant_(self.fc_layer1.bias, 0.1)
+        nn.init.constant_(self.fc_layer_u.bias, 0.1)
+        nn.init.constant_(self.fc_layer_i.bias, 0.1)
