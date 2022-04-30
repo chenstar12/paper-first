@@ -157,7 +157,6 @@ def predict_ranking(model, data_loader, opt):
             output = model(pos_train_datas, opt)
 
             for i in range(len(user)):
-                print(output[i])
                 output_matrix[user[i], pos_item[i]] = output[i]
                 scores_matrix[user[i], pos_item[i]] = scores[i]
 
