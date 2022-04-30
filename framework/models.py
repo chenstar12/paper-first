@@ -60,6 +60,7 @@ class Model(nn.Module):
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
         if opt.stage == 'train':
+
             if opt.inference == '':
                 return output
             elif opt.inference[:5] == 'trans':  # 正确的调参

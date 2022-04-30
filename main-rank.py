@@ -107,7 +107,11 @@ def train(**kwargs):
             neg_scores = model(neg_train_datas, opt)
 
             tmp1 = torch.sigmoid(pos_scores - neg_scores)
+            print(pos_scores)
+            print(neg_scores)
+            print(tmp1)
             tmp2 = torch.log2(tmp1)
+            print(tmp2)
             loss_BPR = -torch.sum(tmp2)
 
             loss = loss_BPR
