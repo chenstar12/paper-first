@@ -102,7 +102,7 @@ class Net(nn.Module):
         r_fea = self.fc_layer1(r_fea)
         r_fea = self.dropout(r_fea)
         # fc_layer:100*32,将r_fea：[128,100] -> [128,32]; 所以stack输入两个都是[128,32],输出[128,2,32]
-        return torch.stack([F.relu(id_emb), F.relu(self.fc_layer(r_fea))], 1)
+        return torch.stack([F.relu(id_emb), F.leaky_relu_(self.fc_layer(r_fea))], 1)
 
     def reset_para(self):
         if self.opt.use_word_embedding:

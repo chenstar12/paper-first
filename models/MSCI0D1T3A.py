@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 class MSCI0D1T3A(nn.Module):
     '''
-    不dropout，用bn
+    用bn
     '''
 
     def __init__(self, opt):
