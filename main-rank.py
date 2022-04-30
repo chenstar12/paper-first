@@ -66,7 +66,7 @@ def train(**kwargs):
         torch.cuda.set_device(opt.gpu_id)
 
     model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
-    #model.cuda()
+    model.cuda()
 
     if model.net.num_fea != opt.num_fea:
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")

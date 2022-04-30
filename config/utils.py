@@ -43,5 +43,5 @@ def unpack_input_sentiment(opt, x):
         data = [user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, user_doc, item_doc,
                 user_sentiments, item_sentiments]
 
-    data = list(map(lambda x: torch.LongTensor(x), data))  # 将data所有数据表x的类型转换成LongTensor
+    data = list(map(lambda x: torch.LongTensor(x).cuda(), data))  # 将data所有数据表x的类型转换成LongTensor
     return data
