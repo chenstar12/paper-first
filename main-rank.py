@@ -183,6 +183,7 @@ def predict_ranking(model, data_loader, opt):
             k = opt.topk
 
             items = set(items_list[:k])
+            print(items)
 
             num_origin_items = len(origin_items_list)
             origin_items = set(origin_items_list)
