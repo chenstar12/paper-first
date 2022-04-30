@@ -180,11 +180,10 @@ def predict_ranking(model, data_loader, opt):
 
             k = opt.topk
 
-            items = set(items_list[0:k])
-            origin_items_list = origin_items_list[0:k]
+            items = set(items_list[:k])
+
             num_origin_items = len(origin_items_list)
-            origin_items = set(origin_items_list[0:k])
-            print(origin_items)
+            origin_items = set(origin_items_list)
 
             num_hit = len(origin_items.intersection(items))
             precision += float(num_hit / k)
