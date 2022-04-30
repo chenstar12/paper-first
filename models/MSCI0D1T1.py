@@ -61,11 +61,7 @@ class Net(nn.Module):
         fea = F.max_pool1d(fea, fea.size(2)).squeeze(2)  # [1280, 100]
         fea = fea.view(-1, r_num, fea.size(1))  # torch.Size([128, 10/27, 100])
 
-        print(ids.shape)
-        print(max(ids))
         id_emb = self.id_embedding(ids)  # [128] -> [128, 32]
-        print(id_emb.shape)
-        print('='*20)
 
         '''
         （1）先把情感权重归一化 ---- softmax
