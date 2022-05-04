@@ -51,6 +51,14 @@ class Model(nn.Module):
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
+        polarity = user_sentiments[:, :, 0]  # 获取第1列
+        subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+        polarity_i = item_sentiments[:, :, 0]  # 获取第1列
+        num = polarity.shape[1]
+        num_i = polarity_i.shape[1]
+        polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
+        subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
+
         if opt.stage == 'train':
 
             if opt.inference == '':
@@ -58,10 +66,10 @@ class Model(nn.Module):
             elif opt.inference[:5] == 'trans':  # 正确的调参
                 po = ui_senti[:, 0] / 10000  # 1e4装个逼
                 sub = ui_senti[:, 1] / 10000
-                c = ui_senti[:, 2] / 10000
+                # c = ui_senti[:, 2] / 10000
 
-                if self.opt.inference in ['trans-PD']:
-                    output = output + output * self.opt.lambda1 * torch.tanh(c)  # T4
+                if self.opt.inference in ['tanh']:
+                    output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
                 if self.opt.inference in ['trans-PD1']:
                     output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
                 if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
@@ -74,16 +82,10 @@ class Model(nn.Module):
         else:
             if self.opt.ei == '':  # eval时的inference
                 return output
+            elif self.opt.inference in ['tanh']:
+                output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
+                return output
             else:
-                polarity = user_sentiments[:, :, 0]  # 获取第1列
-                subjectivity = user_sentiments[:, :, 1]  # 获取第2列
-                polarity_i = item_sentiments[:, :, 0]  # 获取第1列
-                num = polarity.shape[1]
-                num_i = polarity_i.shape[1]
-
-                polarity = polarity_i.sum(dim=1) / (10000 * num_i)  # item的平均分（也可用score的均值）
-                subjectivity = subjectivity.sum(dim=1) / (10000 * num)  # user的主观性
-
                 output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
                 return output
 
