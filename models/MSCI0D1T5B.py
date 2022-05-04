@@ -4,13 +4,13 @@ import torch.nn.functional as F
 import numpy as np
 
 
-class MSCI0D1T5A(nn.Module):
+class MSCI0D1T5B(nn.Module):
     '''
-    尝试：bn
+    尝试：不用softmax（保留负值，用leaky_relu激活）
     '''
 
     def __init__(self, opt):
-        super(MSCI0D1T5A, self).__init__()
+        super(MSCI0D1T5B, self).__init__()
         self.opt = opt
         self.num_fea = 2  # 0,1,2 == id,doc,review
 
@@ -71,20 +71,20 @@ class Net(nn.Module):
 
         fea = self.fc_layer0(fea)
 
-        bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
-        fea = bn2(fea)
+        # bn2 = nn.BatchNorm1d(r_num, affine=True).cuda()
+        # fea = bn2(fea)
 
         id_emb = self.id_embedding(ids)  # [128] -> [128, 10/23, 32]
 
         polarity_w = sentiments[:, :, 0]  # 获取第1列 ---- polarity
         polarity_w = polarity_w.unsqueeze(2)  # -> [128,10,1]
         polarity_w = polarity_w / 10000
-        polarity_w = F.softmax(polarity_w, 1)
+        # polarity_w = F.softmax(polarity_w, 1)
 
         subj_w = sentiments[:, :, 1]  # 获取第2列 ---- subj
         subj_w = subj_w.unsqueeze(2)  # -> [128,10,1]
         subj_w = subj_w / 10000
-        subj_w = F.softmax(subj_w, 1)
+        # subj_w = F.softmax(subj_w, 1)
 
         r_fea = fea
         r_fea = r_fea * polarity_w
