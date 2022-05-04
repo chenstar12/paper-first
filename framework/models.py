@@ -68,7 +68,7 @@ class Model(nn.Module):
                 sub = ui_senti[:, 1] / 10000
                 # c = ui_senti[:, 2] / 10000
 
-                if self.opt.inference in ['tanh']:
+                if self.opt.inference in ['trans-tanh']:
                     output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
                 if self.opt.inference in ['trans-PD1']:
                     output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
@@ -78,11 +78,12 @@ class Model(nn.Module):
                     df.fillna(df.mean(), inplace=True)  # 均值填充
                     tmp = torch.from_numpy(df.values).squeeze(1).cuda()
                     output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
+
                 return output
         else:
             if self.opt.ei == '':  # eval时的inference
                 return output
-            elif self.opt.inference in ['tanh']:
+            elif self.opt.inference in ['trans-tanh']:
                 output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
                 return output
             else:
