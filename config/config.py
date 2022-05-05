@@ -117,12 +117,11 @@ class DefaultConfig:
                 raise Exception('opt has No key: {}'.format(k))
             setattr(self, k, v)
 
-        print('*************************************************')
+        print('**********************命令行参数/options/hyper_params***************************')
         print('user config:')
         for k, v in self.__class__.__dict__.items():
             if not k.startswith('__') and k != 'user_list' and k != 'item_list':
                 print("{} => {}".format(k, getattr(self, k)))
-
         print('*************************************************')
 
 
