@@ -69,7 +69,7 @@ class Model(nn.Module):
                 # c = ui_senti[:, 2] / 10000
 
                 if self.opt.inference in ['trans-tanh']:
-                    output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
+                    output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
                 if self.opt.inference in ['trans-PD1']:
                     output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
                 if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
@@ -84,7 +84,7 @@ class Model(nn.Module):
             if self.opt.ei == '':  # eval时的inference
                 return output
             elif self.opt.inference in ['trans-tanh']:
-                output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
+                output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
                 return output
             else:
                 output = output + output * self.opt.lambda1 * torch.sigmoid(polarity * subjectivity)
