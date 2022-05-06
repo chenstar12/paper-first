@@ -120,8 +120,8 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.dim = dim
         # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(dim, dim * 0.5)
-        self.fc1 = nn.Linear(dim * 0.5, 1)
+        self.fc = nn.Linear(dim, int(dim * 0.5))
+        self.fc1 = nn.Linear(int(dim * 0.5), 1)
         self.init_weight()
 
     def init_weight(self):
