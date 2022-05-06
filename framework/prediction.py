@@ -56,8 +56,8 @@ class LFM(nn.Module):
         return a + torch.sigmoid(score) * (b - a)
 
     def forward(self, feature, user_id, item_id):
-        # return self.rescale_sigmoid(self.fc(feature), 1.0, 5.0) + self.b_users[user_id] + self.b_items[item_id]
-        return self.fc(feature) + self.b_users[user_id] + self.b_items[item_id]
+        return self.rescale_sigmoid(self.fc(feature), 1.0, 5.0) + self.b_users[user_id] + self.b_items[item_id]
+        # return self.fc(feature) + self.b_users[user_id] + self.b_items[item_id]
 
 
 class NFM(nn.Module):
@@ -147,12 +147,16 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.dim = dim
         # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(dim, 1)  # [64,1]
+        self.fc = nn.Linear(dim, dim/2)
+        self.fc1 = nn.Linear(dim/2, 1)
         self.init_weight()
 
     def init_weight(self):
         nn.init.uniform_(self.fc.weight, 0.1, 0.1)
+        nn.init.uniform_(self.fc1.weight, 0.1, 0.1)
         nn.init.uniform_(self.fc.bias, a=0, b=0.2)
+        nn.init.uniform_(self.fc1.bias, a=0, b=0.2)
 
     def forward(self, feature, *args, **kwargs):
-        return F.relu(self.fc(feature))  # [128,64] -> [128,1], 然后在models中squeeze(1)得到output
+        feature = F.relu(self.fc(feature))
+        return F.relu(self.fc1(feature))  # [128,64] -> [128,1], 然后在models中squeeze(1)得到output
