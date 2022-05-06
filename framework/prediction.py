@@ -33,33 +33,6 @@ class PredictionLayer(nn.Module):
             return self.model(feature, 1, keepdim=True)  # NARRE调用MLP的forward函数
 
 
-class LFM(nn.Module):
-
-    def __init__(self, dim, user_num, item_num):
-        super(LFM, self).__init__()
-
-        # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(dim, 1)
-        # -------------------------LFM-user/item-bias-----------------------
-        self.b_users = nn.Parameter(torch.randn(user_num, 1))
-        self.b_items = nn.Parameter(torch.randn(item_num, 1))
-
-        self.init_weight()
-
-    def init_weight(self):
-        nn.init.uniform_(self.fc.weight, a=-0.1, b=0.1)
-        nn.init.uniform_(self.fc.bias, a=0.5, b=1.5)
-        nn.init.uniform_(self.b_users, a=0.5, b=1.5)
-        nn.init.uniform_(self.b_users, a=0.5, b=1.5)
-
-    def rescale_sigmoid(self, score, a, b):
-        return a + torch.sigmoid(score) * (b - a)
-
-    def forward(self, feature, user_id, item_id):
-        return self.rescale_sigmoid(self.fc(feature), 1.0, 5.0) + self.b_users[user_id] + self.b_items[item_id]
-        # return self.fc(feature) + self.b_users[user_id] + self.b_items[item_id]
-
-
 class NFM(nn.Module):
     '''
     Neural FM
@@ -147,8 +120,8 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.dim = dim
         # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(dim, dim/2)
-        self.fc1 = nn.Linear(dim/2, 1)
+        self.fc = nn.Linear(dim, dim / 2)
+        self.fc1 = nn.Linear(dim / 2, 1)
         self.init_weight()
 
     def init_weight(self):
@@ -160,3 +133,29 @@ class MLP(nn.Module):
     def forward(self, feature, *args, **kwargs):
         feature = F.relu(self.fc(feature))
         return F.relu(self.fc1(feature))  # [128,64] -> [128,1], 然后在models中squeeze(1)得到output
+
+
+class LFM(nn.Module):
+
+    def __init__(self, dim, user_num, item_num):
+        super(LFM, self).__init__()
+        # ---------------------------fc_linear------------------------------
+        self.fc = nn.Linear(dim, 1)
+        # -------------------------LFM-user/item-bias-----------------------
+        self.b_users = nn.Parameter(torch.randn(user_num, 1))
+        self.b_items = nn.Parameter(torch.randn(item_num, 1))
+
+        self.init_weight()
+
+    def init_weight(self):
+        nn.init.uniform_(self.fc.weight, a=-0.1, b=0.1)
+        nn.init.uniform_(self.fc.bias, a=0.5, b=1.5)
+        nn.init.uniform_(self.b_users, a=0.5, b=1.5)
+        nn.init.uniform_(self.b_users, a=0.5, b=1.5)
+
+    def rescale_sigmoid(self, score, a, b):
+        return a + torch.sigmoid(score) * (b - a)
+
+    def forward(self, feature, user_id, item_id):
+        return self.rescale_sigmoid(self.fc(feature), 1.0, 5.0) + self.b_users[user_id] + self.b_items[item_id]
+        # return self.fc(feature) + self.b_users[user_id] + self.b_items[item_id]
