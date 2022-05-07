@@ -125,8 +125,8 @@ class MLP(nn.Module):
         self.init_weight()
 
     def init_weight(self):
-        nn.init.uniform_(self.fc.weight, 0.1, 0.1)
-        nn.init.uniform_(self.fc1.weight, 0.1, 0.1)
+        nn.init.uniform_(self.fc.weight, -0.1, 0.1)
+        nn.init.uniform_(self.fc1.weight, -0.1, 0.1)
         nn.init.uniform_(self.fc.bias, a=0, b=0.2)
         nn.init.uniform_(self.fc1.bias, a=0, b=0.2)
 
