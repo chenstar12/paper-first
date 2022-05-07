@@ -139,7 +139,6 @@ class LFM(nn.Module):
     def __init__(self, dim, user_num, item_num):
         super(LFM, self).__init__()
         # ---------------------------fc_linear------------------------------
-        self.fc1 = nn.Linear(dim, int(dim * 0.5))
         self.fc = nn.Linear(int(dim * 0.5), 1)
         # -------------------------LFM-user/item-bias-----------------------
         self.b_users = nn.Parameter(torch.randn(user_num, 1))
@@ -149,11 +148,9 @@ class LFM(nn.Module):
 
     def init_weight(self):
         nn.init.uniform_(self.fc.weight, a=-0.1, b=0.1)
-        nn.init.uniform_(self.fc1.weight, a=-0.1, b=0.1)
         nn.init.uniform_(self.fc.bias, a=0.5, b=1.5)
-        nn.init.uniform_(self.fc1.bias, a=0.5, b=1.5)
         nn.init.uniform_(self.b_users, a=0.5, b=1.5)
-        nn.init.uniform_(self.b_users, a=0.5, b=1.5)
+        nn.init.uniform_(self.b_items, a=0.5, b=1.5)
 
     def rescale_sigmoid(self, score, a, b):
         return a + torch.sigmoid(score) * (b - a)
