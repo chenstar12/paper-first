@@ -44,9 +44,9 @@ class NFM(nn.Module):
         # ---------------------------fc_linear------------------------------
         self.fc = nn.Linear(dim, 1)
         # ------------------------------FM----------------------------------
-        self.fm_V = nn.Parameter(torch.randn(16, dim))
-        self.mlp = nn.Linear(16, 16)
-        self.h = nn.Linear(16, 1, bias=False)
+        self.fm_V = nn.Parameter(torch.randn(int(dim * 0.5), dim))
+        self.mlp = nn.Linear(int(dim * 0.5), int(dim * 0.5))
+        self.h = nn.Linear(int(dim * 0.5), 1, bias=False)
         self.drop_out = nn.Dropout(0.5)
         self.init_weight()
 
