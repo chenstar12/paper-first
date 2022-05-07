@@ -149,7 +149,9 @@ class LFM(nn.Module):
 
     def init_weight(self):
         nn.init.uniform_(self.fc.weight, a=-0.1, b=0.1)
+        nn.init.uniform_(self.fc1.weight, a=-0.1, b=0.1)
         nn.init.uniform_(self.fc.bias, a=0.5, b=1.5)
+        nn.init.uniform_(self.fc1.bias, a=0.5, b=1.5)
         nn.init.uniform_(self.b_users, a=0.5, b=1.5)
         nn.init.uniform_(self.b_users, a=0.5, b=1.5)
 
