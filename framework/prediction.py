@@ -139,7 +139,8 @@ class LFM(nn.Module):
     def __init__(self, dim, user_num, item_num):
         super(LFM, self).__init__()
         # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(dim, 1)
+        self.fc1 = nn.Linear(dim, int(dim * 0.5))
+        self.fc = nn.Linear(int(dim * 0.5), 1)
         # -------------------------LFM-user/item-bias-----------------------
         self.b_users = nn.Parameter(torch.randn(user_num, 1))
         self.b_items = nn.Parameter(torch.randn(item_num, 1))
@@ -156,5 +157,6 @@ class LFM(nn.Module):
         return a + torch.sigmoid(score) * (b - a)
 
     def forward(self, feature, user_id, item_id):
+        feature = F.relu(self.fc1(feature))
         return self.rescale_sigmoid(self.fc(feature), 1.0, 5.0) + self.b_users[user_id] + self.b_items[item_id]
         # return self.fc(feature) + self.b_users[user_id] + self.b_items[item_id]
