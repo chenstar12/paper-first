@@ -70,11 +70,8 @@ def train(**kwargs):
 
     # training
     logger.info("start training.........................................................")
-    min_loss = 1e+10
     best_res = 1e+10
     mse_func = nn.MSELoss()
-    mae_func = nn.L1Loss()
-    smooth_mae_func = nn.SmoothL1Loss()
 
     iter_loss = []  # 每个iteration的loss，用来画图
     epoch_train_mse = []
@@ -82,7 +79,6 @@ def train(**kwargs):
     num_decline = 0  # early_stop 指标
     for epoch in range(opt.num_epochs):
         total_loss = 0.0
-        total_maeloss = 0.0
         model.train()
         logger.info(f"{now()}  Epoch {epoch}...")
         print(f"{now()}  Epoch {epoch}...")
@@ -149,7 +145,8 @@ def test(**kwargs):
     torch.cuda.manual_seed_all(opt.seed)
     torch.cuda.set_device(opt.gpu_id)
 
-    model = models.MF(opt).cuda()
+    Net=opt.model
+    model = Net(opt).cuda()
 
     model.load(opt.pth_path)
     logger.info(f"load model: {opt.pth_path}")
