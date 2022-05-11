@@ -139,7 +139,7 @@ class LFM(nn.Module):
     def __init__(self, dim, user_num, item_num):
         super(LFM, self).__init__()
         # ---------------------------fc_linear------------------------------
-        self.fc = nn.Linear(int(dim * 0.5), 1)
+        self.fc = nn.Linear(dim, 1)
         # -------------------------LFM-user/item-bias-----------------------
         self.b_users = nn.Parameter(torch.randn(user_num, 1))
         self.b_items = nn.Parameter(torch.randn(item_num, 1))
