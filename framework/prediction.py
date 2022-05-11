@@ -156,6 +156,5 @@ class LFM(nn.Module):
         return a + torch.sigmoid(score) * (b - a)
 
     def forward(self, feature, user_id, item_id):
-        feature = F.relu(self.fc1(feature))
         return self.rescale_sigmoid(self.fc(feature), 1.0, 5.0) + self.b_users[user_id] + self.b_items[item_id]
         # return self.fc(feature) + self.b_users[user_id] + self.b_items[item_id]

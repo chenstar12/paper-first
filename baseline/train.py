@@ -53,8 +53,8 @@ def train(**kwargs):
     torch.cuda.manual_seed_all(opt.seed)
     torch.cuda.set_device(opt.gpu_id)
 
-    model = models.MF1(opt)  # opt.model: models文件夹的如DeepDoNN
-    model.cuda()
+    Net = getattr(models, opt.model)
+    model = Net(opt).cuda()
 
     # 3 data
     train_data = ReviewData(opt.data_root, mode="Train")
