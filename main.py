@@ -172,6 +172,29 @@ def train(**kwargs):
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
     logger.info('train loss list: ' + str(epoch_train_mse))
 
+def test(kwargs):
+    if 'dataset' not in kwargs:
+        opt = getattr(config, 'Video_Games_data_Config')()
+    else:
+        opt = getattr(config, kwargs['dataset'] + '_Config')()
+    opt.parse(kwargs)
+    assert (len(opt.pth_path) > 0)
+    random.seed(opt.seed)
+    np.random.seed(opt.seed)
+    torch.manual_seed(opt.seed)
+    torch.cuda.manual_seed_all(opt.seed)
+    torch.cuda.set_device(opt.gpu_id)
+
+    model = Model(opt, getattr(models, opt.model)).cuda()
+    if model.net.num_fea != opt.num_fea:
+        raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
+
+    model.load(opt.pth_path)
+    logger.info(f"load model...................: {opt.pth_path}")
+    test_data = ReviewData(opt.data_root, mode="Test")
+    test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
+    logger.info(f"{now()}: test in the test dataset")
+    predict(model, test_data_loader, opt)
 
 # 模型评估
 def predict(model, data_loader, opt):
@@ -392,28 +415,3 @@ if __name__ == "__main__":
     logger = logging.getLogger('')
     opt = None
     fire.Fire()
-
-
-def test(kwargs):
-    if 'dataset' not in kwargs:
-        opt = getattr(config, 'Video_Games_data_Config')()
-    else:
-        opt = getattr(config, kwargs['dataset'] + '_Config')()
-    opt.parse(kwargs)
-    assert (len(opt.pth_path) > 0)
-    random.seed(opt.seed)
-    np.random.seed(opt.seed)
-    torch.manual_seed(opt.seed)
-    torch.cuda.manual_seed_all(opt.seed)
-    torch.cuda.set_device(opt.gpu_id)
-
-    model = Model(opt, getattr(models, opt.model)).cuda()
-    if model.net.num_fea != opt.num_fea:
-        raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
-
-    model.load(opt.pth_path)
-    logger.info(f"load model...................: {opt.pth_path}")
-    test_data = ReviewData(opt.data_root, mode="Test")
-    test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-    logger.info(f"{now()}: test in the test dataset")
-    predict(model, test_data_loader, opt)
