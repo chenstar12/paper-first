@@ -535,7 +535,7 @@ for i in range(userNum):
     a_count = 0
 
     textList = user_reviews_dict[i]
-    sentimentList = user_sentiments_dict[i]
+    # sentimentList = user_sentiments_dict[i]
     u_iids = user_iid_dict[i]
     u_reviewList = []
 
@@ -572,7 +572,7 @@ for i in range(itemNum):
     count_item = 0
     dataList = []
     textList = item_reviews_dict[i]
-    sentimentList = item_sentiments_dict[i]
+    # sentimentList = item_sentiments_dict[i]
 
     i_uids = item_uid_dict[i]
     i_reviewList = []  # 待添加
