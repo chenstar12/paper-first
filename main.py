@@ -156,7 +156,9 @@ def train(**kwargs):
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
             model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
-            test(kwargs)
+
+            # kwargs['pth_path']=
+            # test(kwargs)
         else:
             num_decline += 1
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
@@ -171,6 +173,7 @@ def train(**kwargs):
     logger.info('train iteration loss list: ' + str(iter_loss))
     logger.info('epoch_val_mse list: ' + str(epoch_val_mse))
     logger.info('train loss list: ' + str(epoch_train_mse))
+
 
 def test(kwargs):
     if 'dataset' not in kwargs:
@@ -195,6 +198,7 @@ def test(kwargs):
     test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
     logger.info(f"{now()}: test in the test dataset")
     predict(model, test_data_loader, opt)
+
 
 # 模型评估
 def predict(model, data_loader, opt):
