@@ -382,8 +382,8 @@ x_test, y_test = extract(data_test)
 
 def extract_sentiment(data_dict):
     senti = []
-    for i in data_dict.values:
-        senti.append([i[4], i[5], i[6]])
+    # for i in data_dict.values:
+        # senti.append([i[4], i[5], i[6]])
     return senti
 
 
