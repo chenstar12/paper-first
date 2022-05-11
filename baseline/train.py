@@ -90,38 +90,15 @@ def train(**kwargs):
             scores = torch.FloatTensor(scores).cuda()
 
             train_datas = unpack_input(opt, train_datas)  # 获取所有数据！！！即：reviews, ids, doc
-            # print(train_datas[0].shape)
-            # print(train_datas[1].shape)
-            # print(train_datas[2].shape)
-            # print(train_datas[3].shape)
-            # print(train_datas[4].shape)
-            # print(train_datas[5].shape)
-            # print(train_datas[6].shape)
-            # print(train_datas[7].shape)
-            # return
 
             optimizer.zero_grad()
             output = model(train_datas)
-            # print(output)
-            # print(scores)
 
             mse_loss = mse_func(output, scores)
             total_loss += mse_loss.item() * len(scores)  # mse_loss默认取mean
             iter_loss.append(mse_loss.item() * len(scores))
 
-            mae_loss = mae_func(output, scores)
-            total_maeloss += mae_loss.item()
-
-            smooth_mae_loss = smooth_mae_func(output, scores)
-
-            if opt.loss_method == 'mse':
-                loss = mse_loss
-            if opt.loss_method == 'rmse':
-                loss = torch.sqrt(mse_loss) / 2.0
-            if opt.loss_method == 'mae':
-                loss = mae_loss
-            if opt.loss_method == 'smooth_mae':
-                loss = smooth_mae_loss
+            loss = mse_loss
 
             loss.backward()
             optimizer.step()
@@ -140,9 +117,7 @@ def train(**kwargs):
             num_decline = 0  # early_stop 指标
             best_res = val_mse
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-
             model.save(name=opt.dataset, opt=opt.print_opt)
-            min_loss = val_loss
             logger.info("model save")
         else:
             num_decline += 1
@@ -171,11 +146,8 @@ def test(**kwargs):
     random.seed(opt.seed)
     np.random.seed(opt.seed)
     torch.manual_seed(opt.seed)
-    if opt.use_gpu:
-        torch.cuda.manual_seed_all(opt.seed)
-
-    if len(opt.gpu_ids) == 0 and opt.use_gpu:
-        torch.cuda.set_device(opt.gpu_id)
+    torch.cuda.manual_seed_all(opt.seed)
+    torch.cuda.set_device(opt.gpu_id)
 
     model = models.MF(opt).cuda()
 
@@ -184,7 +156,7 @@ def test(**kwargs):
     test_data = ReviewData(opt.data_root, mode="Test")
     test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
     logger.info(f"{now()}: test in the test dataset")
-    predict_loss, test_mse, test_mae = predict(model, test_data_loader, opt)
+    predict(model, test_data_loader, opt)
 
 
 def predict(model, data_loader, opt):
@@ -203,8 +175,6 @@ def predict(model, data_loader, opt):
 
             mae_loss = torch.sum(abs(output - scores))
             total_maeloss += mae_loss.item()
-
-        # 排序任务的评价指标（不是点击率任务）：NDCG，Diversity,MRR,HR,AUC,
 
     data_len = len(data_loader.dataset)
     mse = total_loss * 1.0 / data_len
@@ -235,5 +205,4 @@ def unpack_input(opt, x):  # 打包一个batch所有数据
 
 if __name__ == "__main__":
     logger = logging.getLogger('')
-
     fire.Fire()

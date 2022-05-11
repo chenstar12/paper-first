@@ -156,7 +156,7 @@ def train(**kwargs):
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
             model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
-            test(**kwargs)
+            test(kwargs)
         else:
             num_decline += 1
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
