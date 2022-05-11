@@ -394,7 +394,7 @@ if __name__ == "__main__":
     fire.Fire()
 
 
-def test(**kwargs):
+def test(kwargs):
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:
