@@ -388,11 +388,7 @@ def extract_sentiment(data_dict):
 
 
 s_train = extract_sentiment(data_train)
-# s_test = extract_sentiment(data_test)
-# s_val = extract_sentiment(data_val)
 np.save(f"{save_folder}/train/S_Train.npy", s_train)
-# np.save(f"{save_folder}/test/S_Test.npy", s_test)
-# np.save(f"{save_folder}/val/S_Val.npy", s_val)
 
 np.save(f"{save_folder}/train/Train.npy", x_train)
 np.save(f"{save_folder}/train/Train_Score.npy", y_train)
@@ -439,15 +435,15 @@ for i in data_train.values:  # 关键！！！用train set获取user_reviews_dic
         item_reviews_dict[i[1]] = [str_review]
         item_uid_dict[i[1]] = [i[0]]
     # sentiment:
-    if i[0] not in user_sentiments_dict:
-        user_sentiments_dict[i[0]] = [[i[4], i[5], i[6]]]
-    else:
-        user_sentiments_dict[i[0]].append([i[4], i[5], i[6]])
+    # if i[0] not in user_sentiments_dict:
+    #     user_sentiments_dict[i[0]] = [[i[4], i[5], i[6]]]
+    # else:
+    #     user_sentiments_dict[i[0]].append([i[4], i[5], i[6]])
 
-    if i[1] not in item_sentiments_dict:
-        item_sentiments_dict[i[1]] = [[i[4], i[5], i[6]]]
-    else:
-        item_sentiments_dict[i[1]].append([i[4], i[5], i[6]])
+    # if i[1] not in item_sentiments_dict:
+        #item_sentiments_dict[i[1]] = [[i[4], i[5], i[6]]]
+    # else:
+        #item_sentiments_dict[i[1]].append([i[4], i[5], i[6]])
 
 # np.save(f"{save_folder}/train/userReview2Sentiment.npy", user_sentiments_dict)
 # np.save(f"{save_folder}/train/itemReview2Sentiment.npy", item_sentiments_dict)
