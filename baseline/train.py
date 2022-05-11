@@ -50,13 +50,10 @@ def train(**kwargs):
     random.seed(opt.seed)
     np.random.seed(opt.seed)
     torch.manual_seed(opt.seed)
-    if opt.use_gpu:
-        torch.cuda.manual_seed_all(opt.seed)
+    torch.cuda.manual_seed_all(opt.seed)
+    torch.cuda.set_device(opt.gpu_id)
 
-    if len(opt.gpu_ids) == 0 and opt.use_gpu:
-        torch.cuda.set_device(opt.gpu_id)
-
-    model = models.MF(opt)  # opt.model: models文件夹的如DeepDoNN
+    model = models.MF1(opt)  # opt.model: models文件夹的如DeepDoNN
     model.cuda()
 
     # 3 data

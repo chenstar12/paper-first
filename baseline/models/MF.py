@@ -22,6 +22,6 @@ class MF(BaseModel):
         user_id_embedding = self.user_id_embs(uids)
         item_id_embedding = self.item_id_embs(iids)
 
-        output = torch.mul(user_id_embedding, item_id_embedding).sum(dim=1) # torch.mul矩阵点乘 == a * b
+        output = torch.mul(user_id_embedding, item_id_embedding).sum(dim=1)  # torch.mul矩阵点乘 == a * b
 
         return F.relu(output)
