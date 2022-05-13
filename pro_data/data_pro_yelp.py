@@ -105,17 +105,17 @@ if yelp_data:
     df_u = data.groupby('user_id').count()
     uid = df_u[df_u['item_id'] < 5].index
     print('user with interacted item < 5 index: ', uid)
-    print('shape: ', data.shape)
+    print('(1) begin......data.shape: ', data.shape)
     for u in uid:
         data.drop(data[data['user_id'] == u].index, inplace=True)
-    print('shape: ', data.shape)
+    print('(2) user dropped.....data.shape: ', data.shape)
 
     df_i = data.groupby('item_id').count()
     iid = df_i[df_i['user_id'] < 5].index
     print('items with interacted user < 5 index: ', iid)
     for i in iid:
         data.drop(data[data['item_id'] == i].index, inplace=True)
-    print('shape: ', data.shape)
+    print('(3) item dropped.....data.shape', data.shape)
 
     blob = TextBlob(data_frame['text'])
     pola = blob.sentiment.polarity
