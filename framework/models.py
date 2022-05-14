@@ -100,7 +100,7 @@ class Model(nn.Module):
         '''
         保存模型
         '''
-        prefix = 'checkpoints/'
+        prefix = '/content/drive/MyDrive/checkpoints/'
         if name is None:
             name = prefix + self.model_name + '_'
             name = time.strftime(name + '%m%d_%H:%M:%S.pth')
