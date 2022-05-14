@@ -65,6 +65,13 @@ def train(**kwargs):
         torch.cuda.set_device(opt.gpu_id)
 
 
+            name = prefix + self.model_name + '_' + str(name) + '_' + str(opt) + '.pth'
+
+    if Resume:
+        path_checkpoint = '/content/drive/MyDrive/checkpoints/'
+        checkpoint = torch.load(path_checkpoint, map_location=torch.device('cpu'))
+        model.load_state_dict(checkpoint)
+
     model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
     if opt.use_gpu:
         model.cuda()

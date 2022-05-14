@@ -101,6 +101,8 @@ if __name__ == '__main__':
     for k, v in d.copy().items():
         if v < 5:
             d.pop(k)
+        else:
+            print(k + ' ' + v)
 
     print(len(d))
     print('2. start processing ..............................')
