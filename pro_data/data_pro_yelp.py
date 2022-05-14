@@ -89,7 +89,7 @@ if __name__ == '__main__':
             try:
                 uid = str(js['user_id'])
                 iid = str(js['business_id'])
-                if (uid, iid) not in d.keys():
+                if uid + iid not in d.keys():
                     d[uid + iid] = 1
                 else:
                     d[uid + iid] += 1
