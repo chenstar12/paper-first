@@ -98,11 +98,10 @@ if __name__ == '__main__':
 
     print('1. searching < 5 ..............................')
     print(len(d))
-    print(d)
     for k, v in d.copy().items():
         if v < 5:
             d.pop(k)
-
+    print(len(d))
     print('2. start processing ..............................')
     if yelp_data:
         for line in file:
