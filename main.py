@@ -64,6 +64,7 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
+
     model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
     if opt.use_gpu:
         model.cuda()

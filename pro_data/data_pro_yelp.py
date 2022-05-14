@@ -90,18 +90,18 @@ if __name__ == '__main__':
                 uid = str(js['user_id'])
                 iid = str(js['business_id'])
                 if (uid, iid) not in d.keys():
-                    d[(uid, iid)] = 1
+                    d[uid + iid] = 1
                 else:
-                    d[(uid, iid)] += 1
+                    d[uid + iid] += 1
             except:
                 continue
 
     print('1. searching < 5 ..............................')
     print(len(d))
     print(d)
-    for (u, i), v in d.copy().items():
+    for k, v in d.copy().items():
         if v < 5:
-            d.pop((u, i))
+            d.pop(k)
 
     print('2. start processing ..............................')
     if yelp_data:
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
             uid = str(js['user_id'])
             iid = str(js['business_id'])
-            if (uid, iid) not in d:
+            if uid + iid not in d:
                 continue
             reviews.append(js['text'])
             users_id.append(uid)
