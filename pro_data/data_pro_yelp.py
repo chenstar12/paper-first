@@ -128,6 +128,7 @@ if __name__ == '__main__':
             subj = blob.sentiment.subjectivity
             subj = int(subj * 10000)
             subjectivity.append(subj)
+            compound.append(0)
 
 data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
               'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews),
