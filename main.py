@@ -158,7 +158,8 @@ def train(**kwargs):
             num_decline = 0  # early_stop 指标
             best_res = val_mse
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-            state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'epoch': epoch}
+            state = {'optimizer': optimizer.state_dict(), 'epoch': epoch}
+            state.update(model.state_dict())
             torch.save(state, path_checkpoint)
             # model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
