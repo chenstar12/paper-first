@@ -77,62 +77,59 @@ if __name__ == '__main__':
     analyzer = SentimentIntensityAnalyzer()
     d = dict()
 
-    if yelp_data:
-        for line in file:
-            js = json.loads(line)
-            if str(js['user_id']) == 'unknown':
-                print("unknown user id")
-                continue
-            if str(js['business_id']) == 'unknown':
-                print("unkown item id")
-                continue
-            try:
-                uid = str(js['user_id'])
-                iid = str(js['business_id'])
-                if uid + iid not in d.keys():
-                    d[uid + iid] = 1
-                else:
-                    d[uid + iid] += 1
-            except:
-                continue
+    for line in file:
+        js = json.loads(line)
+        if str(js['user_id']) == 'unknown':
+            print("unknown user id")
+            continue
+        if str(js['business_id']) == 'unknown':
+            print("unkown item id")
+            continue
+        try:
+            uid = str(js['user_id'])
+            iid = str(js['business_id'])
+            if (uid, iid) not in d.keys():
+                d[(uid, iid)] = 1
+            else:
+                d[(uid, iid)] += 1
+        except:
+            continue
 
     print('1. searching < 5 ..............................')
     print(len(d))
-    for k, v in d.copy().items():
+    for (u, i), v in d.copy().items():
         if v < 5:
-            d.pop(k)
-        else:
-            print(k + ' ' + str(v))
+            d.pop((u, i))
 
     print(len(d))
     print('2. start processing ..............................')
-    if yelp_data:
-        for line in file:
-            js = json.loads(line)
-            if str(js['user_id']) == 'unknown':
-                print("unknown user id")
-                continue
-            if str(js['business_id']) == 'unknown':
-                print("unkown item id")
-                continue
 
-            uid = str(js['user_id'])
-            iid = str(js['business_id'])
-            if uid + iid not in d.keys():
-                continue
-            reviews.append(js['text'])
-            users_id.append(uid)
-            items_id.append(iid)
-            ratings.append(str(js['stars']))
+    for line in file:
+        js = json.loads(line)
+        if str(js['user_id']) == 'unknown':
+            print("unknown user id")
+            continue
+        if str(js['business_id']) == 'unknown':
+            print("unkown item id")
+            continue
 
-            blob = TextBlob(js['text'])
-            pola = blob.sentiment.polarity
-            pola = int(pola * 10000)  # 防止被floatTensor截断
-            polarity.append(pola)
-            subj = blob.sentiment.subjectivity
-            subj = int(subj * 10000)
-            subjectivity.append(subj)
-            compound.append(0)
+        uid = str(js['user_id'])
+        iid = str(js['business_id'])
+        if (uid, iid) not in d.keys():
+            continue
+        reviews.append(js['text'])
+        users_id.append(uid)
+        items_id.append(iid)
+        ratings.append(str(js['stars']))
+
+        blob = TextBlob(js['text'])
+        pola = blob.sentiment.polarity
+        pola = int(pola * 10000)  # 防止被floatTensor截断
+        polarity.append(pola)
+        subj = blob.sentiment.subjectivity
+        subj = int(subj * 10000)
+        subjectivity.append(subj)
+        compound.append(0)
 
 data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
               'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews),
@@ -140,35 +137,6 @@ data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
               }
 data = pd.DataFrame(data_frame)  # [['user_id', 'item_id', 'ratings', 'reviews']]
 print('3. finally.....................data.shape: ', data.shape)
-'''
-yelp数据集: 5-core处理
-'''
-# if yelp_data:
-# df_u = data.groupby('user_id').count()
-# uid = df_u[df_u['item_id'] < 5].index
-# print('user with interacted item < 5 index: ', uid)
-# print('(1) begin......data.shape: ', data.shape)
-# for u in uid:
-#     data.drop(data[data['user_id'] == u].index, inplace=True)
-# print('(2) user dropped.....data.shape: ', data.shape)
-#
-# df_i = data.groupby('item_id').count()
-# iid = df_i[df_i['user_id'] < 5].index
-# print('items with interacted user < 5 index: ', iid)
-# for i in iid:
-#     data.drop(data[data['item_id'] == i].index, inplace=True)
-# print('(3) item dropped.....data.shape', data.shape)
-
-# blob = TextBlob(data_frame['text'])
-# pola = blob.sentiment.polarity
-# pola = int(pola * 10000)  # 防止被floatTensor截断
-# # polarity.append(pola)
-# subj = blob.sentiment.subjectivity
-# subj = int(subj * 10000)
-# # subjectivity.append(subj)
-#
-# data_frame['polarity'] = pd.Series(polarity)
-# data_frame['subjectivity'] = pd.Series(subjectivity)
 
 del users_id, items_id, ratings, reviews, polarity, subjectivity
 
