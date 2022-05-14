@@ -97,6 +97,8 @@ if __name__ == '__main__':
                 continue
 
     print('1. searching < 5 ..............................')
+    print(len(d))
+    print(d)
     for (u, i), v in d.copy().items():
         if v < 5:
             d.pop((u, i))

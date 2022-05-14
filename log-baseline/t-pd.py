@@ -18,6 +18,7 @@ for i in range(len(user)):
 #     print(v)
 
 print(d)
+print(len(d))
 df = pd.DataFrame({'user': pd.Series(user),
                    'item': pd.Series(item)})
 print(df)
