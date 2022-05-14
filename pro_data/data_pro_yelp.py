@@ -75,6 +75,7 @@ if __name__ == '__main__':
     # vader待完成:
     compound = []
     analyzer = SentimentIntensityAnalyzer()
+    d = dict()
 
     if yelp_data:
         for line in file:
@@ -86,49 +87,83 @@ if __name__ == '__main__':
                 print("unkown item id")
                 continue
             try:
-                reviews.append(js['text'])
-                users_id.append(str(js['user_id']))
-                items_id.append(str(js['business_id']))
-                ratings.append(str(js['stars']))
+                uid = str(js['user_id'])
+                iid = str(js['business_id'])
+                if (uid, iid) not in d.keys():
+                    d[(uid, iid)] = 1
+                else:
+                    d[(uid, iid)] += 1
             except:
                 continue
 
+    print('1. searching < 5 ..............................')
+    for (u, i), v in d.items():
+        if v < 5:
+            d.pop((u, i))
+
+    print('2. start processing ..............................')
+    if yelp_data:
+        for line in file:
+            js = json.loads(line)
+            if str(js['user_id']) == 'unknown':
+                print("unknown user id")
+                continue
+            if str(js['business_id']) == 'unknown':
+                print("unkown item id")
+                continue
+
+            uid = str(js['user_id'])
+            iid = str(js['business_id'])
+            if (uid, iid) not in d:
+                continue
+            reviews.append(js['text'])
+            users_id.append(uid)
+            items_id.append(iid)
+            ratings.append(str(js['stars']))
+
+            blob = TextBlob(js['text'])
+            pola = blob.sentiment.polarity
+            pola = int(pola * 10000)  # 防止被floatTensor截断
+            polarity.append(pola)
+            subj = blob.sentiment.subjectivity
+            subj = int(subj * 10000)
+            subjectivity.append(subj)
+
 data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
               'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews),
+              'polarity': pd.Series(polarity), 'subjectivity': pd.Series(subjectivity)
               }
 data = pd.DataFrame(data_frame)  # [['user_id', 'item_id', 'ratings', 'reviews']]
-
+print('3. finally.....................data.shape: ', data.shape)
 '''
 yelp数据集: 5-core处理
 '''
-if yelp_data:
-    df_u = data.groupby('user_id').count()
-    uid = df_u[df_u['item_id'] < 5].index
-    print('user with interacted item < 5 index: ', uid)
-    print('(1) begin......data.shape: ', data.shape)
-    for u in uid:
-        data.drop(data[data['user_id'] == u].index, inplace=True)
-    print('(2) user dropped.....data.shape: ', data.shape)
+# if yelp_data:
+    # df_u = data.groupby('user_id').count()
+    # uid = df_u[df_u['item_id'] < 5].index
+    # print('user with interacted item < 5 index: ', uid)
+    # print('(1) begin......data.shape: ', data.shape)
+    # for u in uid:
+    #     data.drop(data[data['user_id'] == u].index, inplace=True)
+    # print('(2) user dropped.....data.shape: ', data.shape)
+    #
+    # df_i = data.groupby('item_id').count()
+    # iid = df_i[df_i['user_id'] < 5].index
+    # print('items with interacted user < 5 index: ', iid)
+    # for i in iid:
+    #     data.drop(data[data['item_id'] == i].index, inplace=True)
+    # print('(3) item dropped.....data.shape', data.shape)
 
-    df_i = data.groupby('item_id').count()
-    iid = df_i[df_i['user_id'] < 5].index
-    print('items with interacted user < 5 index: ', iid)
-    for i in iid:
-        data.drop(data[data['item_id'] == i].index, inplace=True)
-    print('(3) item dropped.....data.shape', data.shape)
-
-    blob = TextBlob(data_frame['text'])
-    pola = blob.sentiment.polarity
-    pola = int(pola * 10000)  # 防止被floatTensor截断
-    # polarity.append(pola)
-    subj = blob.sentiment.subjectivity
-    subj = int(subj * 10000)
-    # subjectivity.append(subj)
-
-data_frame['polarity'] = pd.Series(polarity)
-data_frame['subjectivity'] = pd.Series(subjectivity)
-data = pd.DataFrame(data_frame)
-print('finally.....................data.shape: ', data.shape)
+    # blob = TextBlob(data_frame['text'])
+    # pola = blob.sentiment.polarity
+    # pola = int(pola * 10000)  # 防止被floatTensor截断
+    # # polarity.append(pola)
+    # subj = blob.sentiment.subjectivity
+    # subj = int(subj * 10000)
+    # # subjectivity.append(subj)
+#
+# data_frame['polarity'] = pd.Series(polarity)
+# data_frame['subjectivity'] = pd.Series(subjectivity)
 
 del users_id, items_id, ratings, reviews, polarity, subjectivity
 
