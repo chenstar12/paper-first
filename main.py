@@ -64,15 +64,13 @@ def train(**kwargs):
     path_checkpoint = '/content/drive/MyDrive/checkpoints/' + opt.model + '_' + opt.dataset + '.pth'
     if os.path.exists(path_checkpoint):
         print('loading exist model......................')
-        checkpoint = torch.load(path_checkpoint)
+        checkpoint = torch.load(path_checkpoint, map_location='cuda:0')
         model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
         model.load_state_dict(checkpoint)
     else:
         print('new a model................................')
         model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
-
-    if opt.use_gpu:
-        model.cuda()
+        model = model.cuda()
 
     if model.net.num_fea != opt.num_fea:
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
@@ -161,7 +159,7 @@ def train(**kwargs):
             best_res = val_mse
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
             state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'epoch': epoch}
-            torch.save(state, path)
+            torch.save(state, path_checkpoint)
             # model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
 
