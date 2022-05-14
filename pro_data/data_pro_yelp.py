@@ -97,8 +97,8 @@ if __name__ == '__main__':
                 continue
 
     print('1. searching < 5 ..............................')
-    for (u, i) in d.keys():
-        if d[(u, i)] < 5:
+    for (u, i), v in d.copy():
+        if v < 5:
             d.pop((u, i))
 
     print('2. start processing ..............................')
