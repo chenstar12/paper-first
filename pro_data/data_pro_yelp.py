@@ -102,7 +102,7 @@ if __name__ == '__main__':
         if v < 5:
             d.pop(k)
         else:
-            print(k + ' ' + v)
+            print(k + ' ' + str(v))
 
     print(len(d))
     print('2. start processing ..............................')
