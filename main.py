@@ -29,9 +29,6 @@ def collate_fn(batch):
 
 
 def train(**kwargs):
-    # torch.backends.cudnn.benchmark = True
-    # torch.backends.cudnn.deterministic = True
-
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:
@@ -64,15 +61,16 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-
-            name = prefix + self.model_name + '_' + str(name) + '_' + str(opt) + '.pth'
-
-    if Resume:
-        path_checkpoint = '/content/drive/MyDrive/checkpoints/'
-        checkpoint = torch.load(path_checkpoint, map_location=torch.device('cpu'))
+    path_checkpoint = '/content/drive/MyDrive/checkpoints/' + opt.model + '_' + opt.dataset + '.pth'
+    if os.path.exists(path_checkpoint):
+        print('loading exist model......................')
+        checkpoint = torch.load(path_checkpoint)
+        model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
         model.load_state_dict(checkpoint)
+    else:
+        print('new a model................................')
+        model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
 
-    model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
     if opt.use_gpu:
         model.cuda()
 
@@ -162,7 +160,9 @@ def train(**kwargs):
             num_decline = 0  # early_stop 指标
             best_res = val_mse
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-            model.save(name=opt.dataset, opt=opt.print_opt)
+            state = {'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'epoch': epoch}
+            torch.save(state, path)
+            # model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
 
             # kwargs['pth_path']=
