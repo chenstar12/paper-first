@@ -6,7 +6,7 @@ import numpy as np
 
 class MSCI0D1T5B(nn.Module):
     '''
-    尝试：不用softmax（保留负值，用leaky_relu激活）
+    尝试：不用softmax（保留负值）
     '''
 
     def __init__(self, opt):
