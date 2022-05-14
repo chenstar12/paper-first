@@ -101,6 +101,7 @@ if __name__ == '__main__':
     for k, v in d.copy().items():
         if v < 5:
             d.pop(k)
+
     print(len(d))
     print('2. start processing ..............................')
     if yelp_data:
@@ -115,7 +116,7 @@ if __name__ == '__main__':
 
             uid = str(js['user_id'])
             iid = str(js['business_id'])
-            if uid + iid not in d:
+            if uid + iid not in d.keys():
                 continue
             reviews.append(js['text'])
             users_id.append(uid)
