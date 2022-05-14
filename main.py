@@ -64,13 +64,14 @@ def train(**kwargs):
     path_checkpoint = '/content/drive/MyDrive/checkpoints/' + opt.model + '_' + opt.dataset + '.pth'
     if os.path.exists(path_checkpoint):
         print('loading exist model......................')
-        checkpoint = torch.load(path_checkpoint, map_location='cuda:0')
+        checkpoint = torch.load(path_checkpoint)
         model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
         model.load_state_dict(checkpoint)
     else:
         print('new a model................................')
         model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
-        model = model.cuda()
+
+    model = model.cuda()
 
     if model.net.num_fea != opt.num_fea:
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
