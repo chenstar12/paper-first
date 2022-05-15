@@ -61,7 +61,8 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-    path_checkpoint = '/content/drive/MyDrive/checkpoints/' + opt.model + '_' + opt.dataset + '.pth'
+    path_checkpoint = '/content/drive/MyDrive/checkpoints/' + opt.model + '_' + opt.dataset + str(
+        opt.lambda1 * 100) + '.pth'
     if os.path.exists(path_checkpoint):
         print('loading exist model......................')
         checkpoint = torch.load(path_checkpoint)
