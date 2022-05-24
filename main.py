@@ -249,16 +249,22 @@ def predict(model, data_loader, opt):
         neg_idx = idx[:100]
         pos_idx = idx[-100:]
         print(neg_idx)
-        pos = []
-        neg = []
+        # pos = []
+        # neg = []
+        data = []
+        label = []
         for i in pos_idx.numpy().tolist():
-            pos.append(opt.ifea[i])
+            # pos.append(opt.ifea[i])
+            data.append(opt.ifea[i])
+            label.append(1)
         for i in neg_idx.numpy().tolist():
-            neg.append(opt.ifea[i])
-            print(i, end=' ')
-            print(type(i), end=' ')
-        print()
-        print(neg)
+            # neg.append(opt.ifea[i])
+            data.append(opt.ifea[i])
+            label.append(0)
+        tsne = TSNE(n_components=2, init='pca', random_state=0)
+        result = tsne.fit_transform(data)
+        fig = plot_embedding(result, label, '')
+        plt.show(fig)
 
     model.train()
     opt.stage = 'train'
