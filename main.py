@@ -245,8 +245,8 @@ def predict(model, data_loader, opt):
         polarity_i = torch.tensor(polarity_i)
         polarity = polarity_i.sum(dim=1)  # item的总分（替代均值）
         _, idx = torch.sort(torch.tensor(polarity))  # 升序（neg在前）
-        neg_idx = idx[:300]
-        pos_idx = idx[-300:]
+        neg_idx = idx[:500]
+        pos_idx = idx[-500:]
         print(neg_idx)
         # pos = []
         # neg = []
@@ -256,14 +256,14 @@ def predict(model, data_loader, opt):
             # pos.append(opt.ifea[i])
             data.append(opt.ifea[i])
             y.append(1)
-        print(data)
-        print(y)
+        # print(data)
+        # print(y)
         for i in neg_idx.numpy().tolist():
             # neg.append(opt.ifea[i])
             data.append(opt.ifea[i])
             y.append(0)
-        print(data[-300:])
-        print(y[-300:])
+        # print(data[-300:])
+        # print(y[-300:])
 
         tsne = TSNE(n_components=2, init='pca', random_state=0)
         X_tsne = tsne.fit_transform(data)
