@@ -44,7 +44,6 @@ class Model(nn.Module):
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc, user_sentiments, item_sentiments = datas
 
-
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
         # print(item_feature[:, 1, :].shape)
 
@@ -53,7 +52,7 @@ class Model(nn.Module):
         #
         # opt.neg_u.extend(np.array(user_feature[opt.neg_idx, 1, :]).tolist())
         # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
-        if opt.stage == 'test':
+        if opt.stage == 'test':  # 仅用于model test
             ifea = item_feature[:, 1, :]
             opt.ifea.extend(ifea.cpu().numpy().tolist())
             print(len(opt.ifea), end=' ')

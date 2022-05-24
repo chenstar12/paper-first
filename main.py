@@ -241,8 +241,8 @@ def predict(model, data_loader, opt):
     print(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
 
     if opt.stage == 'test':  # 降维，可视化
-        scores = data_loader.dataset.scores
-        _, idx = torch.sort(torch.tensor(scores))  # 升序（neg在前）
+        ys = opt.s_i
+        _, idx = torch.sort(torch.tensor(ys))  # 升序（neg在前）
         neg_idx = idx[:300]
         pos_idx = idx[-300:]
         print(neg_idx)

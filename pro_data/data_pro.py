@@ -546,6 +546,9 @@ user_iid_list = []
 userReview2Sentiment = []
 analyzer = SentimentIntensityAnalyzer()
 
+s_u = []
+s_i = []
+
 for i in range(userNum):
 
     count_user = 0
@@ -558,6 +561,10 @@ for i in range(userNum):
     u_reviewList = []
 
     user_iid_list.append(padding_ids(u_iids, u_pReviewLen, itemNum + 1))
+
+    blob = TextBlob(user_review2doc[i])
+    s_u.append(blob.polarity)
+
     doc2index = [word_index[w] for w in user_review2doc[i]]
     vs = analyzer.polarity_scores(user_review2doc[i])
     doc2index[-1] = int(vs['compound'] * 10000)  # 把sentiment存放在最后一位
@@ -596,6 +603,10 @@ for i in range(itemNum):
     i_reviewList = []  # 待添加
     i_reviewLen = []  # 待添加
     item_uid_list.append(padding_ids(i_uids, i_pReviewLen, userNum + 1))
+
+    blob = TextBlob(item_review2doc[i])
+    s_i.append(blob.polarity)
+
     doc2index = [word_index[w] for w in item_review2doc[i]]
     vs = analyzer.polarity_scores(item_review2doc[i])
     doc2index[-1] = int(vs['compound'] * 10000)  # 把sentiment存放在最后一位
@@ -626,11 +637,13 @@ np.save(f"{save_folder}/train/userReview2Index.npy", userReview2Index)
 np.save(f"{save_folder}/train/user_item2id.npy", user_iid_list)
 np.save(f"{save_folder}/train/userDoc2Index.npy", userDoc2Index)
 np.save(f"{save_folder}/train/userReview2Sentiment.npy", userReview2Sentiment)
+np.save(f"{save_folder}/train/userDoc2S.npy", s_u)
 
 np.save(f"{save_folder}/train/itemReview2Index.npy", itemReview2Index)
 np.save(f"{save_folder}/train/item_user2id.npy", item_uid_list)
 np.save(f"{save_folder}/train/itemDoc2Index.npy", itemDoc2Index)
 np.save(f"{save_folder}/train/itemReview2Sentiment.npy", itemReview2Sentiment)
+np.save(f"{save_folder}/train/itemDoc2S.npy", s_i)
 
 logger.info(f"{now()} write finised")
 
