@@ -51,10 +51,11 @@ class Model(nn.Module):
         #
         # opt.neg_u.extend(np.array(user_feature[opt.neg_idx, 1, :]).tolist())
         # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
-        opt.ifea.append(item_feature.cpu().detach().numpy().tolist())
-        print(len(opt.ifea))
-        print(len(opt.ifea[0]))
-        print(len(opt.ifea[1]))
+        if opt.stage == 'train':
+            opt.ifea.append(item_feature.cpu().detach().numpy().tolist())
+            print(len(opt.ifea))
+            print(len(opt.ifea[0]))
+            print(len(opt.ifea[1]))
 
         # fusion feature,如DeepCoNN的cat得到[128,64]
         ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
