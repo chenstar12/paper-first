@@ -247,7 +247,7 @@ def predict(model, data_loader, opt):
         _, idx = torch.sort(torch.tensor(polarity))  # 升序（neg在前）
         neg_idx = idx[:500]
         pos_idx = idx[-500:]
-        print(neg_idx)
+        # print(neg_idx)
         # pos = []
         # neg = []
         data = []
