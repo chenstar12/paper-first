@@ -45,7 +45,7 @@ class Model(nn.Module):
             user_doc, item_doc, user_sentiments, item_sentiments = datas
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
-        print(item_feature[:,1,:].shape)
+        # print(item_feature[:, 1, :].shape)
 
         # opt.pos_u.extend(np.array(user_feature[opt.pos_idx, 1, :]).tolist())
         # opt.pos_i.extend(np.array(item_feature[opt.pos_idx, 1, :]).tolist())
@@ -53,7 +53,8 @@ class Model(nn.Module):
         # opt.neg_u.extend(np.array(user_feature[opt.neg_idx, 1, :]).tolist())
         # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
         if opt.stage == 'test':
-            opt.ifea.extend(item_feature.clone().cpu().detach().numpy().tolist())
+            ifea = item_feature[:, 1, :]
+            opt.ifea.extend(ifea.numpy().tolist())
             print(len(opt.ifea))
             print(len(opt.ifea[0]))
             print(len(opt.ifea[1]))
@@ -64,7 +65,7 @@ class Model(nn.Module):
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
         polarity = user_sentiments[:, :, 0]  # 获取第1列 [128,10]
-        subjectivity = user_sentiments[:, :, 1]  # 获取第2列 [128,10
+        subjectivity = user_sentiments[:, :, 1]  # 获取第2列 [128,10]
         polarity_i = item_sentiments[:, :, 0]  # 获取第1列
         num = polarity.shape[1]
         num_i = polarity_i.shape[1]
