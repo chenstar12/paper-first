@@ -249,8 +249,8 @@ def predict(model, data_loader, opt):
         neg_idx = idx[:100]
         pos_idx = idx[-100:]
         print(neg_idx)
-        pos = opt.ifea[pos_idx.numpy()]
-        neg = opt.ifea[neg_idx.numpy()]
+        pos = opt.ifea[pos_idx.numpy().tolist()]
+        neg = opt.ifea[neg_idx.numpy().tolist()]
         print(neg)
 
     model.train()
