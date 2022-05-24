@@ -242,7 +242,6 @@ def predict(model, data_loader, opt):
 
     if opt.stage == 'test':  # 降维，可视化
         polarity_i = opt.itemReview2Sentiment[:, :, 0]  # 获取第1列 [n,10]
-        num_i = polarity_i.shape[1]
         polarity = polarity_i.sum(dim=1)  # item的总分（替代均值）
         _, idx = torch.sort(torch.tensor(polarity))  # 升序（neg在前）
         neg_idx = idx[:300]
