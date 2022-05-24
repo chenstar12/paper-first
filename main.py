@@ -251,7 +251,7 @@ def predict(model, data_loader, opt):
             data = (data - x_min) / (x_max - x_min)
 
             fig = plt.figure()
-            ax = plt.subplot(111)
+            # ax = plt.subplot(111)
             for i in range(data.shape[0]):
                 plt.text(data[i, 0], data[i, 1], str(label[i]),
                          color=plt.cm.Set1(label[i] / 10.),
