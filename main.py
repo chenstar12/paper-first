@@ -247,23 +247,15 @@ def predict(model, data_loader, opt):
         _, idx = torch.sort(torch.tensor(polarity))  # 升序（neg在前）
         neg_idx = idx[:500]
         pos_idx = idx[-500:]
-        # print(neg_idx)
-        # pos = []
-        # neg = []
+
         data = []
         y = []
         for i in pos_idx.numpy().tolist():
-            # pos.append(opt.ifea[i])
             data.append(opt.ifea[i])
             y.append(1)
-        # print(data)
-        # print(y)
         for i in neg_idx.numpy().tolist():
-            # neg.append(opt.ifea[i])
             data.append(opt.ifea[i])
             y.append(0)
-        # print(data[-300:])
-        # print(y[-300:])
 
         tsne = TSNE(n_components=2, init='pca', random_state=0)
         X_tsne = tsne.fit_transform(data)
