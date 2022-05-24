@@ -39,20 +39,30 @@ class Model(nn.Module):
     def forward(self, datas, opt):
         if opt.stage == 'train':
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-                user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
+            user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
         else:
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-                user_doc, item_doc, user_sentiments, item_sentiments = datas
+            user_doc, item_doc, user_sentiments, item_sentiments = datas
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
+
+        # opt.pos_u.extend(np.array(user_feature[opt.pos_idx, 1, :]).tolist())
+        # opt.pos_i.extend(np.array(item_feature[opt.pos_idx, 1, :]).tolist())
+        #
+        # opt.neg_u.extend(np.array(user_feature[opt.neg_idx, 1, :]).tolist())
+        # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
+        opt.ifea.append(np.array(item_feature).tolist())
+        print(len(opt.ifea))
+        print(len(opt.ifea[0]))
+        print(len(opt.ifea[1]))
 
         # fusion feature,如DeepCoNN的cat得到[128,64]
         ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
         ui_feature = self.dropout(ui_feature)  # 还是[128,64]
         output = self.predict_net(ui_feature, uids, iids).squeeze(1)  # pred:[128]
 
-        polarity = user_sentiments[:, :, 0]  # 获取第1列
-        subjectivity = user_sentiments[:, :, 1]  # 获取第2列
+        polarity = user_sentiments[:, :, 0]  # 获取第1列 [128,10]
+        subjectivity = user_sentiments[:, :, 1]  # 获取第2列 [128,10
         polarity_i = item_sentiments[:, :, 0]  # 获取第1列
         num = polarity.shape[1]
         num_i = polarity_i.shape[1]
@@ -64,22 +74,25 @@ class Model(nn.Module):
             if opt.inference == '':
                 return output
             elif opt.inference[:5] == 'trans':  # 正确的调参
-                po = ui_senti[:, 0] / 10000  # 1e4装个逼
-                sub = ui_senti[:, 1] / 10000
+                # po = ui_senti[:, 0] / 10000  # 1e4装个逼
+                # sub = ui_senti[:, 1] / 10000
                 # c = ui_senti[:, 2] / 10000
 
                 if self.opt.inference in ['trans-tanh']:
                     output = output + output * self.opt.lambda1 * torch.tanh(polarity * subjectivity)
                 if self.opt.inference in ['trans-PD1']:
-                    output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
+                    pass
+                    # output = output + output * self.opt.lambda1 * torch.sigmoid(po * sub)
                 if self.opt.inference in ['trans-PDA']:  # 调参：lambda2
-                    tmp = po ** self.opt.lambda2
-                    df = pd.DataFrame(tmp.cpu())
-                    df.fillna(df.mean(), inplace=True)  # 均值填充
-                    tmp = torch.from_numpy(df.values).squeeze(1).cuda()
-                    output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
+                    pass
+                    # tmp = po ** self.opt.lambda2
+                    # df = pd.DataFrame(tmp.cpu())
+                    # df.fillna(df.mean(), inplace=True)  # 均值填充
+                    # tmp = torch.from_numpy(df.values).squeeze(1).cuda()
+                    # output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
 
-                return output
+                # return output
+
         else:
             if self.opt.ei == '':  # eval时的inference
                 return output

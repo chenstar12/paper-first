@@ -110,6 +110,7 @@ def train(**kwargs):
         print(f"{now()}  Epoch {epoch}...")
         for idx, (train_datas, scores) in enumerate(train_data_loader):
             scores = torch.FloatTensor(scores).cuda()
+
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), train_data_len))
             if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
                 train_datas = unpack_input_sentiment(opt, train_datas)
@@ -173,6 +174,10 @@ def train(**kwargs):
                 logger.info('Early Stop: ' + 'num_decline = ' + str(num_decline))
                 break
         logger.info("*" * 30)
+    # case study ---- 可视化embedding/representation
+    # _, idx = torch.sort(scores)
+    # opt.pos_idx = idx[:100]  # pos取最高分100个
+    # opt.neg_idx = idx[-100:]  # neg取最低分
 
     logger.info("-" * 150)
     logger.info(f"{now()}  best_res:  {best_res}")
