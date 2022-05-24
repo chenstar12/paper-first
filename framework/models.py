@@ -53,7 +53,10 @@ class Model(nn.Module):
         # opt.neg_u.extend(np.array(user_feature[opt.neg_idx, 1, :]).tolist())
         # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
         if opt.stage == 'test':  # 仅用于model test
-            ifea = item_feature[:, 1, :]
+            if opt.model == 'DeepCoNN':
+                ifea = item_feature
+            else:
+                ifea = item_feature[:, 1, :]
             opt.ifea.extend(ifea.cpu().numpy().tolist())
             print(len(opt.ifea), end=' ')
 
