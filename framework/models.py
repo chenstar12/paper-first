@@ -45,8 +45,7 @@ class Model(nn.Module):
             user_doc, item_doc, user_sentiments, item_sentiments = datas
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
-        print(user_feature.shape)
-        print(item_feature.shape)
+        print(item_feature[:,1,:].shape)
 
         # opt.pos_u.extend(np.array(user_feature[opt.pos_idx, 1, :]).tolist())
         # opt.pos_i.extend(np.array(item_feature[opt.pos_idx, 1, :]).tolist())
