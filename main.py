@@ -224,7 +224,7 @@ def predict(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             scores = torch.FloatTensor(scores).cuda()
-            test_data = unpack_input_sentiment(opt, test_data)(opt, test_data)
+            test_data = unpack_input_sentiment(opt, test_data)
 
             output = model(test_data, opt)
 
