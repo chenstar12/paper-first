@@ -93,9 +93,9 @@ class DefaultConfig:
         self.item2userid_path = f'{prefix}/train/item_user2id.npy'
 
         self.user_doc_path = f'{prefix}/train/userDoc2Index.npy'
-        self.s_u_path = f'{prefix}/train/userDoc2S.npy'
+        # self.s_u_path = f'{prefix}/train/userDoc2S.npy'
         self.item_doc_path = f'{prefix}/train/itemDoc2Index.npy'
-        self.s_i_path = f'{prefix}/train/itemDoc2S.npy'
+        # self.s_i_path = f'{prefix}/train/itemDoc2S.npy'
 
         self.user_sentiment_path = f'{prefix}/train/userReview2Sentiment.npy'
         self.item_sentiment_path = f'{prefix}/train/itemReview2Sentiment.npy'
@@ -116,9 +116,9 @@ class DefaultConfig:
         self.user2itemid_list = np.load(self.user2itemid_path, encoding='bytes')
         self.item2userid_list = np.load(self.item2userid_path, encoding='bytes')
         self.user_doc = np.load(self.user_doc_path, encoding='bytes')
-        self.s_u = np.load(self.s_u_path, encoding='bytes')
+        # self.s_u = np.load(self.s_u_path, encoding='bytes')
         self.item_doc = np.load(self.item_doc_path, encoding='bytes')
-        self.s_i = np.load(self.s_i_path, encoding='bytes')
+        # self.s_i = np.load(self.s_i_path, encoding='bytes')
         self.userReview2Sentiment = np.load(self.user_sentiment_path, encoding='bytes', allow_pickle=True)
         self.itemReview2Sentiment = np.load(self.item_sentiment_path, encoding='bytes', allow_pickle=True)
 
