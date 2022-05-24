@@ -242,6 +242,17 @@ def predict(model, data_loader, opt):
 
     logger.info(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     print(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+
+    if opt.stage == 'test':  # 降维，可视化
+        scores = data_loader.dataset.scores
+        _, idx = torch.sort(scores)  # 升序（neg在前）
+        neg_idx = idx[:100]
+        pos_idx = idx[-100:]
+        print(neg_idx)
+        pos = opt.ifea[pos_idx]
+        neg = opt.ifea[neg_idx]
+        print(neg)
+
     model.train()
     opt.stage = 'train'
     return total_loss, mse, mae
