@@ -254,7 +254,7 @@ def predict(model, data_loader, opt):
         for i in pos_idx.numpy().tolist():
             pos.append(opt.ifea[i])
         for i in neg_idx.numpy().tolist():
-            pos.append(opt.ifea[i])
+            neg.append(opt.ifea[i])
             print(i, end=' ')
             print(type(i), end=' ')
         print(neg)
