@@ -55,7 +55,7 @@ class Model(nn.Module):
         if opt.stage == 'test':
             ifea = item_feature[:, 1, :]
             opt.ifea.extend(ifea.cpu().numpy().tolist())
-            print(len(opt.ifea))
+            print(len(opt.ifea),end=' ')
 
         # fusion feature,如DeepCoNN的cat得到[128,64]
         ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
