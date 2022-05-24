@@ -254,10 +254,12 @@ def predict(model, data_loader, opt):
             # pos.append(opt.ifea[i])
             data.append(opt.ifea[i])
             y.append(1)
+        print(data)
         for i in neg_idx.numpy().tolist():
             # neg.append(opt.ifea[i])
             data.append(opt.ifea[i])
             y.append(0)
+        print(data[-300:])
 
         tsne = TSNE(n_components=2, init='pca', random_state=501)
         X_tsne = tsne.fit_transform(data)
