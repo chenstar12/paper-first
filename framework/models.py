@@ -92,7 +92,7 @@ class Model(nn.Module):
                     # tmp = torch.from_numpy(df.values).squeeze(1).cuda()
                     # output = output * torch.tanh(tmp)  # 新增激活函数----sigmoid
 
-                # return output
+                return output
 
         else:
             if self.opt.ei == '':  # eval时的inference
