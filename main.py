@@ -187,7 +187,7 @@ def train(**kwargs):
     logger.info('train loss list: ' + str(epoch_train_mse))
 
 
-def test(kwargs):
+def test(**kwargs):
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:
