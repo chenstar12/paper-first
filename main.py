@@ -18,6 +18,8 @@ import config
 import logging
 import os
 
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
 
 def now():
     return str(time.strftime('%Y-%m-%d %H:%M:%S'))
