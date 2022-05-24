@@ -276,6 +276,7 @@ def predict(model, data_loader, opt):
         #              fontdict={'weight': 'bold', 'size': 9})
         plt.xticks([])
         plt.yticks([])
+        plt.savefig('1.png')
         plt.show()
 
     model.train()
