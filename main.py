@@ -193,6 +193,8 @@ def test(kwargs):
     else:
         opt = getattr(config, kwargs['dataset'] + '_Config')()
     opt.parse(kwargs)
+    opt.stage = 'val'
+
     assert (len(opt.pth_path) > 0)
     random.seed(opt.seed)
     np.random.seed(opt.seed)
