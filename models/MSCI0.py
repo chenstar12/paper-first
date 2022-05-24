@@ -21,6 +21,7 @@ class MSCI0(nn.Module):
         else:
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
             user_doc, item_doc, user_sentiments, item_sentiments = datas
+
         u_fea = self.user_net(user_reviews, uids, user_item2id, user_sentiments)  # Net的forward -> [128,2,32]
         i_fea = self.item_net(item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
 
@@ -53,7 +54,7 @@ class Net(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
         self.reset_para()
 
-    def forward(self, doc, reviews, ids, ids_list, sentiments):  # 添加了sentiments
+    def forward(self, reviews, ids, ids_list, sentiments):  # 添加了sentiments
         #  1. word embedding
         # reviews:用户[128, 10, 214] ->  [128, 10, 214, 300]，物品[128, 27, 214] ->  [128, 27, 214, 300]
         reviews = self.word_embs(reviews)
