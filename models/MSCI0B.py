@@ -18,9 +18,12 @@ class MSCI0B(nn.Module):
         self.item_net = Net(opt, 'item')
 
     def forward(self, datas):
-        user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-        user_doc, item_doc, user_sentiments, item_sentiments = datas
-
+        if self.opt.stage == 'train':
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc, user_sentiments, item_sentiments, _ = datas
+        else:
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc, user_sentiments, item_sentiments = datas
         u_fea = self.user_net(user_reviews, uids, user_item2id, user_sentiments)  # 下面Net的forward函数得：[128,2,32]
         i_fea = self.item_net(item_reviews, iids, item_user2id, item_sentiments)  # [128,2,32]
 
