@@ -249,8 +249,8 @@ def predict(model, data_loader, opt):
     if opt.stage == 'test':  # 降维，可视化
         scores = data_loader.dataset.scores
         _, idx = torch.sort(torch.tensor(scores))  # 升序（neg在前）
-        neg_idx = idx[:100]
-        pos_idx = idx[-100:]
+        neg_idx = idx[:300]
+        pos_idx = idx[-300:]
         print(neg_idx)
         # pos = []
         # neg = []
