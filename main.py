@@ -207,10 +207,10 @@ def test(**kwargs):
         raise ValueError(f"the num_fea of {opt.model} is error, please specific --num_fea={model.net.num_fea}")
 
     model.load(opt.pth_path)
-    logger.info(f"load model...................: {opt.pth_path}")
+    print(f"load model...................: {opt.pth_path}")
     test_data = ReviewData(opt.data_root, mode="Test")
     test_data_loader = DataLoader(test_data, batch_size=opt.batch_size, shuffle=False, collate_fn=collate_fn)
-    logger.info(f"{now()}: test in the test dataset")
+    print(f"{now()}: test in the test dataset")
     predict(model, test_data_loader, opt)
 
 
@@ -241,6 +241,7 @@ def predict(model, data_loader, opt):
     mae = total_maeloss * 1.0 / data_len
 
     logger.info(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
+    print(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
     model.train()
     opt.stage = 'train'
     return total_loss, mse, mae
