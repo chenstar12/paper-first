@@ -259,6 +259,7 @@ def predict(model, data_loader, opt):
             plt.xticks([])
             plt.yticks([])
             plt.title(title)
+            plt.savefig("1.png", dpi=180)
             return fig
 
         scores = data_loader.dataset.scores
