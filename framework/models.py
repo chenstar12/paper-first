@@ -51,7 +51,7 @@ class Model(nn.Module):
         #
         # opt.neg_u.extend(np.array(user_feature[opt.neg_idx, 1, :]).tolist())
         # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
-        opt.ifea.append(np.array(item_feature.cpu()).tolist())
+        opt.ifea.append(item_feature.cpu().numpy().tolist())
         print(len(opt.ifea))
         print(len(opt.ifea[0]))
         print(len(opt.ifea[1]))
