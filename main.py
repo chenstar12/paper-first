@@ -249,8 +249,12 @@ def predict(model, data_loader, opt):
         neg_idx = idx[:100]
         pos_idx = idx[-100:]
         print(neg_idx)
-        pos = opt.ifea[tuple(pos_idx.numpy().tolist())]
-        neg = opt.ifea[tuple(neg_idx.numpy().tolist())]
+        pos = []
+        neg = []
+        for i in pos_idx.numpy().tolist():
+            pos.append(opt.ifea[i])
+        for i in neg_idx.numpy().tolist():
+            pos.append(opt.ifea[i])
         print(neg)
 
     model.train()
