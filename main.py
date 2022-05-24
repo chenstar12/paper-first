@@ -241,7 +241,7 @@ def predict(model, data_loader, opt):
     print(f"evaluation result: mse: {mse:.4f}; rmse: {math.sqrt(mse):.4f}; mae: {mae:.4f};")
 
     if opt.stage == 'test':  # 降维，可视化
-        polarity_i = opt.item_sentiments[:, :, 0]  # 获取第1列 [n,10]
+        polarity_i = opt.itemReview2Sentiment[:, :, 0]  # 获取第1列 [n,10]
         num_i = polarity_i.shape[1]
         polarity = polarity_i.sum(dim=1)  # item的总分（替代均值）
         _, idx = torch.sort(torch.tensor(polarity))  # 升序（neg在前）
