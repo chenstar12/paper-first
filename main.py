@@ -224,10 +224,7 @@ def predict(model, data_loader, opt):
         for idx, (test_data, scores) in enumerate(data_loader):
             opt.index = range(idx * (opt.batch_size), min((idx + 1) * (opt.batch_size), data_len))
             scores = torch.FloatTensor(scores).cuda()
-            if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-                test_data = unpack_input_sentiment(opt, test_data)
-            else:
-                test_data = unpack_input(opt, test_data)
+            test_data = unpack_input_sentiment(opt, test_data)(opt, test_data)
 
             output = model(test_data, opt)
 
