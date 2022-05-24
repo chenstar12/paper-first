@@ -37,12 +37,16 @@ class Model(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
 
     def forward(self, datas, opt):
-        if opt.stage == 'train':
-            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-            user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
+        if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
+            if opt.stage == 'train':
+                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+                user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
+            else:
+                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+                user_doc, item_doc, user_sentiments, item_sentiments = datas
         else:
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-            user_doc, item_doc, user_sentiments, item_sentiments = datas
+            user_doc, item_doc = datas
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
         # print(item_feature[:, 1, :].shape)
@@ -55,7 +59,7 @@ class Model(nn.Module):
         if opt.stage == 'test':
             ifea = item_feature[:, 1, :]
             opt.ifea.extend(ifea.cpu().numpy().tolist())
-            print(len(opt.ifea),end=' ')
+            print(len(opt.ifea), end=' ')
 
         # fusion feature,如DeepCoNN的cat得到[128,64]
         ui_feature = self.fusion_net(user_feature, item_feature)  # NARRE是[128,64]
