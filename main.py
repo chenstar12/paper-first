@@ -257,6 +257,7 @@ def predict(model, data_loader, opt):
             neg.append(opt.ifea[i])
             print(i, end=' ')
             print(type(i), end=' ')
+        print()
         print(neg)
 
     model.train()
