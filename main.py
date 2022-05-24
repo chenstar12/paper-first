@@ -270,11 +270,11 @@ def predict(model, data_loader, opt):
         #              fontdict={'weight': 'bold', 'size': 9})
         plt.xticks([])
         plt.yticks([])
-        plt.savefig('1.png')
+        plt.savefig(str(time.strftime('%d%H%M')) + '.png')
         plt.show()
 
-    model.train()
-    opt.stage = 'train'
+        model.train()
+        opt.stage = 'train'
     return total_loss, mse, mae
 
 
