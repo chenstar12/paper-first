@@ -37,16 +37,13 @@ class Model(nn.Module):
         self.dropout = nn.Dropout(self.opt.drop_out)
 
     def forward(self, datas, opt):
-        if opt.model[:4] == 'MSCI' or opt.model in ['DeepCoNN1']:  # 获取所有数据(添加sentiment数据)
-            if opt.stage == 'train':
-                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-                user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
-            else:
-                user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-                user_doc, item_doc, user_sentiments, item_sentiments = datas
+        if opt.stage == 'train':
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc, user_sentiments, item_sentiments, ui_senti = datas
         else:
             user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
-            user_doc, item_doc = datas
+            user_doc, item_doc, user_sentiments, item_sentiments = datas
+
 
         user_feature, item_feature = self.net(datas)  # 如：DeepConn输出的u_fea,i_fea
         # print(item_feature[:, 1, :].shape)
