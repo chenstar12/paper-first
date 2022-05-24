@@ -54,7 +54,7 @@ class Model(nn.Module):
         # opt.neg_i.extend(np.array(item_feature[opt.neg_idx, 1, :]).tolist())
         if opt.stage == 'test':
             ifea = item_feature[:, 1, :]
-            opt.ifea.extend(ifea.numpy().tolist())
+            opt.ifea.extend(ifea.cpu().numpy().tolist())
             print(len(opt.ifea))
             print(len(opt.ifea[0]))
             print(len(opt.ifea[1]))
