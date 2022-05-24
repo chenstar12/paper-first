@@ -24,7 +24,13 @@ class DeepCoNN(nn.Module):
         self.reset_para()  # 模型参数 ---- 初始化！！！
 
     def forward(self, datas):  # 依次调用各nn.Module子类的forward函数
-        _, _, uids, iids, _, _, user_doc, item_doc = datas  # user_doc：[128, 500]
+        # _, _, uids, iids, _, _, user_doc, item_doc = datas  # user_doc：[128, 500]
+        if self.opt.stage == 'train':
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc, user_sentiments, item_sentiments, _ = datas
+        else:
+            user_reviews, item_reviews, uids, iids, user_item2id, item_user2id, \
+            user_doc, item_doc, user_sentiments, item_sentiments = datas
 
         # 调用Embedding类的forward函数（F.embedding查找表）： torch.Size([50002, 300]) -> torch.Size([128, 500, 300])
         user_doc = self.user_word_embs(user_doc)  # [128, 500] -> [128, 500, 300]
