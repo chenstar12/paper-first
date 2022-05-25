@@ -261,7 +261,7 @@ def predict(model, data_loader, opt):
         X_tsne = tsne.fit_transform(data)
         x_min, x_max = X_tsne.min(0), X_tsne.max(0)
         X_norm = (X_tsne - x_min) / (x_max - x_min)  # 归一化
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(8, 5))
         plt.scatter(X_norm[:500, 0], X_norm[:500, 1], c='navy', marker='x')
         plt.scatter(X_norm[-500:, 0], X_norm[-500:, 1], c='orange', marker='x')
         # for i in range(X_norm.shape[0]):
