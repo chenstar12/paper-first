@@ -562,7 +562,7 @@ for i in range(userNum):
 
     user_iid_list.append(padding_ids(u_iids, u_pReviewLen, itemNum + 1))
 
-    blob = TextBlob(user_review2doc[i])
+    # blob = TextBlob(user_review2doc[i])
     # s_u.append(blob.polarity)
 
     doc2index = [word_index[w] for w in user_review2doc[i]]
