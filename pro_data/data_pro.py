@@ -604,7 +604,7 @@ for i in range(itemNum):
     i_reviewLen = []  # 待添加
     item_uid_list.append(padding_ids(i_uids, i_pReviewLen, userNum + 1))
 
-    blob = TextBlob(item_review2doc[i])
+    # blob = TextBlob(item_review2doc[i])
     # s_i.append(blob.polarity)
 
     doc2index = [word_index[w] for w in item_review2doc[i]]
