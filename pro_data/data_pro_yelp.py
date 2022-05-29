@@ -126,10 +126,12 @@ if __name__ == '__main__':
 
         uid = str(js['user_id'])
         iid = str(js['business_id'])
-        if uid not in du.keys():
-            continue
         print(uid)
         print(du.keys())
+        break
+        if uid not in du.keys():
+            continue
+
         reviews.append(js['text'])
         users_id.append(uid)
         items_id.append(iid)
