@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
         uid = str(js['user_id'])
         iid = str(js['business_id'])
-        if uid not in du.keys() or iid not in di.keys():
+        if uid not in du.keys() and iid not in di.keys():
             continue
         reviews.append(js['text'])
         users_id.append(uid)
