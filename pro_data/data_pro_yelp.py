@@ -128,7 +128,8 @@ if __name__ == '__main__':
         iid = str(js['business_id'])
         print(uid)
         print(du.keys())
-        break
+        print(uid not in du.keys())
+        continue
         if uid not in du.keys():
             continue
 
