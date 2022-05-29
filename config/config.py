@@ -158,25 +158,6 @@ class Video_Games_data_Config(DefaultConfig):
     item_num = 10672 + 2
 
 
-class Pet_Supplies_data_Config(DefaultConfig):
-
-    def __init__(self):
-        self.dataset = 'Pet_Supplies_data'
-        self.set_path('Pet_Supplies_data')
-
-    r_max_len = 95
-
-    u_max_r = 9
-    i_max_r = 22
-
-    train_data_size = 126283
-    test_data_size = 15777
-    val_data_size = 15776
-
-    user_num = 19856 + 2
-    item_num = 8510 + 2
-
-
 class Kindle_Store_data_Config(DefaultConfig):
 
     def __init__(self):
@@ -251,3 +232,22 @@ class Yelp_data_Config(DefaultConfig):
 
     user_num = 192403 + 2
     item_num = 63001 + 2
+
+
+class Pet_Supplies_data_Config(DefaultConfig):
+
+    def __init__(self):
+        self.dataset = 'Pet_Supplies_data'
+        self.set_path('Pet_Supplies_data')
+
+    r_max_len = 95
+
+    u_max_r = 9
+    i_max_r = 22
+
+    train_data_size = 126283
+    test_data_size = 15777
+    val_data_size = 15776
+
+    user_num = 19856 + 2
+    item_num = 8510 + 2
