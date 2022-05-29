@@ -75,7 +75,8 @@ if __name__ == '__main__':
     # vader待完成:
     compound = []
     analyzer = SentimentIntensityAnalyzer()
-    d = dict()
+    du = dict()
+    di = dict()
 
     for line in file:
         js = json.loads(line)
@@ -88,20 +89,30 @@ if __name__ == '__main__':
         try:
             uid = str(js['user_id'])
             iid = str(js['business_id'])
-            if (uid, iid) not in d.keys():
-                d[(uid, iid)] = 1
+            if uid not in du.keys():
+                du[uid] = 1
             else:
-                d[(uid, iid)] += 1
+                du[uid] += 1
+
+            if iid not in di.keys():
+                di[iid] = 1
+            else:
+                di[iid] += 1
         except:
             continue
 
     print('1. searching < 5 ..............................')
-    print(len(d))
-    for (u, i), v in d.copy().items():
+    print('du: ', len(du))
+    print('di: ', len(di))
+    for uid, v in du.copy().items():
         if v < 5:
-            d.pop((u, i))
+            du.pop(uid)
+    for iid, v in di.copy().items():
+        if v < 5:
+            di.pop(iid)
 
-    print(len(d))
+    print('after drop......du: ', len(du))
+    print('after drop......di: ', len(di))
     print('2. start processing ..............................')
 
     for line in file:
@@ -115,7 +126,7 @@ if __name__ == '__main__':
 
         uid = str(js['user_id'])
         iid = str(js['business_id'])
-        if (uid, iid) not in d.keys():
+        if uid not in du.keys() or iid not in di.keys():
             continue
         reviews.append(js['text'])
         users_id.append(uid)
@@ -130,6 +141,7 @@ if __name__ == '__main__':
         subj = int(subj * 10000)
         subjectivity.append(subj)
         compound.append(0)
+    print('3. finally.....................data len: ', len(users_id))
 
 data_frame = {'user_id': pd.Series(users_id), 'item_id': pd.Series(items_id),
               'ratings': pd.Series(ratings), 'reviews': pd.Series(reviews),
