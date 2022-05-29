@@ -25,7 +25,7 @@ def numerize(data):
 if __name__ == '__main__':
     logger = logging.getLogger('')
 
-    t01 = torch.zeros(1, 1).cuda()  # 防断gpu
+    # t01 = torch.zeros(1, 1).cuda()  # 防断gpu
 
     start_time = time.time()
     assert (len(sys.argv) >= 2)
@@ -104,12 +104,12 @@ if __name__ == '__main__':
     print('1. searching < 5 ..............................')
     print('du: ', len(du))
     print('di: ', len(di))
-    for uid, v in du.copy().items():
+    for ui, v in du.copy().items():
         if v < 5:
-            du.pop(uid)
-    for iid, v in di.copy().items():
+            du.pop(ui)
+    for ii, v in di.copy().items():
         if v < 5:
-            di.pop(iid)
+            di.pop(ii)
 
     print('after drop......du: ', len(du))
     print('after drop......di: ', len(di))
@@ -126,8 +126,10 @@ if __name__ == '__main__':
 
         uid = str(js['user_id'])
         iid = str(js['business_id'])
-        if uid not in du.keys() and iid not in di.keys():
+        if uid not in du.keys():
             continue
+        print(uid)
+        print(du.keys())
         reviews.append(js['text'])
         users_id.append(uid)
         items_id.append(iid)
