@@ -114,7 +114,7 @@ if __name__ == '__main__':
     print('after drop......du: ', len(du))
     print('after drop......di: ', len(di))
     print('2. start processing ..............................')
-
+    file = open(filename, errors='ignore')
     for line in file:
         js = json.loads(line)
         if str(js['user_id']) == 'unknown':
@@ -126,11 +126,10 @@ if __name__ == '__main__':
 
         uid = str(js['user_id'])
         iid = str(js['business_id'])
-        print(uid)
-        print(du.keys())
-        print(uid not in du.keys())
-        continue
+
         if uid not in du.keys():
+            continue
+        if iid not in di.keys():
             continue
 
         reviews.append(js['text'])
