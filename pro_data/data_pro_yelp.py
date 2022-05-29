@@ -242,7 +242,7 @@ x_test, y_test = extract(data_test)
 def extract_sentiment(data_dict):
     senti = []
     for i in data_dict.values:
-        senti.append([i[4], i[5], i[6]])
+        senti.append([i[4], i[5]])
     return senti
 
 
@@ -299,14 +299,14 @@ for i in data_train.values:  # 关键！！！用train set获取user_reviews_dic
         item_uid_dict[i[1]] = [i[0]]
     # sentiment:
     if i[0] not in user_sentiments_dict:
-        user_sentiments_dict[i[0]] = [[i[4], i[5], i[6]]]
+        user_sentiments_dict[i[0]] = [[i[4], i[5]]]
     else:
-        user_sentiments_dict[i[0]].append([i[4], i[5], i[6]])
+        user_sentiments_dict[i[0]].append([i[4], i[5]])
 
     if i[1] not in item_sentiments_dict:
-        item_sentiments_dict[i[1]] = [[i[4], i[5], i[6]]]
+        item_sentiments_dict[i[1]] = [[i[4], i[5]]]
     else:
-        item_sentiments_dict[i[1]].append([i[4], i[5], i[6]])
+        item_sentiments_dict[i[1]].append([i[4], i[5]])
 
 # np.save(f"{save_folder}/train/userReview2Sentiment.npy", user_sentiments_dict)
 # np.save(f"{save_folder}/train/itemReview2Sentiment.npy", item_sentiments_dict)
