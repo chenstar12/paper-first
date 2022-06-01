@@ -245,8 +245,8 @@ def predict(model, data_loader, opt):
         polarity_i = torch.tensor(polarity_i)
         polarity = polarity_i.sum(dim=1)  # item的总分（替代均值）
         _, idx = torch.sort(torch.tensor(polarity))  # 升序（neg在前）
-        neg_idx = idx[:500]
-        pos_idx = idx[-500:]
+        neg_idx = idx[:1000]
+        pos_idx = idx[-1000:]
 
         data = []
         y = []
