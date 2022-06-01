@@ -1,3 +1,5 @@
+import time
+
 index = range(10)
 
 import numpy as np
@@ -11,3 +13,7 @@ s= 'trans--'
 print(s[:5]=='trans')
 
 print(1e4)
+
+for i in range(10):
+    time.sleep(1)
+    print(i)
