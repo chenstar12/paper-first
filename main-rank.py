@@ -64,7 +64,17 @@ def train(**kwargs):
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
 
-    model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
+    path_checkpoint = '/content/drive/MyDrive/checkpoints/' + opt.model + '_' + opt.dataset + str(
+        int(opt.lambda1 * 100)) + '.pth'
+    if os.path.exists(path_checkpoint):
+        print('loading exist model......................')
+        checkpoint = torch.load(path_checkpoint)
+        model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
+        model.load_state_dict(checkpoint)
+    else:
+        print('new a model................................')
+        model = Model(opt, getattr(models, opt.model))  # opt.model: models文件夹的如DeepDoNN
+
     model.cuda()
 
     if model.net.num_fea != opt.num_fea:
@@ -120,7 +130,8 @@ def train(**kwargs):
             num_decline = 0  # early_stop 指标
             best_res = ndcg
             logger.info('current best_res: ' + str(best_res) + ', num_decline: ' + str(num_decline))
-            model.save(name=opt.dataset, opt=opt.print_opt)
+            torch.save(model.state_dict(), path_checkpoint)
+            # model.save(name=opt.dataset, opt=opt.print_opt)
             logger.info("model save")
         else:
             num_decline += 1
