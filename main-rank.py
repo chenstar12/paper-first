@@ -35,9 +35,6 @@ def collate_fn_eval(batch):
 
 
 def train(**kwargs):
-    # torch.backends.cudnn.benchmark = True
-    # torch.backends.cudnn.deterministic = True
-
     if 'dataset' not in kwargs:
         opt = getattr(config, 'Video_Games_data_Config')()
     else:
@@ -58,14 +55,11 @@ def train(**kwargs):
                 'r_id_merge: ' + opt.r_id_merge + '\n' + 'ui_merge: ' + opt.ui_merge + '\n' +
                 'output: ' + opt.output + '\n' + 'lr: ' + str(opt.lr) + '\n' + 'lambda1: ' +
                 str(opt.lambda1) + '\n' + 'inference: ' + str(opt.inference))
-    # logger.info('\n' + 'lambda1C: ' + str(opt.lambda1C) + '\n' + 'lambda2C: ' +
-    #             str(opt.lambda2C))
 
     random.seed(opt.seed)
     np.random.seed(opt.seed)
     torch.manual_seed(opt.seed)
-    if opt.use_gpu:
-        torch.cuda.manual_seed_all(opt.seed)
+    torch.cuda.manual_seed_all(opt.seed)
 
     if len(opt.gpu_ids) == 0 and opt.use_gpu:
         torch.cuda.set_device(opt.gpu_id)
@@ -207,13 +201,14 @@ def predict_ranking(model, data_loader, opt):
 
             # print('Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
 
-
         data_len = len(data_loader.dataset)
         precision = precision / data_len
         recall = recall / data_len
         ndcg = ndcg / data_len
 
         logger.info(
+            'Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
+        print(
             'Precision: {:.4f}, Recall: {:.4f}, NDCG: {:.4f}, Diversity: {}'.format(precision, recall, ndcg, diversity))
         model.train()
         opt.stage = 'train'

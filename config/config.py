@@ -76,7 +76,7 @@ class DefaultConfig:
 
     stage = 'train'  # 模仿clickbait：在评估阶段（test和validation）进行微调
     # topk = [5, 10, 50, 100]  # 排序指标 ---- 与原论文一致
-    topk = 5  # 排序指标 ---- 与原论文一致
+    topk = 50  # 排序指标 ---- 与原论文一致
     index = range(128)  # 用于获取ui-sentiment
 
     def set_path(self, name):
